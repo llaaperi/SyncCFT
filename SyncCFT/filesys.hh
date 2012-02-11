@@ -9,6 +9,9 @@
 #ifndef SyncCFT_filesys_hh
 #define SyncCFT_filesys_hh
 
+#define FT_FILE     8
+#define FT_FOLDER   4
+
 void info(void);
 
 #endif

@@ -26,8 +26,31 @@ void info(void) {
     if (directory != NULL)
         {
         while ((entry = readdir(directory))) {
+            
+            // Skip . and ..
+            if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+                continue;
+            
             stat(entry->d_name, &stats);
-            cout << "Name: " << entry->d_name << "\nType: " << (int)entry->d_type << "\nSize: " << stats.st_size << endl << "---" << endl;
+            cout << "Name: " << entry->d_name << endl;
+            
+            // Check file type
+            string typeStr;
+            int type = (int)entry->d_type; 
+            switch (type) {
+                case FT_FILE:
+                    typeStr = "file";
+                    break;
+                case FT_FOLDER:
+                    typeStr = "folder";
+                    break;
+                default:
+                    typeStr = "unknown";
+                    break;
+            }
+            cout << "Type: " << typeStr << endl;
+            
+            cout << "Size: " << stats.st_size << endl << "---" << endl;
         }
         (void) closedir (directory);
         }
