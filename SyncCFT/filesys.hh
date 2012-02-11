@@ -12,6 +12,8 @@
 #define FT_FILE     8
 #define FT_FOLDER   4
 
+#define METAFILE ".sync.cft"
+
 void info(void);
 
 #endif

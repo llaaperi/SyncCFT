@@ -7,7 +7,15 @@
 //
 
 #include <iostream>
+#include <fstream>
+#include <list>
+#include <ctime>
+
+#include <openssl/md5.h>
+
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
@@ -21,10 +29,42 @@ void info(void) {
     DIR *directory;
     struct dirent *entry;
     struct stat stats;
+    fstream metafile;
+    list<string> metadata;
+    
     
     directory = opendir ("./");
-    if (directory != NULL)
-        {
+    if (directory != NULL) {
+        
+        // Try to open directory metafile
+        metafile.open(METAFILE);
+        if (metafile.is_open()) { // Old metafile found
+            cout << "Old metafile found" << endl;
+            
+            // Read configuration file line by line
+            string line;
+            while (getline(metafile, line)) {
+                cout << "Metafile: " << line << endl;
+                // Save data into an array
+                metadata.push_back(line);
+            }
+            metafile.close();
+            
+            
+        } else { // No metafile found
+            cout << "No metafile found" << endl;
+            metafile.open(METAFILE, fstream::out);
+            if (metafile.is_open()) { // Old metafile found
+                cout << "Opened new metafile" << endl;
+                metafile << "SEKALAISTA DATAAAAAAAA" << endl;
+                metafile.close();
+            }
+            
+            
+            
+            
+        }
+        
         while ((entry = readdir(directory))) {
             
             // Skip . and ..
@@ -33,6 +73,20 @@ void info(void) {
             
             stat(entry->d_name, &stats);
             cout << "Name: " << entry->d_name << endl;
+            time_t seconds;
+            seconds = time(NULL);
+            cout << "Time: " << seconds << endl;
+            
+            // MD5 hash
+            unsigned char result[MD5_DIGEST_LENGTH];
+            const char* str = "Test sentenc";
+            MD5((const unsigned char *)str,strlen(str),result);
+            
+            // output
+            cout << "Hash: ";
+            for(int i = 0; i < MD5_DIGEST_LENGTH; i++)
+                printf("%02x", result[i]);
+            printf("\n");
             
             // Check file type
             string typeStr;
