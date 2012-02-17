@@ -8,14 +8,17 @@
 
 #include <iostream>
 
-#include "filesys.hh"
+#include "metafile.hh"
+
+#define METAFILE ".sync.cft"
 
 int main (int argc, const char * argv[])
 {
     std::cout << "*** SyncCTF launched ***" << std::endl;
     
     //Print folder info
-    info();
+    MetaFile mFile(METAFILE);
+    mFile.print();
     
     return 0;
 }

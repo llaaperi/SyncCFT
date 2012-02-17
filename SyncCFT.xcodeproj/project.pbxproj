@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		906FAC2814E5C5A000D78FF6 /* filesys.cc in Sources */ = {isa = PBXBuildFile; fileRef = 906FAC2714E5C5A000D78FF6 /* filesys.cc */; };
+		906FAC2814E5C5A000D78FF6 /* metafile.cc in Sources */ = {isa = PBXBuildFile; fileRef = 906FAC2714E5C5A000D78FF6 /* metafile.cc */; };
 		966F0F9614E5AADB007FB278 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966F0F9514E5AADB007FB278 /* main.cc */; };
 		966F0F9814E5AADB007FB278 /* SyncCFT.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 966F0F9714E5AADB007FB278 /* SyncCFT.1 */; };
 /* End PBXBuildFile section */
@@ -26,8 +26,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		906FAC2714E5C5A000D78FF6 /* filesys.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = filesys.cc; sourceTree = "<group>"; };
-		906FAC2914E5C5B900D78FF6 /* filesys.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = filesys.hh; sourceTree = "<group>"; };
+		906FAC2714E5C5A000D78FF6 /* metafile.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = metafile.cc; sourceTree = "<group>"; };
+		906FAC2914E5C5B900D78FF6 /* metafile.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = metafile.hh; sourceTree = "<group>"; };
 		966F0F9114E5AADB007FB278 /* SyncCFT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SyncCFT; sourceTree = BUILT_PRODUCTS_DIR; };
 		966F0F9514E5AADB007FB278 /* main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
 		966F0F9714E5AADB007FB278 /* SyncCFT.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = SyncCFT.1; sourceTree = "<group>"; };
@@ -64,8 +64,8 @@
 			isa = PBXGroup;
 			children = (
 				966F0F9514E5AADB007FB278 /* main.cc */,
-				906FAC2714E5C5A000D78FF6 /* filesys.cc */,
-				906FAC2914E5C5B900D78FF6 /* filesys.hh */,
+				906FAC2714E5C5A000D78FF6 /* metafile.cc */,
+				906FAC2914E5C5B900D78FF6 /* metafile.hh */,
 				966F0F9714E5AADB007FB278 /* SyncCFT.1 */,
 			);
 			path = SyncCFT;
@@ -97,7 +97,7 @@
 		966F0F8814E5AADB007FB278 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0430;
 				ORGANIZATIONNAME = student;
 			};
 			buildConfigurationList = 966F0F8B14E5AADB007FB278 /* Build configuration list for PBXProject "SyncCFT" */;
@@ -123,7 +123,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				966F0F9614E5AADB007FB278 /* main.cc in Sources */,
-				906FAC2814E5C5A000D78FF6 /* filesys.cc in Sources */,
+				906FAC2814E5C5A000D78FF6 /* metafile.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
