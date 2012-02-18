@@ -18,27 +18,29 @@
 
 using namespace std;
 
-class File {
+class Element {
+    string mName;  
+    int mSize;
+    string mHash;
+    int mTimestamp;  
+    
 public:
+    string getName() const {return mName;}
+    void setName(string const& newName) {mName = newName;}
+    size_t getSize() const {return mSize;}
+    void setSize(size_t const size) {mSize = size;}
+    string getHash() const {return mHash;}
+    void setHash(string const& newHash) {mHash = newHash;}
+    time_t getTimeStamp() const {return mTimestamp;}
+    void setTimeStamp(time_t const timestamp) {mTimestamp = timestamp;}
     
 
-    string getName() const {return name;}
-    void setName(string const& newName) {name = newName;}
-    size_t getSize() const {return size;}
-    void setSize(size_t const newSize) {size = newSize;}
-    string getHash() const {return hash;}
-    void setHash(string const& newHash) {hash = newHash;}
-    time_t getTimeStamp() const {return timestamp;}
-    void setTimeStamp(time_t const newTime) {timestamp = newTime;}
-    
-private:
-    string name;  
-    int size;
-    string hash;
-    int timestamp;
 };
 
-class MetaFile {
+class MetaFile {    
+    const string fileName;
+    fstream metafile;
+    list<Element> metadata;
     
 public:
     
@@ -48,22 +50,22 @@ public:
     /*
      * Find file
      */
-    bool find(string const& name, File& file);
+    bool find(string const& name, Element& file);
     
     /*
      * Find file
      */
-    File& find2(string const& name, File& file);
+    Element& find2(string const& name, Element& file);
     
     /*
      * Convert string to File
      */
-    bool strToFile(string const& line, File& file);
+    bool strToFile(string const& line, Element& file);
     
     /*
      * Convert File to string
      */
-    string fileToStr(File const& file) const;
+    string fileToStr(Element const& file) const;
     
     /* Calculates 16-byte MD5 hash from the given file
      * @param filename Name of the file
@@ -93,15 +95,11 @@ public:
      */
     void print(void) const;
     
-    
 private:
     // Rule of three
     MetaFile(MetaFile const& other);
     MetaFile& operator=(MetaFile const& other);
-    
-    const string fileName;
-    fstream metafile;
-    list<File> metadata;
+
 };
 
 

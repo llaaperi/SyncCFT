@@ -43,8 +43,8 @@ MetaFile::MetaFile(string fName) : fileName(fName) {
 /*
  * Find file
  */
- bool MetaFile::find(string const& name, File& file) {
-    for (list<File>::iterator iter = metadata.begin(); iter != metadata.end(); iter++) {
+ bool MetaFile::find(string const& name, Element& file) {
+    for (list<Element>::iterator iter = metadata.begin(); iter != metadata.end(); iter++) {
         if (iter->getName() == name) {
             file = *iter;
             return true;
@@ -56,8 +56,8 @@ MetaFile::MetaFile(string fName) : fileName(fName) {
 /*
  * Find file
  */
-File& MetaFile::find2(string const& name, File& file) {
-    for (list<File>::iterator iter = metadata.begin(); iter != metadata.end(); iter++) {
+Element& MetaFile::find2(string const& name, Element& file) {
+    for (list<Element>::iterator iter = metadata.begin(); iter != metadata.end(); iter++) {
         if (iter->getName() == name) {
             return *iter;
         }
@@ -68,7 +68,7 @@ File& MetaFile::find2(string const& name, File& file) {
 /*
  * Convert string to File
  */
-bool MetaFile::strToFile(string const& line, File& file) {
+bool MetaFile::strToFile(string const& line, Element& file) {
     vector<string> splitted;
     if(Utilities::split(line, ";", splitted) != 4)
         return false;
@@ -82,7 +82,7 @@ bool MetaFile::strToFile(string const& line, File& file) {
 /*
  * Convert File to string
  */
-string MetaFile::fileToStr(File const& file) const{
+string MetaFile::fileToStr(Element const& file) const{
     ostringstream line;
     line << file.getName() << ";" << file.getSize() << ";" << file.getHash() << ";" << file.getTimeStamp();
     return line.str();
@@ -132,7 +132,7 @@ void MetaFile::read(void) {
         
         // Read configuration file line by line and save data into an array
         while (getline(metafile, line)) {
-            File newFile;
+            Element newFile;
             if(strToFile(line, newFile))
                 metadata.push_back(newFile);
         }
@@ -146,7 +146,7 @@ void MetaFile::read(void) {
 bool MetaFile::write(void) {
     metafile.open(fileName.c_str(), fstream::out | fstream::trunc);
     if (metafile.is_open()) {
-        for (list<File>::const_iterator iter = metadata.begin(); iter != metadata.end(); iter++)
+        for (list<Element>::const_iterator iter = metadata.begin(); iter != metadata.end(); iter++)
             metafile << fileToStr(*iter) << endl;
         metafile.close();
         return true;
@@ -161,14 +161,14 @@ bool MetaFile::update(void) {
     DIR *directory;
     struct dirent *entry;
     struct stat stats;
-    list<File> newData;
+    list<Element> newData;
     
     directory = opendir ("./");
     if (directory != NULL) {
         
         // Loop through each entry in the given directory
         while ((entry = readdir(directory))) {
-            File newFile;            
+            Element newFile;            
             // Skip '.', '..' and hidden files
             if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0 || entry->d_name[0] == '.')
                 continue;
@@ -193,7 +193,7 @@ bool MetaFile::update(void) {
                 newFile.setTimeStamp(time(NULL));
                 
                 // Check if data already exists and update only changed files
-                File oldFile;
+                Element oldFile;
                 if (find(newFile.getName(), oldFile)) {
                     if (newFile.getHash() == oldFile.getHash())
                         newData.push_back(oldFile);
@@ -223,7 +223,7 @@ bool MetaFile::update(void) {
  * Print metadata
  */
 void MetaFile::print(void) const{
-    for (list<File>::const_iterator iter = metadata.begin(); iter != metadata.end(); iter++) {
+    for (list<Element>::const_iterator iter = metadata.begin(); iter != metadata.end(); iter++) {
         cout << fileToStr(*iter) << endl;
     }
 }

@@ -7,8 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D5CAC9D14EFE1CD006CDCD6 /* networking.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0D5CAC9B14EFE1CD006CDCD6 /* networking.cc */; };
 		90487DEF14EF0A7B006505C2 /* utilities.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90487DEE14EF0A7B006505C2 /* utilities.cc */; };
-		906FAC2814E5C5A000D78FF6 /* metafile.cc in Sources */ = {isa = PBXBuildFile; fileRef = 906FAC2714E5C5A000D78FF6 /* metafile.cc */; };
+		906FAC2814E5C5A000D78FF6 /* Metafile.cc in Sources */ = {isa = PBXBuildFile; fileRef = 906FAC2714E5C5A000D78FF6 /* Metafile.cc */; };
 		966F0F9614E5AADB007FB278 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966F0F9514E5AADB007FB278 /* main.cc */; };
 		966F0F9814E5AADB007FB278 /* SyncCFT.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 966F0F9714E5AADB007FB278 /* SyncCFT.1 */; };
 /* End PBXBuildFile section */
@@ -27,10 +28,16 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0D5CAC9714EFE155006CDCD6 /* Server.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Server.hh; sourceTree = "<group>"; };
+		0D5CAC9814EFE160006CDCD6 /* Client.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Client.hh; sourceTree = "<group>"; };
+		0D5CAC9914EFE16A006CDCD6 /* Message.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Message.hh; sourceTree = "<group>"; };
+		0D5CAC9A14EFE1B3006CDCD6 /* Transceiver.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Transceiver.hh; sourceTree = "<group>"; };
+		0D5CAC9B14EFE1CD006CDCD6 /* networking.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = networking.cc; sourceTree = "<group>"; };
+		0D5CAC9C14EFE1CD006CDCD6 /* networking.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = networking.hh; sourceTree = "<group>"; };
 		90487DEC14EF0A67006505C2 /* utilities.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utilities.hh; sourceTree = "<group>"; };
 		90487DEE14EF0A7B006505C2 /* utilities.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utilities.cc; sourceTree = "<group>"; };
-		906FAC2714E5C5A000D78FF6 /* metafile.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = metafile.cc; sourceTree = "<group>"; };
-		906FAC2914E5C5B900D78FF6 /* metafile.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = metafile.hh; sourceTree = "<group>"; };
+		906FAC2714E5C5A000D78FF6 /* Metafile.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Metafile.cc; sourceTree = "<group>"; };
+		906FAC2914E5C5B900D78FF6 /* Metafile.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Metafile.hh; sourceTree = "<group>"; };
 		966F0F9114E5AADB007FB278 /* SyncCFT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SyncCFT; sourceTree = BUILT_PRODUCTS_DIR; };
 		966F0F9514E5AADB007FB278 /* main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
 		966F0F9714E5AADB007FB278 /* SyncCFT.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = SyncCFT.1; sourceTree = "<group>"; };
@@ -66,11 +73,17 @@
 		966F0F9414E5AADB007FB278 /* SyncCFT */ = {
 			isa = PBXGroup;
 			children = (
+				0D5CAC9B14EFE1CD006CDCD6 /* networking.cc */,
+				0D5CAC9C14EFE1CD006CDCD6 /* networking.hh */,
 				966F0F9514E5AADB007FB278 /* main.cc */,
-				906FAC2714E5C5A000D78FF6 /* metafile.cc */,
-				906FAC2914E5C5B900D78FF6 /* metafile.hh */,
+				906FAC2714E5C5A000D78FF6 /* Metafile.cc */,
+				906FAC2914E5C5B900D78FF6 /* Metafile.hh */,
 				90487DEC14EF0A67006505C2 /* utilities.hh */,
 				90487DEE14EF0A7B006505C2 /* utilities.cc */,
+				0D5CAC9714EFE155006CDCD6 /* Server.hh */,
+				0D5CAC9814EFE160006CDCD6 /* Client.hh */,
+				0D5CAC9914EFE16A006CDCD6 /* Message.hh */,
+				0D5CAC9A14EFE1B3006CDCD6 /* Transceiver.hh */,
 				966F0F9714E5AADB007FB278 /* SyncCFT.1 */,
 			);
 			path = SyncCFT;
@@ -128,8 +141,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				966F0F9614E5AADB007FB278 /* main.cc in Sources */,
-				906FAC2814E5C5A000D78FF6 /* metafile.cc in Sources */,
+				906FAC2814E5C5A000D78FF6 /* Metafile.cc in Sources */,
 				90487DEF14EF0A7B006505C2 /* utilities.cc in Sources */,
+				0D5CAC9D14EFE1CD006CDCD6 /* networking.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
