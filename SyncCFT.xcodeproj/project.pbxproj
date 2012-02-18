@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		90487DEF14EF0A7B006505C2 /* utilities.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90487DEE14EF0A7B006505C2 /* utilities.cc */; };
 		906FAC2814E5C5A000D78FF6 /* metafile.cc in Sources */ = {isa = PBXBuildFile; fileRef = 906FAC2714E5C5A000D78FF6 /* metafile.cc */; };
 		966F0F9614E5AADB007FB278 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966F0F9514E5AADB007FB278 /* main.cc */; };
 		966F0F9814E5AADB007FB278 /* SyncCFT.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 966F0F9714E5AADB007FB278 /* SyncCFT.1 */; };
@@ -26,6 +27,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		90487DEC14EF0A67006505C2 /* utilities.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utilities.hh; sourceTree = "<group>"; };
+		90487DEE14EF0A7B006505C2 /* utilities.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utilities.cc; sourceTree = "<group>"; };
 		906FAC2714E5C5A000D78FF6 /* metafile.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = metafile.cc; sourceTree = "<group>"; };
 		906FAC2914E5C5B900D78FF6 /* metafile.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = metafile.hh; sourceTree = "<group>"; };
 		966F0F9114E5AADB007FB278 /* SyncCFT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SyncCFT; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -67,6 +70,8 @@
 				906FAC2714E5C5A000D78FF6 /* metafile.cc */,
 				906FAC2914E5C5B900D78FF6 /* metafile.hh */,
 				966F0F9714E5AADB007FB278 /* SyncCFT.1 */,
+				90487DEC14EF0A67006505C2 /* utilities.hh */,
+				90487DEE14EF0A7B006505C2 /* utilities.cc */,
 			);
 			path = SyncCFT;
 			sourceTree = "<group>";
@@ -124,6 +129,7 @@
 			files = (
 				966F0F9614E5AADB007FB278 /* main.cc in Sources */,
 				906FAC2814E5C5A000D78FF6 /* metafile.cc in Sources */,
+				90487DEF14EF0A7B006505C2 /* utilities.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

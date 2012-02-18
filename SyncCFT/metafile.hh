@@ -18,6 +18,25 @@
 
 using namespace std;
 
+class File {
+public:
+    
+
+    string getName() const {return name;}
+    void setName(string const& newName) {name = newName;}
+    size_t getSize() const {return size;}
+    void setSize(size_t const newSize) {size = newSize;}
+    string getHash() const {return hash;}
+    void setHash(string const& newHash) {hash = newHash;}
+    time_t getTimeStamp() const {return timestamp;}
+    void setTimeStamp(time_t const newTime) {timestamp = newTime;}
+    
+private:
+    string name;  
+    int size;
+    string hash;
+    int timestamp;
+};
 
 class MetaFile {
     
@@ -25,6 +44,21 @@ public:
     
     MetaFile(string fName);
     ~MetaFile(){}
+    
+    /*
+     * Find file
+     */
+    bool find(string const& name, File& file);
+    
+    /*
+     * Convert string to File
+     */
+    bool strToFile(string const& line, File& file);
+    
+    /*
+     * Convert File to string
+     */
+    string fileToStr(File const& file) const;
     
     /* Calculates 16-byte MD5 hash from the given file
      * @param filename Name of the file
@@ -50,7 +84,7 @@ public:
     bool update(void);
     
     /*
-     * Prints the contents of the metatile
+     * Print metadata
      */
     void print(void) const;
     
@@ -62,7 +96,7 @@ private:
     
     const string fileName;
     fstream metafile;
-    list<string> metadata;
+    list<File> metadata;
 };
 
 

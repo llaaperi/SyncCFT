@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 #include <ctime>
 
@@ -24,6 +25,7 @@
 #include <unistd.h>
 
 #include "metafile.hh"
+#include "utilities.hh"
 
 
 MetaFile::MetaFile(string fName) : fileName(fName) {
@@ -31,13 +33,48 @@ MetaFile::MetaFile(string fName) : fileName(fName) {
     // Read metadata file
     read();
     
-    // Update metafile
+    // Update metadata
     update();
+    
+    // Save changes to metafile
+    write();
 }
 
+/*
+ * Find file
+ */
+ bool MetaFile::find(string const& name, File& file) {
+    for (list<File>::iterator iter = metadata.begin(); iter != metadata.end(); iter++) {
+        if (iter->getName() == name) {
+            file = *iter;
+            return true;
+        }
+    }
+    return false;
+}
 
+/*
+ * Convert string to File
+ */
+bool MetaFile::strToFile(string const& line, File& file) {
+    vector<string> splitted;
+    if(Utilities::split(line, ";", splitted) != 4)
+        return false;
+    file.setName(splitted[0]);
+    file.setSize(atoi(splitted[1].c_str()));
+    file.setHash(splitted[2]);
+    file.setTimeStamp(atoi(splitted[3].c_str()));
+    return true;
+}
 
-
+/*
+ * Convert File to string
+ */
+string MetaFile::fileToStr(File const& file) const{
+    ostringstream line;
+    line << file.getName() << ";" << file.getSize() << ";" << file.getHash() << ";" << file.getTimeStamp();
+    return line.str();
+}
 
 /* Calculates 16-byte MD5 hash from the given file
  * @param filename Name of the file
@@ -82,8 +119,11 @@ void MetaFile::read(void) {
         cout << "Metafile found" << endl;
         
         // Read configuration file line by line and save data into an array
-        while (getline(metafile, line))
-            metadata.push_back(line);
+        while (getline(metafile, line)) {
+            File newFile;
+            if(strToFile(line, newFile))
+                metadata.push_back(newFile);
+        }
         metafile.close();   
     }   
 }
@@ -94,8 +134,8 @@ void MetaFile::read(void) {
 bool MetaFile::write(void) {
     metafile.open(fileName.c_str(), fstream::out | fstream::trunc);
     if (metafile.is_open()) {
-        for (list<string>::const_iterator iter = metadata.begin(); iter != metadata.end(); iter++)
-            metafile << *iter << endl;
+        for (list<File>::const_iterator iter = metadata.begin(); iter != metadata.end(); iter++)
+            metafile << fileToStr(*iter) << endl;
         metafile.close();
         return true;
     } else
@@ -109,19 +149,17 @@ bool MetaFile::update(void) {
     DIR *directory;
     struct dirent *entry;
     struct stat stats;
-    list<string> newData;
+    list<File> newData;
     
     directory = opendir ("./");
     if (directory != NULL) {
         
         // Loop through each entry in the given directory
         while ((entry = readdir(directory))) {
-            ostringstream metaline;
-            
+            File newFile;            
             // Skip '.', '..' and hidden files
             if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0 || entry->d_name[0] == '.')
                 continue;
-            
             // Obtain file information
             if (stat(entry->d_name, &stats) < 0)
                 continue;
@@ -130,26 +168,28 @@ bool MetaFile::update(void) {
             int type = (int)entry->d_type;
 
             if (type == FT_FILE) {
-                //cout << "Name: " << entry->d_name << endl;
-                metaline << entry->d_name << ";";
-                
-                //cout << "Size: " << stats.st_size << endl;
-                metaline << stats.st_size << ";";
-                
+                // Filename
+                newFile.setName(entry->d_name);
+                // File size
+                newFile.setSize(stats.st_size);
+                // MD5 hash
                 string fileHash;
                 if(!MD5Hash(entry->d_name, stats.st_size,fileHash))
                     continue;
-                //cout << "Hash: " << fileHash << endl;
-                metaline << fileHash << ";";
+                newFile.setHash(fileHash);
+                // Timestamp
+                newFile.setTimeStamp(time(NULL));
                 
-                time_t seconds;
-                seconds = time(NULL);
-                //cout << "Time: " << seconds << endl;
-                metaline << seconds;
-                
-                newData.push_back(metaline.str());
-                
-                cout << metaline.str() << endl;
+                // Check if data already exists and update only changed files
+                File oldFile;
+                if (find(newFile.getName(), oldFile)) {
+                    if (newFile.getHash() == oldFile.getHash())
+                        newData.push_back(oldFile);
+                    else if (newFile.getTimeStamp() <= oldFile.getTimeStamp())
+                        newData.push_back(oldFile);
+                    else
+                        newData.push_back(newFile);
+                }     
             } else if (FT_FOLDER) {
                 //cout << "Skip folder" << endl;
             } else
@@ -157,7 +197,7 @@ bool MetaFile::update(void) {
         }
         (void) closedir (directory);
         metadata = newData;
-        return write();     
+        return true;     
     }
     else {
         perror ("Couldn't open the directory");
@@ -166,10 +206,10 @@ bool MetaFile::update(void) {
 }
 
 /*
- * Print the contents of the metatile
+ * Print metadata
  */
 void MetaFile::print(void) const{
-    for (list<string>::const_iterator iter = metadata.begin(); iter != metadata.end(); iter++) {
-        cout << *iter << endl;
+    for (list<File>::const_iterator iter = metadata.begin(); iter != metadata.end(); iter++) {
+        cout << fileToStr(*iter) << endl;
     }
 }
