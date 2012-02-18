@@ -19,7 +19,11 @@ int main (int argc, const char * argv[])
     //Print folder info
     MetaFile mFile(METAFILE);
     mFile.print();
-    
+    File asd;
+    /*if (mFile.find("SyncCFT", asd)) {
+        asd.setName("UGGABUGGA");
+        mFile.print();
+    }*/   
     return 0;
 }
 

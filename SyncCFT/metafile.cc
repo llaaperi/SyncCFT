@@ -54,6 +54,18 @@ MetaFile::MetaFile(string fName) : fileName(fName) {
 }
 
 /*
+ * Find file
+ */
+File& MetaFile::find2(string const& name, File& file) {
+    for (list<File>::iterator iter = metadata.begin(); iter != metadata.end(); iter++) {
+        if (iter->getName() == name) {
+            return *iter;
+        }
+    }
+    return file;
+}
+
+/*
  * Convert string to File
  */
 bool MetaFile::strToFile(string const& line, File& file) {
@@ -189,7 +201,9 @@ bool MetaFile::update(void) {
                         newData.push_back(oldFile);
                     else
                         newData.push_back(newFile);
-                }     
+                    continue;
+                }
+                newData.push_back(newFile);
             } else if (FT_FOLDER) {
                 //cout << "Skip folder" << endl;
             } else

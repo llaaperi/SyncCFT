@@ -51,6 +51,11 @@ public:
     bool find(string const& name, File& file);
     
     /*
+     * Find file
+     */
+    File& find2(string const& name, File& file);
+    
+    /*
      * Convert string to File
      */
     bool strToFile(string const& line, File& file);
