@@ -34,7 +34,6 @@ public:
     time_t getTimeStamp() const {return mTimestamp;}
     void setTimeStamp(time_t const timestamp) {mTimestamp = timestamp;}
     
-
 };
 
 class MetaFile {    
@@ -43,29 +42,29 @@ class MetaFile {
     list<Element> metadata;
     
 public:
+    list<Element>& getData() {return metadata;};
+
     
     MetaFile(string fName);
     ~MetaFile(){}
     
     /*
-     * Find file
+     * Find element
+     * @param name Name of the element
+     * @param found Success status of search
+     * @return Reference to the found element
      */
-    bool find(string const& name, Element& file);
+    Element& find(string const& name, bool& found);
     
     /*
-     * Find file
+     * Convert string to Element
      */
-    Element& find2(string const& name, Element& file);
+    bool strToElement(string const& line, Element& file);
     
     /*
-     * Convert string to File
+     * Convert Element to string
      */
-    bool strToFile(string const& line, Element& file);
-    
-    /*
-     * Convert File to string
-     */
-    string fileToStr(Element const& file) const;
+    string elementToStr(Element const& file) const;
     
     /* Calculates 16-byte MD5 hash from the given file
      * @param filename Name of the file
@@ -88,7 +87,7 @@ public:
     /*
      * Updates the contents of metafile and metadata
      */
-    bool update(void);
+    bool updateAll(void);
     
     /*
      * Print metadata

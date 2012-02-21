@@ -19,19 +19,11 @@ int main (int argc, const char * argv[])
     //Print folder info
     MetaFile mFile(METAFILE);
     mFile.print();
-    Element asd;
-    /*if (mFile.find("SyncCFT", asd)) {
-        asd.setName("UGGABUGGA");
-        mFile.print();
-    }*/ 
-    
     
     // Start client first
     
     
     // Pass reference to client object to the server
-    
-
     
     
     return 0;
