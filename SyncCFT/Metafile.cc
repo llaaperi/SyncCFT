@@ -99,6 +99,7 @@ bool MetaFile::MD5Hash(string const& filename, long const length, string& hash) 
     // Map file to memory
     fileBuf = (char*)mmap(0, length, PROT_READ, MAP_SHARED, fd, 0);
     MD5((unsigned char*)fileBuf, length, result);
+    munmap(fileBuf, length);
     close(fd);
     
     // Convert hash to string

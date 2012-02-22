@@ -1,6 +1,9 @@
 //
 //  networking.hh
-//  RadioStreamer
+//  SyncCFT
+//
+//  Created by Elo Matias on 18.2.2012.
+//  Copyright (c) 2012 student. All rights reserved.
 //
 
 #ifndef RadioStreamer_networking_hh
@@ -8,6 +11,8 @@
 
 #include <string>
 #include <list>
+
+#include <netinet/in.h>
 
 #define NETWORKING_MTU 1500
 #define TIMEOUT 5
@@ -25,42 +30,40 @@ namespace Networking {
     void* getAddr(struct sockaddr* address);
     
     /*
-     * Creates a socket for waiting incoming client connections
-     * @param port, Port number to be used
+     * Creates an UDP socket for incoming client connections
+     * @param port Port number to be used
      * @return Socket to be listened
      */
     int createServerSocket(string port);
-    
-    int createUDPSocket(string port);
-	
-        // Connect to the shoutcast server
-    int connectTCP(string address, string port);
 
-        // Create client socket
-    int connectUDP(string address, string port);
-    
-        // TCP receiving method with timeout
-    int receiveTCP(int socketFd, int max_len, char* reply);
-    
     /*
-     * Receives message from a given socket
-     * @param socketFd, socket from which to receive message
-     * @param message, Message to be sent
-     * @param cliAddr, Structure for storin client address info
-     * @return Received message string
+     * Creates an UDP socket to a remote server
+     * @param address Server address to connect
+     * @param port Server port number
+     * @return File descriptor to the created socket
      */
-    int receiveMessage(int socketFd, string& message, struct sockaddr_in* cliAddr);
+    int createClientSocket(string address, string port);
     
     /*
-     * Send message to given socket
-     * @param socketFd, TCP socket to send message
-     * @param message, Message to be sent
+     * Receive message from a given socket
+     * @param socketFd socket from which to receive message
+     * @param buffer Data buffer for storing received packets
+     * @param cliAddr Structure for storing received address info
+     * @return Number of bytes received
+     */
+    int receivePacket(int socketFd, char* buffer, struct sockaddr_in* cliAddr);
+    
+    /*
+     * Send message to a given socket
+     * @param socketFd socket to which message is sent
+     * @param data Message to be sent
+     * @param length Size of the message
+     * @param cliAddr Structure for storing target address info
      * @return Number of bytes sent
      */
-    int sendMessage(int socketFd, string message);
+    int sendPacket(int socketFd, char* data,int length, struct sockaddr_in* cliAddr);
+
 }
-
-
-
+    
 
 #endif
