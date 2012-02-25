@@ -9,6 +9,13 @@
 #include <iostream>
 
 #include "Metafile.hh"
+#include "networking.hh"
+
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 
 #define METAFILE ".sync.cft"
 
@@ -19,6 +26,7 @@ int main (int argc, const char * argv[])
     //Print folder info
     MetaFile mFile(METAFILE);
     mFile.print();
+    
     
     // Start client first
     

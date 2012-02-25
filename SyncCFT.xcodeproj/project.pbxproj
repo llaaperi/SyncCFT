@@ -9,12 +9,27 @@
 /* Begin PBXBuildFile section */
 		0D5CAC9D14EFE1CD006CDCD6 /* networking.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0D5CAC9B14EFE1CD006CDCD6 /* networking.cc */; };
 		90487DEF14EF0A7B006505C2 /* utilities.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90487DEE14EF0A7B006505C2 /* utilities.cc */; };
+		906B8BC414F94EBB0038163D /* UnitTests.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 906B8BC314F94EBB0038163D /* UnitTests.1 */; };
+		906B8BC814F94F090038163D /* gtest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 906B8BB414F94E7D0038163D /* gtest.framework */; };
+		906B8BD814F957B40038163D /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 906B8BD714F957B40038163D /* main.cc */; };
+		906B8BDC14F959B90038163D /* networking_unittest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 906B8BDB14F959B90038163D /* networking_unittest.cc */; };
+		906B8BDD14F95BB70038163D /* networking.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0D5CAC9B14EFE1CD006CDCD6 /* networking.cc */; };
 		906FAC2814E5C5A000D78FF6 /* Metafile.cc in Sources */ = {isa = PBXBuildFile; fileRef = 906FAC2714E5C5A000D78FF6 /* Metafile.cc */; };
 		966F0F9614E5AADB007FB278 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966F0F9514E5AADB007FB278 /* main.cc */; };
 		966F0F9814E5AADB007FB278 /* SyncCFT.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 966F0F9714E5AADB007FB278 /* SyncCFT.1 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		906B8BBC14F94EBB0038163D /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				906B8BC414F94EBB0038163D /* UnitTests.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		966F0F8F14E5AADB007FB278 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -36,6 +51,11 @@
 		0D5CAC9C14EFE1CD006CDCD6 /* networking.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = networking.hh; sourceTree = "<group>"; };
 		90487DEC14EF0A67006505C2 /* utilities.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utilities.hh; sourceTree = "<group>"; };
 		90487DEE14EF0A7B006505C2 /* utilities.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utilities.cc; sourceTree = "<group>"; };
+		906B8BB414F94E7D0038163D /* gtest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = gtest.framework; path = ../SyncCFT/gtest.framework; sourceTree = "<group>"; };
+		906B8BBE14F94EBB0038163D /* UnitTests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = UnitTests; sourceTree = BUILT_PRODUCTS_DIR; };
+		906B8BC314F94EBB0038163D /* UnitTests.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = UnitTests.1; sourceTree = "<group>"; };
+		906B8BD714F957B40038163D /* main.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
+		906B8BDB14F959B90038163D /* networking_unittest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = networking_unittest.cc; sourceTree = "<group>"; };
 		906FAC2714E5C5A000D78FF6 /* Metafile.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Metafile.cc; sourceTree = "<group>"; };
 		906FAC2914E5C5B900D78FF6 /* Metafile.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Metafile.hh; sourceTree = "<group>"; };
 		966F0F9114E5AADB007FB278 /* SyncCFT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SyncCFT; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -44,6 +64,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		906B8BBB14F94EBB0038163D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				906B8BC814F94F090038163D /* gtest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		966F0F8E14E5AADB007FB278 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -54,10 +82,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		906B8BC014F94EBB0038163D /* UnitTests */ = {
+			isa = PBXGroup;
+			children = (
+				906B8BD714F957B40038163D /* main.cc */,
+				906B8BDB14F959B90038163D /* networking_unittest.cc */,
+				906B8BC314F94EBB0038163D /* UnitTests.1 */,
+				906B8BB414F94E7D0038163D /* gtest.framework */,
+			);
+			path = UnitTests;
+			sourceTree = "<group>";
+		};
 		966F0F8614E5AADB007FB278 = {
 			isa = PBXGroup;
 			children = (
 				966F0F9414E5AADB007FB278 /* SyncCFT */,
+				906B8BC014F94EBB0038163D /* UnitTests */,
 				966F0F9214E5AADB007FB278 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -66,6 +106,7 @@
 			isa = PBXGroup;
 			children = (
 				966F0F9114E5AADB007FB278 /* SyncCFT */,
+				906B8BBE14F94EBB0038163D /* UnitTests */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -92,6 +133,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		906B8BBD14F94EBB0038163D /* UnitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 906B8BC514F94EBB0038163D /* Build configuration list for PBXNativeTarget "UnitTests" */;
+			buildPhases = (
+				906B8BBA14F94EBB0038163D /* Sources */,
+				906B8BBB14F94EBB0038163D /* Frameworks */,
+				906B8BBC14F94EBB0038163D /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = UnitTests;
+			productName = UnitTests;
+			productReference = 906B8BBE14F94EBB0038163D /* UnitTests */;
+			productType = "com.apple.product-type.tool";
+		};
 		966F0F9014E5AADB007FB278 /* SyncCFT */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 966F0F9B14E5AADB007FB278 /* Build configuration list for PBXNativeTarget "SyncCFT" */;
@@ -131,11 +189,22 @@
 			projectRoot = "";
 			targets = (
 				966F0F9014E5AADB007FB278 /* SyncCFT */,
+				906B8BBD14F94EBB0038163D /* UnitTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		906B8BBA14F94EBB0038163D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				906B8BD814F957B40038163D /* main.cc in Sources */,
+				906B8BDC14F959B90038163D /* networking_unittest.cc in Sources */,
+				906B8BDD14F95BB70038163D /* networking.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		966F0F8D14E5AADB007FB278 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -150,6 +219,34 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		906B8BC614F94EBB0038163D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/SyncCFT\"",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		906B8BC714F94EBB0038163D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/SyncCFT\"",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		966F0F9914E5AADB007FB278 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -206,6 +303,14 @@
 		966F0F9C14E5AADB007FB278 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/SyncCFT\"",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/SyncCFT\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -213,6 +318,14 @@
 		966F0F9D14E5AADB007FB278 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/SyncCFT\"",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/SyncCFT\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -220,6 +333,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		906B8BC514F94EBB0038163D /* Build configuration list for PBXNativeTarget "UnitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				906B8BC614F94EBB0038163D /* Debug */,
+				906B8BC714F94EBB0038163D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		966F0F8B14E5AADB007FB278 /* Build configuration list for PBXProject "SyncCFT" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
