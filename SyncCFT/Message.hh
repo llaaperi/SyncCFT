@@ -12,6 +12,11 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
+#define HEADER_SIZE 16
+enum MsgType {TYPE_ACK, TYPE_HELLO, TYPE_DESCR, TYPE_DIFF, TYPE_GET, TYPE_FILE, TYPE_QUIT, TYPE_NACK};
+
+using namespace std;
+
 class Message {
     struct sockaddr_in mAddrInfo;
     
@@ -25,18 +30,24 @@ class Message {
     uint32_t mSeqnum;
     uint32_t mChunk;
     // Flags
-    bool mBeing;
+    bool mBegin;
     bool mEnd;
     char* mPayload;
+    
+    char mBinaryHeader[HEADER_SIZE];
         
 public:
-    Message(){}
+    Message();
     ~Message(){}
     
     void initHeader(char* data, int length);
     
     char* getPayload() const {return mPayload;}
-    void setPayload(char* payload, int length);
+    void setPayload(char* payload, int length) {mPayload = payload; mLength = length;}
+    
+    void parseBytes();
+    
+    void print();
 
 private:
     // Rule of three

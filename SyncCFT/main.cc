@@ -10,6 +10,7 @@
 #include <getopt.h>
 
 #include "Metafile.hh"
+#include "Message.hh"
 
 #define METAFILE ".sync.cft"
 #define HELP "Usage: synccft [-t <port>] [-p <p>] [-q <q>] <hosts>"

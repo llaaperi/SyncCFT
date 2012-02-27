@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0D5CAC9D14EFE1CD006CDCD6 /* networking.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0D5CAC9B14EFE1CD006CDCD6 /* networking.cc */; };
+		9023096014FBEB89004C81D0 /* Message.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9023095F14FBEB89004C81D0 /* Message.cc */; };
 		90487DEF14EF0A7B006505C2 /* utilities.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90487DEE14EF0A7B006505C2 /* utilities.cc */; };
 		906B8BC414F94EBB0038163D /* UnitTests.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 906B8BC314F94EBB0038163D /* UnitTests.1 */; };
 		906B8BC814F94F090038163D /* gtest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 906B8BB414F94E7D0038163D /* gtest.framework */; };
@@ -49,6 +50,7 @@
 		0D5CAC9A14EFE1B3006CDCD6 /* Transceiver.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Transceiver.hh; sourceTree = "<group>"; };
 		0D5CAC9B14EFE1CD006CDCD6 /* networking.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = networking.cc; sourceTree = "<group>"; };
 		0D5CAC9C14EFE1CD006CDCD6 /* networking.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = networking.hh; sourceTree = "<group>"; };
+		9023095F14FBEB89004C81D0 /* Message.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Message.cc; sourceTree = "<group>"; };
 		90487DEC14EF0A67006505C2 /* utilities.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utilities.hh; sourceTree = "<group>"; };
 		90487DEE14EF0A7B006505C2 /* utilities.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utilities.cc; sourceTree = "<group>"; };
 		906B8BB414F94E7D0038163D /* gtest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = gtest.framework; path = ../SyncCFT/gtest.framework; sourceTree = "<group>"; };
@@ -114,16 +116,17 @@
 		966F0F9414E5AADB007FB278 /* SyncCFT */ = {
 			isa = PBXGroup;
 			children = (
-				0D5CAC9B14EFE1CD006CDCD6 /* networking.cc */,
-				0D5CAC9C14EFE1CD006CDCD6 /* networking.hh */,
 				966F0F9514E5AADB007FB278 /* main.cc */,
-				906FAC2714E5C5A000D78FF6 /* Metafile.cc */,
+				0D5CAC9C14EFE1CD006CDCD6 /* networking.hh */,
+				0D5CAC9B14EFE1CD006CDCD6 /* networking.cc */,
 				906FAC2914E5C5B900D78FF6 /* Metafile.hh */,
+				906FAC2714E5C5A000D78FF6 /* Metafile.cc */,
 				90487DEC14EF0A67006505C2 /* utilities.hh */,
 				90487DEE14EF0A7B006505C2 /* utilities.cc */,
 				0D5CAC9714EFE155006CDCD6 /* Server.hh */,
 				0D5CAC9814EFE160006CDCD6 /* Client.hh */,
 				0D5CAC9914EFE16A006CDCD6 /* Message.hh */,
+				9023095F14FBEB89004C81D0 /* Message.cc */,
 				0D5CAC9A14EFE1B3006CDCD6 /* Transceiver.hh */,
 				966F0F9714E5AADB007FB278 /* SyncCFT.1 */,
 			);
@@ -213,6 +216,7 @@
 				906FAC2814E5C5A000D78FF6 /* Metafile.cc in Sources */,
 				90487DEF14EF0A7B006505C2 /* utilities.cc in Sources */,
 				0D5CAC9D14EFE1CD006CDCD6 /* networking.cc in Sources */,
+				9023096014FBEB89004C81D0 /* Message.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -227,6 +231,7 @@
 					"\"$(SRCROOT)/SyncCFT\"",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -241,6 +246,7 @@
 					"\"$(SRCROOT)/SyncCFT\"",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -273,7 +279,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-lcrypto";
-				SDKROOT = macosx;
+				SDKROOT = macosx10.6;
 			};
 			name = Debug;
 		};
@@ -296,7 +302,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_LDFLAGS = "-lcrypto";
-				SDKROOT = macosx;
+				SDKROOT = macosx10.6;
 			};
 			name = Release;
 		};
@@ -307,6 +313,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/SyncCFT\"",
 				);
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/SyncCFT\"",
@@ -322,6 +329,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/SyncCFT\"",
 				);
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/SyncCFT\"",
@@ -340,6 +348,7 @@
 				906B8BC714F94EBB0038163D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		966F0F8B14E5AADB007FB278 /* Build configuration list for PBXProject "SyncCFT" */ = {
 			isa = XCConfigurationList;
