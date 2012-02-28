@@ -16,6 +16,8 @@
 		906B8BDC14F959B90038163D /* networking_unittest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 906B8BDB14F959B90038163D /* networking_unittest.cc */; };
 		906B8BDD14F95BB70038163D /* networking.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0D5CAC9B14EFE1CD006CDCD6 /* networking.cc */; };
 		906FAC2814E5C5A000D78FF6 /* Metafile.cc in Sources */ = {isa = PBXBuildFile; fileRef = 906FAC2714E5C5A000D78FF6 /* Metafile.cc */; };
+		907F833914FD4378001C5E15 /* Message.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9023095F14FBEB89004C81D0 /* Message.cc */; };
+		907F833C14FD439D001C5E15 /* Message_unittest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 907F833B14FD439D001C5E15 /* Message_unittest.cc */; };
 		966F0F9614E5AADB007FB278 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966F0F9514E5AADB007FB278 /* main.cc */; };
 		966F0F9814E5AADB007FB278 /* SyncCFT.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 966F0F9714E5AADB007FB278 /* SyncCFT.1 */; };
 /* End PBXBuildFile section */
@@ -60,6 +62,7 @@
 		906B8BDB14F959B90038163D /* networking_unittest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = networking_unittest.cc; sourceTree = "<group>"; };
 		906FAC2714E5C5A000D78FF6 /* Metafile.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Metafile.cc; sourceTree = "<group>"; };
 		906FAC2914E5C5B900D78FF6 /* Metafile.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Metafile.hh; sourceTree = "<group>"; };
+		907F833B14FD439D001C5E15 /* Message_unittest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Message_unittest.cc; sourceTree = "<group>"; };
 		966F0F9114E5AADB007FB278 /* SyncCFT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SyncCFT; sourceTree = BUILT_PRODUCTS_DIR; };
 		966F0F9514E5AADB007FB278 /* main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
 		966F0F9714E5AADB007FB278 /* SyncCFT.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = SyncCFT.1; sourceTree = "<group>"; };
@@ -88,6 +91,7 @@
 			isa = PBXGroup;
 			children = (
 				906B8BD714F957B40038163D /* main.cc */,
+				907F833B14FD439D001C5E15 /* Message_unittest.cc */,
 				906B8BDB14F959B90038163D /* networking_unittest.cc */,
 				906B8BC314F94EBB0038163D /* UnitTests.1 */,
 				906B8BB414F94E7D0038163D /* gtest.framework */,
@@ -204,7 +208,9 @@
 			files = (
 				906B8BD814F957B40038163D /* main.cc in Sources */,
 				906B8BDC14F959B90038163D /* networking_unittest.cc in Sources */,
+				907F833914FD4378001C5E15 /* Message.cc in Sources */,
 				906B8BDD14F95BB70038163D /* networking.cc in Sources */,
+				907F833C14FD439D001C5E15 /* Message_unittest.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -233,7 +239,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -248,7 +254,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

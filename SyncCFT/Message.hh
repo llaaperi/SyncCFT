@@ -40,12 +40,12 @@ public:
     Message();
     ~Message(){}
     
-    void initHeader(char* data, int length);
+    void initHeader(uint8_t version, uint8_t type, uint8_t clientID, uint8_t checksum, uint16_t length, uint16_t window, uint32_t seqnum, uint32_t chunk);
     
     char* getPayload() const {return mPayload;}
     void setPayload(char* payload, int length) {mPayload = payload; mLength = length;}
     
-    void parseBytes();
+    char* parseBytes();
     
     void print();
 

@@ -18,12 +18,23 @@ Message::Message() : mWindow(1), mChunk(0),mBegin(false), mEnd(false)  {
     mSeqnum = rand();
 
 }
-
-
+/*
+ * Initialize all header values
+ */
+void Message::initHeader(uint8_t version, uint8_t type, uint8_t clientID, uint8_t checksum, uint16_t length, uint16_t window, uint32_t seqnum, uint32_t chunk) {
+    mVersion = version;
+    mType = type;
+    mClientID = clientID;
+    mChecksum = checksum;
+    mLength = length;
+    mWindow = window;
+    mSeqnum = seqnum;
+    mChunk = chunk;
+}
 
 
 // Convert message header into binary format
-void Message::parseBytes() {
+char* Message::parseBytes() {
     memset(mBinaryHeader, 0, HEADER_SIZE);
     
     // Version and flags    
@@ -50,6 +61,8 @@ void Message::parseBytes() {
 	mBinaryHeader[13] = (mChunk >> 16) & 0xFF;
 	mBinaryHeader[14] = (mChunk >> 8) & 0xFF;
 	mBinaryHeader[15] = (mChunk & 0xFF);
+    
+    return mBinaryHeader;
 }
 
 
