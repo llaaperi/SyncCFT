@@ -14,16 +14,36 @@
 #include "Message.hh"
 
 class Client {
-    Transceiver mTransceiver;
+    Transceiver _transceiver;
+    pthread_t _thread;
     
 public:
     
-    start();
+    Client(list<string>& hosts, string port) : _transceiver(hosts, port) {}
+    ~Client() {}
     
-    stop();
+    /*
+     * Start thread for handling clients
+     */
+    void start();
     
-    synchronize(Metafile file);
+    /*
+     * Stop thread
+     */
+    void stop();
     
+    /*
+     * Main function for client thread
+     */
+    static void* handle(void* arg);
+    
+    void synchronize(MetaFile file);
+    
+    
+private:
+    //Rule of three
+    Client(Client const& other);
+    Client operator=(Client const& other);
 };
 
 #endif

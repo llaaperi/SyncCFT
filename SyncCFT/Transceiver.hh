@@ -9,7 +9,11 @@
 #ifndef SyncCFT_Transceiver_hh
 #define SyncCFT_Transceiver_hh
 
+#include <list>
+
 #include "Message.hh"
+
+
 
 using namespace std;
 
@@ -18,7 +22,7 @@ class Transceiver {
 
     
 public:
-    Transceiver(string port){}
+    Transceiver(list<string>& hosts, string port){}
     ~Transceiver(){}
     
     

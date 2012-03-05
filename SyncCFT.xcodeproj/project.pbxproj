@@ -18,6 +18,8 @@
 		906FAC2814E5C5A000D78FF6 /* Metafile.cc in Sources */ = {isa = PBXBuildFile; fileRef = 906FAC2714E5C5A000D78FF6 /* Metafile.cc */; };
 		907F833914FD4378001C5E15 /* Message.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9023095F14FBEB89004C81D0 /* Message.cc */; };
 		907F833C14FD439D001C5E15 /* Message_unittest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 907F833B14FD439D001C5E15 /* Message_unittest.cc */; };
+		90B291DB1503779C00E57979 /* Client.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90B291DA1503779B00E57979 /* Client.cc */; };
+		90B291DD150377A900E57979 /* Server.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90B291DC150377A900E57979 /* Server.cc */; };
 		966F0F9614E5AADB007FB278 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966F0F9514E5AADB007FB278 /* main.cc */; };
 		966F0F9814E5AADB007FB278 /* SyncCFT.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 966F0F9714E5AADB007FB278 /* SyncCFT.1 */; };
 /* End PBXBuildFile section */
@@ -63,6 +65,8 @@
 		906FAC2714E5C5A000D78FF6 /* Metafile.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Metafile.cc; sourceTree = "<group>"; };
 		906FAC2914E5C5B900D78FF6 /* Metafile.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Metafile.hh; sourceTree = "<group>"; };
 		907F833B14FD439D001C5E15 /* Message_unittest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Message_unittest.cc; sourceTree = "<group>"; };
+		90B291DA1503779B00E57979 /* Client.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Client.cc; sourceTree = "<group>"; };
+		90B291DC150377A900E57979 /* Server.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Server.cc; sourceTree = "<group>"; };
 		966F0F9114E5AADB007FB278 /* SyncCFT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SyncCFT; sourceTree = BUILT_PRODUCTS_DIR; };
 		966F0F9514E5AADB007FB278 /* main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
 		966F0F9714E5AADB007FB278 /* SyncCFT.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = SyncCFT.1; sourceTree = "<group>"; };
@@ -128,7 +132,9 @@
 				90487DEC14EF0A67006505C2 /* utilities.hh */,
 				90487DEE14EF0A7B006505C2 /* utilities.cc */,
 				0D5CAC9714EFE155006CDCD6 /* Server.hh */,
+				90B291DC150377A900E57979 /* Server.cc */,
 				0D5CAC9814EFE160006CDCD6 /* Client.hh */,
+				90B291DA1503779B00E57979 /* Client.cc */,
 				0D5CAC9914EFE16A006CDCD6 /* Message.hh */,
 				9023095F14FBEB89004C81D0 /* Message.cc */,
 				0D5CAC9A14EFE1B3006CDCD6 /* Transceiver.hh */,
@@ -223,6 +229,8 @@
 				90487DEF14EF0A7B006505C2 /* utilities.cc in Sources */,
 				0D5CAC9D14EFE1CD006CDCD6 /* networking.cc in Sources */,
 				9023096014FBEB89004C81D0 /* Message.cc in Sources */,
+				90B291DB1503779C00E57979 /* Client.cc in Sources */,
+				90B291DD150377A900E57979 /* Server.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,7 +293,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-lcrypto";
-				SDKROOT = macosx10.6;
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -308,7 +316,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_LDFLAGS = "-lcrypto";
-				SDKROOT = macosx10.6;
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};

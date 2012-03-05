@@ -14,14 +14,33 @@
 #include "Message.hh"
 
 class Server {
-    Transceiver mTransceiver;
-    
+    //Transceiver mTransceiver;
+    pthread_t _thread;
+
 public:
     
-    start();
+    Server(){}
+    ~Server(){}
     
-    stop();
+    /*
+     * Start thread for handling server messages
+     */
+    void start();
     
+    /*
+     * Stop thread
+     */
+    void stop();
+    
+    /*
+     * Main function for server thread
+     */
+    static void* handle(void* arg);
+
+private:
+    //Rule of three
+    Server(Server const& other);
+    Server operator=(Server const& other);
 };
 
 #endif

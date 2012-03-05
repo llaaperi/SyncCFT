@@ -11,6 +11,8 @@
 
 #include "Metafile.hh"
 #include "Message.hh"
+#include "Client.hh"
+#include "Server.hh"
 
 #define METAFILE ".sync.cft"
 #define HELP "Usage: synccft [-t <port>] [-p <p>] [-q <q>] <hosts>"
@@ -68,7 +70,7 @@ int main (int argc, const char * argv[])
     
     // Check that all necessary input parameters are given
     if (hosts.empty()) {
-        cout << "Missing parameter" << endl;
+        cout << "Missing host address" << endl;
         cout << HELP << endl;
         return 0;
     }
@@ -77,12 +79,24 @@ int main (int argc, const char * argv[])
     MetaFile mFile(METAFILE);
     mFile.print();
     
-    
     // Start client first
-    
+    try {
+        Client* clientHandler = new Client(hosts, port);
+        clientHandler->start();
+    } catch (...) {
+        cout << "Creating client handler failed." << endl;
+        return 0;
+    }
     
     // Pass reference to client object to the server
-    
+    // Start client first
+    try {
+        Server* serverHandler = new Server;
+        serverHandler->start();
+    } catch (...) {
+        cout << "Creating server handler failed." << endl;
+        return 0;
+    }
     
     return 0;
 }

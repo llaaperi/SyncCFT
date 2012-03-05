@@ -9,6 +9,8 @@
 #ifndef SyncCFT_Message_hh
 #define SyncCFT_Message_hh
 
+#include "utilities.hh"
+
 #include <arpa/inet.h>
 #include <netdb.h>
 
