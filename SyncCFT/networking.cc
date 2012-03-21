@@ -40,7 +40,7 @@ void* Networking::getAddr(struct sockaddr *address) {
  * @param port, Port number to be used
  * @return Socket to be listened
  */
-int Networking::createServerSocket(string port) {
+int Networking::createUnconnectedSocket(string port) {
     int listenFd;
     int yes=1;
     struct addrinfo hints, *serverInfo, *tempInfo;
@@ -91,7 +91,7 @@ int Networking::createServerSocket(string port) {
  * @param port Server port number
  * @return File descriptor to the created socket
  */
-int Networking::createClientSocket(std::string address, std::string port) {
+int Networking::createConnectedSocket(std::string address, std::string port) {
     
     int socketFd;
     struct addrinfo hints, *serverInfo, *tempInfo; // Structs for storing address info

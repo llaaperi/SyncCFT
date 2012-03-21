@@ -24,7 +24,7 @@ TEST(MessageTest, AllZeroHeader) {
         EXPECT_TRUE((memcmp(&header[i], &mask[i], 1)) == 0);
 }
 
-// Test creating header with all zero values.
+// Test creating header with all maximum values.
 TEST(MessageTest, MaxValues) {
     
     Message msg;

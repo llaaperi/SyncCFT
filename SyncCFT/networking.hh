@@ -34,7 +34,7 @@ namespace Networking {
      * @param port Port number to be used
      * @return Socket to be listened
      */
-    int createServerSocket(string port);
+    int createUnconnectedSocket(string port);
 
     /*
      * Creates an UDP socket to a remote server
@@ -42,7 +42,7 @@ namespace Networking {
      * @param port Server port number
      * @return File descriptor to the created socket
      */
-    int createClientSocket(string address, string port);
+    int createConnectedSocket(string address, string port);
     
     /*
      * Receive message from a given socket

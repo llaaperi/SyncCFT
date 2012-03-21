@@ -11,7 +11,6 @@
 		9023096014FBEB89004C81D0 /* Message.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9023095F14FBEB89004C81D0 /* Message.cc */; };
 		90487DEF14EF0A7B006505C2 /* utilities.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90487DEE14EF0A7B006505C2 /* utilities.cc */; };
 		906B8BC414F94EBB0038163D /* UnitTests.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 906B8BC314F94EBB0038163D /* UnitTests.1 */; };
-		906B8BC814F94F090038163D /* gtest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 906B8BB414F94E7D0038163D /* gtest.framework */; };
 		906B8BD814F957B40038163D /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 906B8BD714F957B40038163D /* main.cc */; };
 		906B8BDC14F959B90038163D /* networking_unittest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 906B8BDB14F959B90038163D /* networking_unittest.cc */; };
 		906B8BDD14F95BB70038163D /* networking.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0D5CAC9B14EFE1CD006CDCD6 /* networking.cc */; };
@@ -22,6 +21,7 @@
 		90B291DD150377A900E57979 /* Server.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90B291DC150377A900E57979 /* Server.cc */; };
 		966F0F9614E5AADB007FB278 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966F0F9514E5AADB007FB278 /* main.cc */; };
 		966F0F9814E5AADB007FB278 /* SyncCFT.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 966F0F9714E5AADB007FB278 /* SyncCFT.1 */; };
+		9682F5A91519FB9200421C69 /* gtest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9682F5A81519FB9200421C69 /* gtest.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -57,7 +57,6 @@
 		9023095F14FBEB89004C81D0 /* Message.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Message.cc; sourceTree = "<group>"; };
 		90487DEC14EF0A67006505C2 /* utilities.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utilities.hh; sourceTree = "<group>"; };
 		90487DEE14EF0A7B006505C2 /* utilities.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utilities.cc; sourceTree = "<group>"; };
-		906B8BB414F94E7D0038163D /* gtest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = gtest.framework; path = ../SyncCFT/gtest.framework; sourceTree = "<group>"; };
 		906B8BBE14F94EBB0038163D /* UnitTests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = UnitTests; sourceTree = BUILT_PRODUCTS_DIR; };
 		906B8BC314F94EBB0038163D /* UnitTests.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = UnitTests.1; sourceTree = "<group>"; };
 		906B8BD714F957B40038163D /* main.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
@@ -70,6 +69,7 @@
 		966F0F9114E5AADB007FB278 /* SyncCFT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SyncCFT; sourceTree = BUILT_PRODUCTS_DIR; };
 		966F0F9514E5AADB007FB278 /* main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
 		966F0F9714E5AADB007FB278 /* SyncCFT.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = SyncCFT.1; sourceTree = "<group>"; };
+		9682F5A81519FB9200421C69 /* gtest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = gtest.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,7 +77,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				906B8BC814F94F090038163D /* gtest.framework in Frameworks */,
+				9682F5A91519FB9200421C69 /* gtest.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -98,7 +98,7 @@
 				907F833B14FD439D001C5E15 /* Message_unittest.cc */,
 				906B8BDB14F959B90038163D /* networking_unittest.cc */,
 				906B8BC314F94EBB0038163D /* UnitTests.1 */,
-				906B8BB414F94E7D0038163D /* gtest.framework */,
+				9682F5A81519FB9200421C69 /* gtest.framework */,
 			);
 			path = UnitTests;
 			sourceTree = "<group>";
@@ -243,6 +243,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/SyncCFT\"",
+					"\"$(SRCROOT)/UnitTests\"",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
@@ -258,6 +259,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/SyncCFT\"",
+					"\"$(SRCROOT)/UnitTests\"",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;

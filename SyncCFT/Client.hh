@@ -12,14 +12,20 @@
 #include "Transceiver.hh"
 #include "Metafile.hh"
 #include "Message.hh"
+#include <stdexcept>
+
+using namespace std;
 
 class Client {
-    Transceiver _transceiver;
+    //Transceiver _transceiver;
     pthread_t _thread;
+    string _port;
+    bool _running;
+    int _socket;
     
 public:
     
-    Client(list<string>& hosts, string port) : _transceiver(hosts, port) {}
+    Client(list<string>& hosts, string port) throw(invalid_argument, runtime_error);
     ~Client() {}
     
     /*

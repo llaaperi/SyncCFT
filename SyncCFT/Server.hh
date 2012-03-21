@@ -12,15 +12,23 @@
 #include "Transceiver.hh"
 #include "Metafile.hh"
 #include "Message.hh"
+#include "Client.hh"
+#include "stdexcept"
+
+using namespace std;
 
 class Server {
     //Transceiver mTransceiver;
+    Client* _clientHandler;
     pthread_t _thread;
+    bool _running;
+    string _port;
+    int _socket;
 
 public:
     
-    Server(){}
-    ~Server(){}
+    Server(Client* clientHandler, string port) throw(invalid_argument,runtime_error);
+    ~Server();
     
     /*
      * Start thread for handling server messages

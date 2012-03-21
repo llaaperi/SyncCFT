@@ -15,19 +15,22 @@
 #include "Server.hh"
 
 #define METAFILE ".sync.cft"
-#define HELP "Usage: synccft [-t <port>] [-p <p>] [-q <q>] <hosts>"
+#define HELP "Usage: synccft [-c <client port>] [-s <server port>] [-p <p>] [-q <q>] <hosts>"
 
 int main (int argc, const char * argv[])
 {
     std::cout << "*** SyncCTF launched ***" << std::endl;
     
-    string port = "80";
+    //Default values
+    string cport = "5063";
+    string sport = "5062";
     string p, q;
     list<string> hosts;
     
 	// Long versions of command line parameters
     static struct option long_options[] = {
-		{"port", 	required_argument, 	0, 't'},
+		{"cport", 	required_argument, 	0, 'c'},
+        {"sport", 	required_argument, 	0, 's'},
         {"success", required_argument, 	0, 'p'},
         {"fail", 	required_argument, 	0, 'q'},
         {"help", 	no_argument, 		0, 'h'},
@@ -37,12 +40,16 @@ int main (int argc, const char * argv[])
     int c;
     opterr = 0;
     // Use get_opt to parse command line parameters
-	while ((c = getopt_long (argc, (char **)argv, "ht:p:q:", long_options, NULL)) != -1){
+	while ((c = getopt_long (argc, (char **)argv, "hc:s:p:q:", long_options, NULL)) != -1){
         switch (c)
         {
-            case 't':
-                port = optarg;
-                cout << "Port: " << port << endl;
+            case 'c':
+                cport = optarg;
+                cout << "Client port: " << cport << endl;
+                break;
+            case 's':
+                sport = optarg;
+                cout << "Server port: " << sport << endl;
                 break;
             case 'p':
                 p = optarg;
@@ -80,8 +87,9 @@ int main (int argc, const char * argv[])
     mFile.print();
     
     // Start client first
+    Client* clientHandler = NULL;
     try {
-        Client* clientHandler = new Client(hosts, port);
+        clientHandler = new Client(hosts, cport);
         clientHandler->start();
     } catch (...) {
         cout << "Creating client handler failed." << endl;
@@ -90,13 +98,24 @@ int main (int argc, const char * argv[])
     
     // Pass reference to client object to the server
     // Start client first
+    Server* serverHandler = NULL;
     try {
-        Server* serverHandler = new Server;
+        serverHandler = new Server(clientHandler, sport);
         serverHandler->start();
     } catch (...) {
         cout << "Creating server handler failed." << endl;
         return 0;
     }
+        
+    while(true){
+        sleep(1);
+        //break;
+    }
+    
+    serverHandler->stop();
+    clientHandler->stop();
+    
+    cout << "SyncCFT terminated" << endl;
     
     return 0;
 }

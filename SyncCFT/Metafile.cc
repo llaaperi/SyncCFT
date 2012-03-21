@@ -156,6 +156,7 @@ bool MetaFile::updateAll(void) {
     struct dirent *entry;
     struct stat stats;
     
+    
     directory = opendir ("./");
     if (directory != NULL) {
         
