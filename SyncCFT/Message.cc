@@ -23,22 +23,21 @@ Message::Message() :
     _chunk(0),
     _begin(false),
     _end(false), 
-    _payload(0) {}
+    _payload(0) {
+    
+    }
 
 /*
  * Initialize all header values
  */
 void Message::initHeader(uint8_t version, uint8_t type, uint8_t clientID, uint8_t checksum, uint16_t length, uint16_t window, uint32_t seqnum, uint32_t chunk) {
-    
-    srand(time(NULL));     // Use time as seed for random number generator
-    
     _version = version;
     _type = type;
     _clientID = clientID;
     _checksum = checksum;
     _length = length;
     _window = window;
-    _seqnum = rand();
+    _seqnum = seqnum;
     _chunk = chunk;
 }
 
@@ -51,63 +50,93 @@ int Message::parseFromBytes(const char* buffer, int len){
     }
     
     _version = ((buffer[0] & 0xE0) >> 5);   //3 MSBs
-    _flags = (buffer[0] & 1F);   //5 LSBs
+    
+    //Flags
+    if(buffer[0] & 0x01){
+        _begin = true;
+    }
+    if(buffer[0] & 0x02){
+        _end = true;
+    }
+    
     _type = buffer[1];
     _clientID = buffer[2];
     _checksum = buffer[3];
-    _length = (buffer[4] << 8);
-    _length |= buffer[5];
-    _windowSize = (buffer[6] << 8);
-    _windowSize |= buffer[7];
-    _seqnum = (buffer[8] << 24);
-    _seqnum |= (buffer[9] << 16);
-    _seqnum |= (buffer[10] << 8);
-    _seqnum |= buffer[11];
-    _chunk = (buffer[12] << 24);
-    _chunk |= (buffer[13] << 16);
-    _chunk |= (buffer[14] << 8);
-    _chunk |= buffer[15];
+    _length = ((buffer[4] & 0xFF) << 8);
+    _length |= (buffer[5] & 0xFF);
+    _window = ((buffer[6] & 0xFF) << 8);
+    _window |= (buffer[7] & 0xFF);
+    _seqnum = ((buffer[8] & 0xFF) << 24);
+    _seqnum |= ((buffer[9] & 0xFF) << 16);
+    _seqnum |= ((buffer[10] & 0xFF) << 8);
+    _seqnum |= (buffer[11] & 0xFF);
+    _chunk = ((buffer[12] & 0xFF) << 24);
+    _chunk |= ((buffer[13] & 0xFF) << 16);
+    _chunk |= ((buffer[14] & 0xFF) << 8);
+    _chunk |= (buffer[15] & 0xFF);
     
+    return 0;
 }
 
 
 // Convert message header into binary format
-char* Message::parseBytes() {
-    memset(_binaryHeader, 0, HEADER_SIZE);
+void Message::parseToBytes(char* buffer) {
+    
+    //Init memory
+    memset(buffer, 0, HEADER_SIZE);
     
     // Version and flags    
-	_binaryHeader[0] = ((_version & 0x07) << 5) | ((_begin & 0x01) << 4) | ((_end & 0x01) << 3);
+	buffer[0] = ((_version & 0x07) << 5) | (_begin & 0x01) | (_end & 0x02);
     // Type
-	_binaryHeader[1] =  (_type & 0xFF);
+	buffer[1] =  (_type & 0xFF);
     // Client ID
-	_binaryHeader[2] =  (_clientID & 0xFF);
+	buffer[2] =  (_clientID & 0xFF);
     // Checksum
-	_binaryHeader[3] =  (_checksum & 0xFF);
+	buffer[3] =  (_checksum & 0xFF);
     // Payload length
-	_binaryHeader[4] =  (_length >> 8) & 0xFF;
-	_binaryHeader[5] =  (_length & 0xFF);
+	buffer[4] =  (_length >> 8) & 0xFF;
+	buffer[5] =  (_length & 0xFF);
     // Window size
-	_binaryHeader[6] =  (_window >> 8) & 0xFF;
-	_binaryHeader[7] =  (_window & 0xFF);
+	buffer[6] =  (_window >> 8) & 0xFF;
+	buffer[7] =  (_window & 0xFF);
     // Sequence number
-	_binaryHeader[8] =  (_seqnum >> 24) & 0xFF;
-	_binaryHeader[9] =  (_seqnum >> 16) & 0xFF;
-	_binaryHeader[10] = (_seqnum >> 8) & 0xFF;
-	_binaryHeader[11] = (_seqnum & 0xFF);
+	buffer[8] =  (_seqnum >> 24) & 0xFF;
+	buffer[9] =  (_seqnum >> 16) & 0xFF;
+	buffer[10] = (_seqnum >> 8) & 0xFF;
+	buffer[11] = (_seqnum & 0xFF);
     // Chunk number
-    _binaryHeader[12] = (_chunk >> 24) & 0xFF;
-	_binaryHeader[13] = (_chunk >> 16) & 0xFF;
-	_binaryHeader[14] = (_chunk >> 8) & 0xFF;
-	_binaryHeader[15] = (_chunk & 0xFF);
-    
-    return _binaryHeader;
+    buffer[12] = (_chunk >> 24) & 0xFF;
+	buffer[13] = (_chunk >> 16) & 0xFF;
+	buffer[14] = (_chunk >> 8) & 0xFF;
+	buffer[15] = (_chunk & 0xFF);
 }
 
 
 // Print contents of the header
-void Message::print() {
+void Message::printBytes() {
+    
+    char buffer[16];
+    parseToBytes(buffer);
     cout <<"[ ";
     for (int i = 0; i < HEADER_SIZE; i++)
-        printf("%02x ", (unsigned char)_binaryHeader[i]);
+        printf("%02x ", (unsigned char)buffer[i]);
     cout << "]" << endl;
+}
+
+
+void Message::printInfo(){
+    
+    cout << "Message header:" << endl;
+    cout << "Version = " << (unsigned int)getVersion() << endl;
+    cout << "Type = " << (unsigned int)getType() << endl;
+    cout << "ClientID = " << (unsigned int)getClientID() << endl;
+    cout << "Checksum = " << (unsigned int)getChecksum() << endl;
+    cout << "Length = " << getLength() << endl;
+    cout << "WindowSize = " << getWindow() << endl;
+    cout << "Seqnum = " << getSeqnum() << endl;
+    cout << "Chunk = " << getChunk() << endl;
+    
+    cout << "Flags: " << endl;
+    cout << "Begin = " << (isFirst()?"true":"false") << endl;
+    cout << "End = " << (isLast()?"true":"false") << endl;
 }

@@ -34,10 +34,10 @@ class Message {
     // Flags
     bool _begin;
     bool _end;
+    
+    //char _binaryHeader[HEADER_SIZE];
     char* _payload;
     
-    char _binaryHeader[HEADER_SIZE];
-        
 public:
     Message();
     ~Message(){}
@@ -49,8 +49,10 @@ public:
     uint8_t getChecksum(){return _checksum;}
     uint16_t getLength(){return _length;}
     uint16_t getWindow(){return _window;}
-    uint32_t getSeqnume(){return _seqnum;}
+    uint32_t getSeqnum(){return _seqnum;}
     uint32_t getChunk(){return _chunk;}
+    bool isFirst(){return _begin;}
+    bool isLast(){return _end;}
 
     
     void initHeader(uint8_t version, uint8_t type, uint8_t clientID, uint8_t checksum, uint16_t length, uint16_t window, uint32_t seqnum, uint32_t chunk);
@@ -58,10 +60,11 @@ public:
     char* getPayload() const {return _payload;}
     void setPayload(char* payload, int length) {_payload = payload; _length = length;}
     
-    char* parseBytes();
+    void parseToBytes(char* buffer);
     int parseFromBytes(const char* buffer, int len);
     
-    void print();
+    void printBytes();
+    void printInfo();
 
 private:
     // Rule of three

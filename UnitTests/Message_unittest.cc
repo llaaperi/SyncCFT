@@ -14,9 +14,12 @@
 TEST(MessageTest, AllZeroHeader) {
     
     Message msg;
-    msg.initHeader(0, 0, 0, 0, 0, 0, 0, 0);
-    char* header;
-    header = msg.parseBytes();
+    //msg.initHeader(0, 0, 0, 0, 0, 0, 0, 0);
+    char header[HEADER_SIZE];
+    msg.parseToBytes(header);
+    
+    //msg.printBytes();
+    //msg.printInfo();
     
     const uint8_t mask[16] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     
@@ -29,8 +32,8 @@ TEST(MessageTest, MaxValues) {
     
     Message msg;
     msg.initHeader(7, 255, 255, 255, 65535, 65535, 4294967295, 4294967295);
-    char* header;
-    header = msg.parseBytes();
+    char header[HEADER_SIZE];
+    msg.parseToBytes(header);
     const uint8_t mask[16] = {0xe0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
     
     for (int i = 0; i < 16; i++)
@@ -42,15 +45,19 @@ TEST(MessageTest, MaxValues) {
  */
 TEST(MessageTest, parseFromBytes){
 
-    const char* buffer[16] = {0x21, 0x01, 0x02, 0xFF, 0x00, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02};
+    const char buffer[16] = {0x21, 0x01, 0x02, 0xFF, 0x00, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02};
     
     Message msg;
     msg.parseFromBytes(buffer, 16);
     
-    EXPECT_TRUE(msg.getVersion() == 1);
-    EXPECT_TRUE(msg.getFlags() == 1);
+    //msg.printInfo();
+    //msg.printBytes();
+    
+    EXPECT_EQ(1, msg.getVersion());
+    EXPECT_TRUE(msg.isFirst());
+    EXPECT_FALSE(msg.isLast());
     EXPECT_TRUE(msg.getType() == 1);
-    EXPECT_TRUE(msg.getClientID()() == 2);
+    EXPECT_TRUE(msg.getClientID() == 2);
     EXPECT_TRUE(msg.getChecksum() == 255);
     EXPECT_TRUE(msg.getLength() == 255);
     EXPECT_TRUE(msg.getWindow() == 65280);
