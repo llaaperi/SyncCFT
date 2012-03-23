@@ -37,10 +37,10 @@ void Message::initHeader(uint8_t type) {
 
 
 
-int Message::parseFromBytes(const char* buffer, int len){
+bool Message::parseFromBytes(const char* buffer, int len){
 
     if(len < HEADER_SIZE){
-        return -1;
+        return false;
     }
     
     _version = ((buffer[0] & 0xE0) >> 5);   //3 MSBs
@@ -78,7 +78,7 @@ int Message::parseFromBytes(const char* buffer, int len){
         _payloadLen = 0;
     }
     
-    return 0;
+    return true;
 }
 
 

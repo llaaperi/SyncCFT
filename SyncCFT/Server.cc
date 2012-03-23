@@ -21,12 +21,12 @@ Server::Server(Client* clientHandler, string port) throw(invalid_argument,runtim
         _clientHandler = clientHandler;
     }
     else{
-        throw invalid_argument("NULL Client");
+        throw invalid_argument("[SERVER] NULL Client");
     }
     
     _socket = Networking::createUnconnectedSocket(_port);
     if(_socket < 0){
-        throw runtime_error("Socket creation failed");
+        throw runtime_error("[SERVER] Socket creation failed");
     }
     
     //Initialize session handler pointers to NULL
@@ -61,7 +61,7 @@ void Server::start(void){
 void Server::stop(void){
     _running = false;
     pthread_join(_thread, NULL);
-    cout << "Server terminated" << endl;
+    cout << "[SERVER] Server terminated" << endl;
 }
 
 
@@ -72,7 +72,7 @@ void Server::stop(void){
 void* Server::handle(void* arg){
     Server* handler = (Server*)arg;
     
-    cout << "Server handler" << endl;
+    cout << "[SERVER] Server handler" << endl;
     
     struct sockaddr cliAddr;
     
@@ -83,32 +83,34 @@ void* Server::handle(void* arg){
     while(handler->_running){
         
         //Wait incoming packets
-        cout << "Server: waiting packets..." << endl;
+        cout << "[SERVER] Server: waiting packets..." << endl;
         int recvLen = Networking::receivePacket(handler->_socket, recvBuffer, &cliAddr, SERVER_TIMEOUT_RECV);
         
-        cout << "Received " << recvLen << " bytes" << endl;
+        cout << "[SERVER] Received " << recvLen << " bytes" << endl;
         
-        // Parse message headers and discard invalid packets
+        // Parse message and discard invalid packets
         Message msg;
-        if(msg.parseFromBytes(recvBuffer, recvLen) < 0){
+        if(!msg.parseFromBytes(recvBuffer, recvLen)){
             continue;
         }
         
         //msg.printBytes();
         //msg.printInfo();
         
-        //Handle new handshake requests
-        if(msg.getType() == TYPE_HELLO){
-            handler->handshakeHandler(&msg, cliAddr);
-        }else{
-            
-            //Forward existing connections to corresponding handler
-            if((msg.getClientID() < SERVER_SESSION_HANDLERS) && (handler->_sessionHandlers[msg.getClientID()] != NULL)){
-                handler->_sessionHandlers[msg.getClientID()]->newMessage(&msg);
-            }
+        switch(msg.getType()){
+            case TYPE_HELLO:    //Handle new handshake requests
+                handler->handshakeHandler(&msg, cliAddr);
+                continue;
+            case TYPE_QUIT:     //Handle termination requests
+                handler->terminateHandler(&msg, cliAddr);
+                continue;
+        }
+        
+        //Forward existing connections to corresponding handler
+        if((msg.getClientID() < SERVER_SESSION_HANDLERS) && (handler->_sessionHandlers[msg.getClientID()] != NULL)){
+            handler->_sessionHandlers[msg.getClientID()]->newMessage(&msg);
         }
     }
-    
     return 0;
 }
 
@@ -136,7 +138,7 @@ int Server::getFreeID(){
  */
 void Server::handshakeHandler(Message* msg, sockaddr cliAddr){
     
-    cout << "Handshake handler started" << endl;
+    cout << "[SERVER] Handshake handler started" << endl;
     
     int bytes;
     char sendBuffer[HEADER_SIZE];
@@ -144,7 +146,7 @@ void Server::handshakeHandler(Message* msg, sockaddr cliAddr){
     //Check that there are free client ID's
     int id = getFreeID();
     if(id < 0){
-        cout << "Connection refused: ClientID's depleted" << endl;
+        cout << "[SERVER] Connection refused: ClientID's depleted" << endl;
         
         //Send NACK if ID's are depleted
         msg->incrSeqnum();
@@ -160,4 +162,28 @@ void Server::handshakeHandler(Message* msg, sockaddr cliAddr){
     msg->setType(TYPE_ACK);
     msg->parseToBytes(sendBuffer);
     bytes = Networking::sendPacket(_socket, sendBuffer, HEADER_SIZE,  &cliAddr, SERVER_TIMEOUT_SEND);
+    
+    //Wait confimation HELLOACK
+    //TODO
+}
+
+
+
+/*
+ * Handler for session termination
+ */
+void Server::terminateHandler(Message* msg, sockaddr cliAddr){
+
+    cout << "[SERVER] Terminate handler started" << endl;
+    
+    int bytes = 0;
+    char sendBuffer[HEADER_SIZE];
+    
+    //Reply with final QUITACK
+    msg->setType(TYPE_ACK);
+    msg->incrSeqnum();
+    msg->setPayload(NULL, 0);
+    msg->parseToBytes(sendBuffer);
+    bytes = Networking::sendPacket(_socket, sendBuffer, HEADER_SIZE, &cliAddr, SERVER_TIMEOUT_SEND);
+    
 }

@@ -12,7 +12,7 @@
 
 SessionHandler::SessionHandler(uint8_t id, sockaddr cliAddr) : _id(id), _cliAddr(cliAddr){
     
-    cout << "New session with id " << (unsigned int)id << " accepted"<< endl;
+    cout << "[SERVER] New session with id " << (unsigned int)id << " accepted"<< endl;
     
 }
 

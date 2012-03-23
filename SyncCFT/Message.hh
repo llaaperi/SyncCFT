@@ -75,7 +75,12 @@ public:
     
     void initHeader(uint8_t type);
     void parseToBytes(char* buffer);
-    int parseFromBytes(const char* buffer, int len);
+    
+    /*
+     * Parse message from byte array.
+     * Return true if message was parsed succesfully, otherwise return false
+     */
+    bool parseFromBytes(const char* buffer, int len);
     
     void printBytes();
     void printInfo();

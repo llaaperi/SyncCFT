@@ -18,19 +18,22 @@
 #define CLIENT_TIMEOUT_SEND 5
 #define CLIENT_TIMEOUT_HELLO 5
 #define CLIENT_TIMEOUT_HELLOACK 5
+#define CLIENT_TIMEOUT_QUIT 5
+#define CLIENT_TIMEOUT_BACKOFF 5
 
 using namespace std;
 
 class Client {
     //Transceiver _transceiver;
     pthread_t _thread;
-    string _port;
+    string _cport;
+    string _sport;
     bool _running;
     int _socket;
     
 public:
     
-    Client(list<string>& hosts, string port) throw(invalid_argument, runtime_error);
+    Client(list<string>& hosts, string cport, string sport) throw(invalid_argument, runtime_error);
     ~Client() {}
     
     /*
@@ -55,6 +58,12 @@ private:
     //Rule of three
     Client(Client const& other);
     Client operator=(Client const& other);
+    
+    void startSession(sockaddr servAddr);
+    void endSession(sockaddr servAddr);
+    
+    bool handshakeHandler(sockaddr servAddr);
+    bool terminateHandler(sockaddr servAddr);
 };
 
 #endif

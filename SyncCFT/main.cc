@@ -89,7 +89,7 @@ int main (int argc, const char * argv[])
     // Start client first
     Client* clientHandler = NULL;
     try {
-        clientHandler = new Client(hosts, cport);
+        clientHandler = new Client(hosts, cport, sport);
         clientHandler->start();
     } catch (...) {
         cout << "Creating client handler failed." << endl;
