@@ -134,15 +134,16 @@ int Networking::createConnectedSocket(std::string address, std::string port) {
  * @param socketFd socket from which to receive message
  * @param buffer Data buffer for storing received packets
  * @param cliAddr Structure for storing received address info
+ * @param timeout Timeout value in seconds
  * @return Number of bytes received
  */
-int Networking::receivePacket(int socketFd, char* buffer, struct sockaddr* cliAddr) {
+int Networking::receivePacket(int socketFd, char* buffer, struct sockaddr* cliAddr, unsigned int timeout) {
      int j, numBytes, maxFd;
      
      // Struct for setting responce timeout
-     struct timeval timeout; 
-     timeout.tv_sec = TIMEOUT; // Sets server timeout to 5 sec  
-     timeout.tv_usec = 0;
+     struct timeval tOut; 
+     tOut.tv_sec = TIMEOUT; // Sets server timeout to 5 sec  
+     tOut.tv_usec = 0;
      
      fd_set readSet; // Set for storing socket information
      
@@ -151,7 +152,7 @@ int Networking::receivePacket(int socketFd, char* buffer, struct sockaddr* cliAd
      maxFd = socketFd + 1;
      
      // Wait until there is data to receive or connection times out
-     if ((j = select(maxFd, &readSet, NULL, NULL, &timeout)) == -1) // Triggered by incoming data or timeout
+     if ((j = select(maxFd, &readSet, NULL, NULL, &tOut)) == -1) // Triggered by incoming data or timeout
          perror("Receive select error");
      
      // Handling of timeout
@@ -178,16 +179,17 @@ int Networking::receivePacket(int socketFd, char* buffer, struct sockaddr* cliAd
  * @param data Message to be sent
  * @param length Size of the message
  * @param cliAddr Structure for storing target address info
+ * @param timeout Timeout value in seconds
  * @return Number of bytes sent
  */
-int Networking::sendPacket(int socketFd, char* data,int length, struct sockaddr* cliAddr) {
+int Networking::sendPacket(int socketFd, char* data,int length, struct sockaddr* cliAddr, unsigned int timeout) {
     
     int j, maxFd;
     
     // Struct for setting responce timeout
-    struct timeval timeout; 
-    timeout.tv_sec = 5; // Sets server timeout to 5 sec
-    timeout.tv_usec = 0;
+    struct timeval tOut; 
+    tOut.tv_sec = 5; // Sets server timeout to 5 sec
+    tOut.tv_usec = 0;
     
     fd_set writeSet; // Set for storing socket information
     
@@ -196,7 +198,7 @@ int Networking::sendPacket(int socketFd, char* data,int length, struct sockaddr*
     maxFd = socketFd + 1;
     
     // Wait until you are able to write to socket
-    if ((j = select(maxFd, NULL, &writeSet, NULL, &timeout)) == -1) // Triggered by available socket or timeout
+    if ((j = select(maxFd, NULL, &writeSet, NULL, &tOut)) == -1) // Triggered by available socket or timeout
         perror("Select error");
     
     // Handling of timeout

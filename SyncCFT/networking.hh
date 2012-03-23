@@ -49,9 +49,10 @@ namespace Networking {
      * @param socketFd socket from which to receive message
      * @param buffer Data buffer for storing received packets
      * @param cliAddr Structure for storing received address info
+     * @param timeout Timeout value in seconds
      * @return Number of bytes received
      */
-    int receivePacket(int socketFd, char* buffer, struct sockaddr* cliAddr);
+    int receivePacket(int socketFd, char* buffer, struct sockaddr* cliAddr, unsigned int timeout);
     
     /*
      * Send message to a given socket
@@ -59,9 +60,10 @@ namespace Networking {
      * @param data Message to be sent
      * @param length Size of the message
      * @param cliAddr Structure for storing target address info
+     * @param timeout Timeout value in seconds
      * @return Number of bytes sent
      */
-    int sendPacket(int socketFd, char* data,int length, struct sockaddr* cliAddr);
+    int sendPacket(int socketFd, char* data,int length, struct sockaddr* cliAddr, unsigned int timeout);
 
 }
     
