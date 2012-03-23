@@ -14,6 +14,11 @@
 #include "Message.hh"
 #include <stdexcept>
 
+
+#define CLIENT_TIMEOUT_SEND 5
+#define CLIENT_TIMEOUT_HELLO 5
+#define CLIENT_TIMEOUT_HELLOACK 5
+
 using namespace std;
 
 class Client {

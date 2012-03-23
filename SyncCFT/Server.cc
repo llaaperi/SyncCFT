@@ -64,13 +64,14 @@ void* Server::handle(void* arg)
     struct sockaddr cliAddr;
     
     char recvBuffer[NETWORKING_MTU]; 
+    char sendBuffer[NETWORKING_MTU]; 
     
     //Main loop
     while(handler->_running){
         
         cout << "Server: waiting packets..." << endl;
         
-        int recvLen = Networking::receivePacket(handler->_socket, recvBuffer, &cliAddr);
+        int recvLen = Networking::receivePacket(handler->_socket, recvBuffer, &cliAddr, SERVER_TIMEOUT_RECV);
         
         cout << "Received " << recvLen << " bytes" << endl;
         
@@ -92,9 +93,8 @@ void* Server::handle(void* arg)
                 msg.incrSeqnum();
                 msg.setClientID(1);
                 msg.setType(TYPE_ACK);
-                
-                bytes = Networking::sendPacket(handler->_socket, recvBuffer, recvLen,  &cliAddr);
-                
+                msg.parseToBytes(sendBuffer);
+                bytes = Networking::sendPacket(handler->_socket, sendBuffer, HEADER_SIZE,  &cliAddr, SERVER_TIMEOUT_SEND);
                 
                 break;
             case TYPE_DESCR:
