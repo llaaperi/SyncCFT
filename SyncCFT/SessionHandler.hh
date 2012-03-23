@@ -9,19 +9,28 @@
 #ifndef SyncCFT_SessionHandler_hh
 #define SyncCFT_SessionHandler_hh
 
+#include "networking.hh"
+#include "Message.hh"
+
+using namespace std;
+
 class SessionHandler {
-    SessionHandler(){};
-    ~SessionHandler(){};
     
-    
+    uint8_t _id;
+    struct sockaddr _cliAddr;
     
 public:
+    SessionHandler(uint8_t id, sockaddr cliAddr);
+    ~SessionHandler(){};
     
+    void newMessage(Message* msg);
     
 private:
     // Rule of three
     SessionHandler(SessionHandler const& other);
     SessionHandler& operator=(SessionHandler const& other);
+    
+    bool isValidSource();
 };
 
 #endif

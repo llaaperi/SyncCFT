@@ -22,7 +22,7 @@ Message::Message() : _version(0), _type(0), _clientID(0), _checksum(0), _payload
  */
 void Message::initHeader(uint8_t type) {
     
-    srand(time(NULL));
+    srand((unsigned int)time(NULL));
     
     _version = DEFAULT_VERSION;
     _type = type;

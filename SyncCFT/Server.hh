@@ -10,6 +10,7 @@
 #define SyncCFT_Server_hh
 
 #include "Transceiver.hh"
+#include "SessionHandler.hh" 
 #include "Metafile.hh"
 #include "Message.hh"
 #include "Client.hh"
@@ -20,6 +21,8 @@
 #define SERVER_TIMEOUT_SEND 5
 #define SERVER_TIMEOUT_HELLOACK 5
 
+#define SERVER_SESSION_HANDLERS 3 //No need for 256 handler
+
 using namespace std;
 
 class Server {
@@ -29,6 +32,8 @@ class Server {
     bool _running;
     string _port;
     int _socket;
+    
+    SessionHandler* _sessionHandlers[SERVER_SESSION_HANDLERS];
 
 public:
     
@@ -54,6 +59,9 @@ private:
     //Rule of three
     Server(Server const& other);
     Server operator=(Server const& other);
+    
+    int getFreeID();
+    void handshakeHandler(Message* msg, sockaddr cliAddr);
 };
 
 #endif
