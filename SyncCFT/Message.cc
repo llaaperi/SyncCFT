@@ -12,32 +12,33 @@
 
 
 
-Message::Message() : _window(1), _chunk(0), _begin(false), _end(false)  {
-    
-    srand(time(NULL));     // Use time as seed for random number generator
-    _seqnum = rand();
-
-}
-
-
-Message::Message(char* buffer){
-    
-    
-    
-}
-
+Message::Message() :
+    _version(0),
+    _type(0),
+    _clientID(0),
+    _checksum(0),
+    _length(0),
+    _window(0),
+    _seqnum(0),
+    _chunk(0),
+    _begin(false),
+    _end(false), 
+    _payload(0) {}
 
 /*
  * Initialize all header values
  */
 void Message::initHeader(uint8_t version, uint8_t type, uint8_t clientID, uint8_t checksum, uint16_t length, uint16_t window, uint32_t seqnum, uint32_t chunk) {
+    
+    srand(time(NULL));     // Use time as seed for random number generator
+    
     _version = version;
     _type = type;
     _clientID = clientID;
     _checksum = checksum;
     _length = length;
     _window = window;
-    _seqnum = seqnum;
+    _seqnum = rand();
     _chunk = chunk;
 }
 
