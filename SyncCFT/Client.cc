@@ -69,7 +69,7 @@ void* Client::handle(void* arg)
     
     // Get address information in struct addrinfo format. Works for IPv4 and IPv6.
     int temp;
-    temp = getaddrinfo("localhost", "5062", &hints, &serverInfo);
+    temp = getaddrinfo("127.0.0.1", "5062", &hints, &serverInfo);
     if (temp != 0) {
         perror("Running getaddrinfo failed.");
         return 0;

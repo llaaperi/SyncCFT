@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0D5CAC9D14EFE1CD006CDCD6 /* networking.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0D5CAC9B14EFE1CD006CDCD6 /* networking.cc */; };
 		0DDFD180151C8DFD00B77760 /* gtest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDFD17F151C8DFD00B77760 /* gtest.framework */; };
+		0DDFD182151CBFED00B77760 /* SessionHandler.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0DDFD181151CBFED00B77760 /* SessionHandler.cc */; };
 		9023096014FBEB89004C81D0 /* Message.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9023095F14FBEB89004C81D0 /* Message.cc */; };
 		90487DEF14EF0A7B006505C2 /* utilities.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90487DEE14EF0A7B006505C2 /* utilities.cc */; };
 		906B8BC414F94EBB0038163D /* UnitTests.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 906B8BC314F94EBB0038163D /* UnitTests.1 */; };
@@ -55,6 +56,8 @@
 		0D5CAC9B14EFE1CD006CDCD6 /* networking.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = networking.cc; sourceTree = "<group>"; };
 		0D5CAC9C14EFE1CD006CDCD6 /* networking.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = networking.hh; sourceTree = "<group>"; };
 		0DDFD17F151C8DFD00B77760 /* gtest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = gtest.framework; sourceTree = "<group>"; };
+		0DDFD181151CBFED00B77760 /* SessionHandler.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SessionHandler.cc; sourceTree = "<group>"; };
+		0DDFD183151CC00300B77760 /* SessionHandler.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SessionHandler.hh; sourceTree = "<group>"; };
 		9023095F14FBEB89004C81D0 /* Message.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Message.cc; sourceTree = "<group>"; };
 		90487DEC14EF0A67006505C2 /* utilities.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utilities.hh; sourceTree = "<group>"; };
 		90487DEE14EF0A7B006505C2 /* utilities.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utilities.cc; sourceTree = "<group>"; };
@@ -139,6 +142,8 @@
 				9023095F14FBEB89004C81D0 /* Message.cc */,
 				0D5CAC9A14EFE1B3006CDCD6 /* Transceiver.hh */,
 				966F0F9714E5AADB007FB278 /* SyncCFT.1 */,
+				0DDFD183151CC00300B77760 /* SessionHandler.hh */,
+				0DDFD181151CBFED00B77760 /* SessionHandler.cc */,
 			);
 			path = SyncCFT;
 			sourceTree = "<group>";
@@ -231,6 +236,7 @@
 				9023096014FBEB89004C81D0 /* Message.cc in Sources */,
 				90B291DB1503779C00E57979 /* Client.cc in Sources */,
 				90B291DD150377A900E57979 /* Server.cc in Sources */,
+				0DDFD182151CBFED00B77760 /* SessionHandler.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
