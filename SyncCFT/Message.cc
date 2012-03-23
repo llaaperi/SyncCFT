@@ -18,6 +18,15 @@ Message::Message() : mWindow(1), mChunk(0),mBegin(false), mEnd(false)  {
     mSeqnum = rand();
 
 }
+
+
+Message::Message(char* buffer){
+    
+    
+    
+}
+
+
 /*
  * Initialize all header values
  */
@@ -30,6 +39,34 @@ void Message::initHeader(uint8_t version, uint8_t type, uint8_t clientID, uint8_
     mWindow = window;
     mSeqnum = seqnum;
     mChunk = chunk;
+}
+
+
+
+int Message::parseFromBytes(char* buffer, int len){
+
+    if(len < HEADER_SIZE){
+        return -1;
+    }
+    
+    _version = ((buffer[0] & 0xE0) >> 5);   //3 MSBs
+    _flags = (buffer[0] & 1F);   //5 LSBs
+    _type = buffer[1];
+    _clientID = buffer[2];
+    _checksum = buffer[3];
+    _length = (buffer[4] << 8);
+    _length |= buffer[5];
+    _windowSize = (buffer[6] << 8);
+    _windowSize |= buffer[7];
+    _seqnum = (buffer[8] << 24);
+    _seqnum |= (buffer[9] << 16);
+    _seqnum |= (buffer[10] << 8);
+    _seqnum |= buffer[11];
+    _chunk = (buffer[12] << 24);
+    _chunk |= (buffer[13] << 16);
+    _chunk |= (buffer[14] << 8);
+    _chunk |= buffer[15];
+    
 }
 
 

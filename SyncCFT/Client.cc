@@ -78,7 +78,7 @@ void* Client::handle(void* arg)
     int i = 1, bytes = 0;
     while(handler->_running){
         
-        sprintf(sendBuffer,"Message %d\0", i++);
+        sprintf(sendBuffer,"Message %d", i++);
         
         bytes = sendto(handler->_socket, sendBuffer, strlen(sendBuffer), 0, serverInfo->ai_addr, serverInfo->ai_addrlen);
         

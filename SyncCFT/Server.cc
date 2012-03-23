@@ -73,6 +73,10 @@ void* Server::handle(void* arg)
         int recvLen = Networking::receivePacket(handler->_socket, recvBuffer, &cliAddr);
         
         cout << "Received " << recvLen << " bytes" << endl;
+        
+        
+        
+        
     }
     
     return 0;
