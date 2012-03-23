@@ -7,38 +7,32 @@
 //
 
 #include <iostream>
-
+#include <string.h>
 #include "Message.hh"
 
 
 
-Message::Message() :
-    _version(0),
-    _type(0),
-    _clientID(0),
-    _checksum(0),
-    _length(0),
-    _window(0),
-    _seqnum(0),
-    _chunk(0),
-    _begin(false),
-    _end(false), 
-    _payload(0) {
-    
+Message::Message() : _version(0), _type(0), _clientID(0), _checksum(0), _payloadLen(0),
+                    _window(0), _seqnum(0), _chunk(0), _begin(false), _end(false), 
+                    _payload(0){
     }
 
 /*
  * Initialize all header values
  */
-void Message::initHeader(uint8_t version, uint8_t type, uint8_t clientID, uint8_t checksum, uint16_t length, uint16_t window, uint32_t seqnum, uint32_t chunk) {
-    _version = version;
+void Message::initHeader(uint8_t type) {
+    
+    srand(time(NULL));
+    
+    _version = DEFAULT_VERSION;
     _type = type;
-    _clientID = clientID;
-    _checksum = checksum;
-    _length = length;
-    _window = window;
-    _seqnum = seqnum;
-    _chunk = chunk;
+    _clientID = 0;
+    _checksum = 0;
+    _window = DEFAULT_WINDOW;
+    _seqnum = rand();
+    _chunk = 0;
+    _begin = false;
+    _end = false;
 }
 
 
@@ -62,8 +56,8 @@ int Message::parseFromBytes(const char* buffer, int len){
     _type = buffer[1];
     _clientID = buffer[2];
     _checksum = buffer[3];
-    _length = ((buffer[4] & 0xFF) << 8);
-    _length |= (buffer[5] & 0xFF);
+    _payloadLen = ((buffer[4] & 0xFF) << 8);
+    _payloadLen |= (buffer[5] & 0xFF);
     _window = ((buffer[6] & 0xFF) << 8);
     _window |= (buffer[7] & 0xFF);
     _seqnum = ((buffer[8] & 0xFF) << 24);
@@ -76,10 +70,12 @@ int Message::parseFromBytes(const char* buffer, int len){
     _chunk |= (buffer[15] & 0xFF);
     
     //Set payload pointer
-    if(len > 16){
-        _payoad = buffer[16];
+    if(len > HEADER_SIZE){
+        _payload = &buffer[HEADER_SIZE];
+        _payloadLen = len - HEADER_SIZE;
     }else{
         _payload = NULL;
+        _payloadLen = 0;
     }
     
     return 0;
@@ -101,8 +97,8 @@ void Message::parseToBytes(char* buffer) {
     // Checksum
 	buffer[3] =  (_checksum & 0xFF);
     // Payload length
-	buffer[4] =  (_length >> 8) & 0xFF;
-	buffer[5] =  (_length & 0xFF);
+	buffer[4] =  (_payloadLen >> 8) & 0xFF;
+	buffer[5] =  (_payloadLen & 0xFF);
     // Window size
 	buffer[6] =  (_window >> 8) & 0xFF;
 	buffer[7] =  (_window & 0xFF);
@@ -116,6 +112,13 @@ void Message::parseToBytes(char* buffer) {
 	buffer[13] = (_chunk >> 16) & 0xFF;
 	buffer[14] = (_chunk >> 8) & 0xFF;
 	buffer[15] = (_chunk & 0xFF);
+    
+    //Copy payload to buffer
+    if(_payloadLen > 0){
+        memcpy(&buffer[HEADER_SIZE], _payload, _payloadLen);
+    }
+    
+    //TODO calculate checknum
 }
 
 
@@ -138,7 +141,7 @@ void Message::printInfo(){
     cout << "Type = " << (unsigned int)getType() << endl;
     cout << "ClientID = " << (unsigned int)getClientID() << endl;
     cout << "Checksum = " << (unsigned int)getChecksum() << endl;
-    cout << "Length = " << getLength() << endl;
+    cout << "Length = " << getPayloadLength() << endl;
     cout << "WindowSize = " << getWindow() << endl;
     cout << "Seqnum = " << getSeqnum() << endl;
     cout << "Chunk = " << getChunk() << endl;

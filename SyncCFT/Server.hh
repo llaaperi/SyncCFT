@@ -15,6 +15,11 @@
 #include "Client.hh"
 #include "stdexcept"
 
+
+#define SERVER_TIMEOUT_RECV 1000
+#define SERVER_TIMEOUT_SEND 5
+#define SERVER_TIMEOUT_HELLOACK 5
+
 using namespace std;
 
 class Server {

@@ -78,9 +78,12 @@ void* Client::handle(void* arg)
     int i = 1, bytes = 0;
     while(handler->_running){
         
-        sprintf(sendBuffer,"Message %d", i++);
+        Message msg;
+        msg.initHeader(TYPE_HELLO);
+        msg.parseToBytes(sendBuffer);
         
-        bytes = sendto(handler->_socket, sendBuffer, strlen(sendBuffer), 0, serverInfo->ai_addr, serverInfo->ai_addrlen);
+        //bytes = sendto(handler->_socket, sendBuffer, strlen(sendBuffer), 0, serverInfo->ai_addr, serverInfo->ai_addrlen);
+        bytes = Networking::sendPacket(handler->_socket, sendBuffer, HEADER_SIZE, serverInfo->ai_addr, CLIENT_TIMEOUT_SEND);
         
         if(bytes < 0){
             cout << "Packet send failed" << endl;
@@ -88,7 +91,44 @@ void* Client::handle(void* arg)
             cout << "Packet sent" << endl;
         }
         
-        sleep(2);
+        bytes = Networking::receivePacket(handler->_socket, recvBuffer, serverInfo->ai_addr, CLIENT_TIMEOUT_HELLO);
+        
+        if(bytes > 0){
+            
+            cout << "Received message" << endl;
+            msg.parseFromBytes(recvBuffer, bytes);
+            
+            if(msg.getType() == TYPE_ACK){
+                
+                cout << "Received ack" << endl;
+                
+                msg.incrSeqnum();
+                msg.setPayload(NULL, 0);
+                msg.parseToBytes(sendBuffer);
+                bytes = Networking::sendPacket(handler->_socket, sendBuffer, HEADER_SIZE, serverInfo->ai_addr, CLIENT_TIMEOUT_SEND);
+                
+                //Check bytes if send correctly
+                
+                bytes = Networking::receivePacket(handler->_socket, recvBuffer, serverInfo->ai_addr, CLIENT_TIMEOUT_HELLO);
+                
+                if(bytes > 0){
+                    
+                    msg.parseFromBytes(recvBuffer, bytes);
+                    if(msg.getType() == TYPE_ACK){
+                        cout << "Handshake succesfull" << endl;
+                    }else{
+                        cout << "Handshake failed" << endl;
+                    }
+                    
+                }else{
+                    cout << "HELLOACK not received" << endl;
+                }
+                
+            }
+        
+        }
+        
+        sleep(5);
     }
     return 0;
 }
