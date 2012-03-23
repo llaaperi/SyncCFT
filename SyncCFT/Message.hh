@@ -20,23 +20,23 @@ enum MsgType {TYPE_ACK, TYPE_HELLO, TYPE_DESCR, TYPE_DIFF, TYPE_GET, TYPE_FILE, 
 using namespace std;
 
 class Message {
-    struct sockaddr_in mAddrInfo;
+    struct sockaddr_in _addrInfo;
     
     // Header
-    uint8_t mVersion;
-    uint8_t mType;
-    uint8_t mClientID;
-    uint8_t mChecksum;
-    uint16_t mLength;
-    uint16_t mWindow;
-    uint32_t mSeqnum;
-    uint32_t mChunk;
+    uint8_t _version;
+    uint8_t _type;
+    uint8_t _clientID;
+    uint8_t _checksum;
+    uint16_t _length;
+    uint16_t _window;
+    uint32_t _seqnum;
+    uint32_t _chunk;
     // Flags
-    bool mBegin;
-    bool mEnd;
-    char* mPayload;
+    bool _begin;
+    bool _end;
+    char* _payload;
     
-    char mBinaryHeader[HEADER_SIZE];
+    char _binaryHeader[HEADER_SIZE];
         
 public:
     Message();
@@ -44,8 +44,8 @@ public:
     
     void initHeader(uint8_t version, uint8_t type, uint8_t clientID, uint8_t checksum, uint16_t length, uint16_t window, uint32_t seqnum, uint32_t chunk);
     
-    char* getPayload() const {return mPayload;}
-    void setPayload(char* payload, int length) {mPayload = payload; mLength = length;}
+    char* getPayload() const {return _payload;}
+    void setPayload(char* payload, int length) {_payload = payload; _length = length;}
     
     char* parseBytes();
     

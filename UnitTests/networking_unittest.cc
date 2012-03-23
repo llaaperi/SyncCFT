@@ -13,8 +13,8 @@
 class NetworkingTest : public testing::Test {
 protected:
     virtual void SetUp() {
-        serverSocket = Networking::createServerSocket("55500");
-        clientSocket = Networking::createClientSocket("127.0.0.1", "55500");
+        serverSocket = Networking::createUnconnectedSocket("55500");
+        clientSocket = Networking::createConnectedSocket("127.0.0.1", "55500");
     }
     
     virtual void TearDown() {

@@ -12,10 +12,10 @@
 
 
 
-Message::Message() : mWindow(1), mChunk(0),mBegin(false), mEnd(false)  {
+Message::Message() : _window(1), _chunk(0), _begin(false), _end(false)  {
     
     srand(time(NULL));     // Use time as seed for random number generator
-    mSeqnum = rand();
+    _seqnum = rand();
 
 }
 
@@ -31,14 +31,14 @@ Message::Message(char* buffer){
  * Initialize all header values
  */
 void Message::initHeader(uint8_t version, uint8_t type, uint8_t clientID, uint8_t checksum, uint16_t length, uint16_t window, uint32_t seqnum, uint32_t chunk) {
-    mVersion = version;
-    mType = type;
-    mClientID = clientID;
-    mChecksum = checksum;
-    mLength = length;
-    mWindow = window;
-    mSeqnum = seqnum;
-    mChunk = chunk;
+    _version = version;
+    _type = type;
+    _clientID = clientID;
+    _checksum = checksum;
+    _length = length;
+    _window = window;
+    _seqnum = seqnum;
+    _chunk = chunk;
 }
 
 
@@ -72,34 +72,34 @@ int Message::parseFromBytes(char* buffer, int len){
 
 // Convert message header into binary format
 char* Message::parseBytes() {
-    memset(mBinaryHeader, 0, HEADER_SIZE);
+    memset(_binaryHeader, 0, HEADER_SIZE);
     
     // Version and flags    
-	mBinaryHeader[0] = ((mVersion & 0x07) << 5) | ((mBegin & 0x01) << 4) | ((mEnd & 0x01) << 3);
+	_binaryHeader[0] = ((_version & 0x07) << 5) | ((_begin & 0x01) << 4) | ((_end & 0x01) << 3);
     // Type
-	mBinaryHeader[1] =  (mType & 0xFF);
+	_binaryHeader[1] =  (_type & 0xFF);
     // Client ID
-	mBinaryHeader[2] =  (mClientID & 0xFF);
+	_binaryHeader[2] =  (_clientID & 0xFF);
     // Checksum
-	mBinaryHeader[3] =  (mChecksum & 0xFF);
+	_binaryHeader[3] =  (_checksum & 0xFF);
     // Payload length
-	mBinaryHeader[4] =  (mLength >> 8) & 0xFF;
-	mBinaryHeader[5] =  (mLength & 0xFF);
+	_binaryHeader[4] =  (_length >> 8) & 0xFF;
+	_binaryHeader[5] =  (_length & 0xFF);
     // Window size
-	mBinaryHeader[6] =  (mWindow >> 8) & 0xFF;
-	mBinaryHeader[7] =  (mWindow & 0xFF);
+	_binaryHeader[6] =  (_window >> 8) & 0xFF;
+	_binaryHeader[7] =  (_window & 0xFF);
     // Sequence number
-	mBinaryHeader[8] =  (mSeqnum >> 24) & 0xFF;
-	mBinaryHeader[9] =  (mSeqnum >> 16) & 0xFF;
-	mBinaryHeader[10] = (mSeqnum >> 8) & 0xFF;
-	mBinaryHeader[11] = (mSeqnum & 0xFF);
+	_binaryHeader[8] =  (_seqnum >> 24) & 0xFF;
+	_binaryHeader[9] =  (_seqnum >> 16) & 0xFF;
+	_binaryHeader[10] = (_seqnum >> 8) & 0xFF;
+	_binaryHeader[11] = (_seqnum & 0xFF);
     // Chunk number
-    mBinaryHeader[12] = (mChunk >> 24) & 0xFF;
-	mBinaryHeader[13] = (mChunk >> 16) & 0xFF;
-	mBinaryHeader[14] = (mChunk >> 8) & 0xFF;
-	mBinaryHeader[15] = (mChunk & 0xFF);
+    _binaryHeader[12] = (_chunk >> 24) & 0xFF;
+	_binaryHeader[13] = (_chunk >> 16) & 0xFF;
+	_binaryHeader[14] = (_chunk >> 8) & 0xFF;
+	_binaryHeader[15] = (_chunk & 0xFF);
     
-    return mBinaryHeader;
+    return _binaryHeader;
 }
 
 
@@ -107,6 +107,6 @@ char* Message::parseBytes() {
 void Message::print() {
     cout <<"[ ";
     for (int i = 0; i < HEADER_SIZE; i++)
-        printf("%02x ", (unsigned char)mBinaryHeader[i]);
+        printf("%02x ", (unsigned char)_binaryHeader[i]);
     cout << "]" << endl;
 }
