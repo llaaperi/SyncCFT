@@ -136,7 +136,7 @@ int Networking::createConnectedSocket(std::string address, std::string port) {
  * @param cliAddr Structure for storing received address info
  * @return Number of bytes received
  */
-int Networking::receivePacket(int socketFd, char* buffer, struct sockaddr_in* cliAddr) {
+int Networking::receivePacket(int socketFd, char* buffer, struct sockaddr* cliAddr) {
      int j, numBytes, maxFd;
      
      // Struct for setting responce timeout
@@ -162,7 +162,7 @@ int Networking::receivePacket(int socketFd, char* buffer, struct sockaddr_in* cl
      if (FD_ISSET(socketFd, &readSet)) { // Check if fd is active         
          int flags = 0;
          int cliLen = sizeof(*cliAddr);
-         if ((numBytes = (int)recvfrom(socketFd, buffer, (size_t)NETWORKING_MTU, flags, (struct sockaddr *)cliAddr, (socklen_t*)&cliLen)) <= 0) {
+         if ((numBytes = (int)recvfrom(socketFd, buffer, (size_t)NETWORKING_MTU, flags, cliAddr, (socklen_t*)&cliLen)) <= 0) {
              perror("Receiving error.");
              return -1;
          }
@@ -180,7 +180,7 @@ int Networking::receivePacket(int socketFd, char* buffer, struct sockaddr_in* cl
  * @param cliAddr Structure for storing target address info
  * @return Number of bytes sent
  */
-int Networking::sendPacket(int socketFd, char* data,int length, struct sockaddr_in* cliAddr) {
+int Networking::sendPacket(int socketFd, char* data,int length, struct sockaddr* cliAddr) {
     
     int j, maxFd;
     
@@ -207,7 +207,7 @@ int Networking::sendPacket(int socketFd, char* data,int length, struct sockaddr_
     
     if (FD_ISSET(socketFd, &writeSet)) { // Check if fd is active
         // Send request to the server
-        return (int)sendto(socketFd, data, length, 0, (struct sockaddr *)cliAddr, sizeof(*cliAddr));
+        return (int)sendto(socketFd, data, length, 0, cliAddr, sizeof(*cliAddr));
     }
     return -1;
 }

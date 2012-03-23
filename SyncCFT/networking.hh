@@ -51,7 +51,7 @@ namespace Networking {
      * @param cliAddr Structure for storing received address info
      * @return Number of bytes received
      */
-    int receivePacket(int socketFd, char* buffer, struct sockaddr_in* cliAddr);
+    int receivePacket(int socketFd, char* buffer, struct sockaddr* cliAddr);
     
     /*
      * Send message to a given socket
@@ -61,7 +61,7 @@ namespace Networking {
      * @param cliAddr Structure for storing target address info
      * @return Number of bytes sent
      */
-    int sendPacket(int socketFd, char* data,int length, struct sockaddr_in* cliAddr);
+    int sendPacket(int socketFd, char* data,int length, struct sockaddr* cliAddr);
 
 }
     
