@@ -61,7 +61,7 @@ void* Client::handle(void* arg)
     char sendBuffer[NETWORKING_MTU];
     char recvBuffer[NETWORKING_MTU];
     
-    struct addrinfo hints, *serverInfo, *tempInfo;
+    struct addrinfo hints, *serverInfo;
     
     bzero(&hints, sizeof(struct addrinfo)); // Zero struct values
     hints.ai_family = AF_UNSPEC; // IPv4 or IPv6
@@ -75,7 +75,7 @@ void* Client::handle(void* arg)
         return 0;
     }
     
-    int i = 1, bytes = 0;
+    int bytes = 0;
     while(handler->_running){
         
         Message msg;

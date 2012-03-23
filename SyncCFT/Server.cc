@@ -77,7 +77,7 @@ void* Server::handle(void* arg){
     struct sockaddr cliAddr;
     
     char recvBuffer[NETWORKING_MTU]; 
-    char sendBuffer[NETWORKING_MTU]; 
+    //char sendBuffer[NETWORKING_MTU]; 
     
     //Main loop
     while(handler->_running){
