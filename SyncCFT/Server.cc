@@ -103,7 +103,7 @@ void* Server::handle(void* arg){
         }else{
             
             //Forward existing connections to corresponding handler
-            if(handler->_sessionHandlers[msg.getClientID()] != NULL){
+            if((msg.getClientID() < SERVER_SESSION_HANDLERS) && (handler->_sessionHandlers[msg.getClientID()] != NULL)){
                 handler->_sessionHandlers[msg.getClientID()]->newMessage(&msg);
             }
         }

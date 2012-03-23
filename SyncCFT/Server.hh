@@ -21,7 +21,7 @@
 #define SERVER_TIMEOUT_SEND 5
 #define SERVER_TIMEOUT_HELLOACK 5
 
-#define SERVER_SESSION_HANDLERS 3 //No need for 256 handler
+#define SERVER_SESSION_HANDLERS 3 //Number of handlers can be defined. Maximum value is 256.
 
 using namespace std;
 
