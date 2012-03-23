@@ -43,7 +43,7 @@ void Message::initHeader(uint8_t version, uint8_t type, uint8_t clientID, uint8_
 
 
 
-int Message::parseFromBytes(char* buffer, int len){
+int Message::parseFromBytes(const char* buffer, int len){
 
     if(len < HEADER_SIZE){
         return -1;

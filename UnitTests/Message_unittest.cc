@@ -36,3 +36,24 @@ TEST(MessageTest, MaxValues) {
     for (int i = 0; i < 16; i++)
         EXPECT_TRUE((memcmp(&header[i], &mask[i], 1)) == 0);
 }
+
+/*
+ *
+ */
+TEST(MessageTest, parseFromBytes){
+
+    const char* buffer[16] = {0x21, 0x01, 0x02, 0xFF, 0x00, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02};
+    
+    Message msg;
+    msg.parseFromBytes(buffer, 16);
+    
+    EXPECT_TRUE(msg.getVersion() == 1);
+    EXPECT_TRUE(msg.getFlags() == 1);
+    EXPECT_TRUE(msg.getType() == 1);
+    EXPECT_TRUE(msg.getClientID()() == 2);
+    EXPECT_TRUE(msg.getChecksum() == 255);
+    EXPECT_TRUE(msg.getLength() == 255);
+    EXPECT_TRUE(msg.getWindow() == 65280);
+    EXPECT_TRUE(msg.getSeqnum() == 1);
+    EXPECT_TRUE(msg.getChunk() == 2);
+}

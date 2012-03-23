@@ -42,12 +42,24 @@ public:
     Message();
     ~Message(){}
     
+    
+    uint8_t getVersion(){return _version;}
+    uint8_t getType(){return _type;}
+    uint8_t getClientID(){return _clientID;}
+    uint8_t getChecksum(){return _checksum;}
+    uint16_t getLength(){return _length;}
+    uint16_t getWindow(){return _window;}
+    uint32_t getSeqnume(){return _seqnum;}
+    uint32_t getChunk(){return _chunk;}
+
+    
     void initHeader(uint8_t version, uint8_t type, uint8_t clientID, uint8_t checksum, uint16_t length, uint16_t window, uint32_t seqnum, uint32_t chunk);
     
     char* getPayload() const {return _payload;}
     void setPayload(char* payload, int length) {_payload = payload; _length = length;}
     
     char* parseBytes();
+    int parseFromBytes(const char* buffer, int len);
     
     void print();
 
