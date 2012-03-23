@@ -101,6 +101,7 @@ void* Client::handle(void* arg)
             if(msg.getType() == TYPE_ACK){
                 
                 cout << "Received ack" << endl;
+                cout << "Handshake finished" << endl;
                 
                 msg.incrSeqnum();
                 msg.setPayload(NULL, 0);
@@ -108,21 +109,6 @@ void* Client::handle(void* arg)
                 bytes = Networking::sendPacket(handler->_socket, sendBuffer, HEADER_SIZE, serverInfo->ai_addr, CLIENT_TIMEOUT_SEND);
                 
                 //Check bytes if send correctly
-                
-                bytes = Networking::receivePacket(handler->_socket, recvBuffer, serverInfo->ai_addr, CLIENT_TIMEOUT_HELLO);
-                
-                if(bytes > 0){
-                    
-                    msg.parseFromBytes(recvBuffer, bytes);
-                    if(msg.getType() == TYPE_ACK){
-                        cout << "Handshake succesfull" << endl;
-                    }else{
-                        cout << "Handshake failed" << endl;
-                    }
-                    
-                }else{
-                    cout << "HELLOACK not received" << endl;
-                }
                 
             }
         
