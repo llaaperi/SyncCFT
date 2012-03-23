@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0D5CAC9D14EFE1CD006CDCD6 /* networking.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0D5CAC9B14EFE1CD006CDCD6 /* networking.cc */; };
+		0DDFD180151C8DFD00B77760 /* gtest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDFD17F151C8DFD00B77760 /* gtest.framework */; };
 		9023096014FBEB89004C81D0 /* Message.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9023095F14FBEB89004C81D0 /* Message.cc */; };
 		90487DEF14EF0A7B006505C2 /* utilities.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90487DEE14EF0A7B006505C2 /* utilities.cc */; };
 		906B8BC414F94EBB0038163D /* UnitTests.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 906B8BC314F94EBB0038163D /* UnitTests.1 */; };
@@ -21,7 +22,6 @@
 		90B291DD150377A900E57979 /* Server.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90B291DC150377A900E57979 /* Server.cc */; };
 		966F0F9614E5AADB007FB278 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966F0F9514E5AADB007FB278 /* main.cc */; };
 		966F0F9814E5AADB007FB278 /* SyncCFT.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 966F0F9714E5AADB007FB278 /* SyncCFT.1 */; };
-		9682F5A91519FB9200421C69 /* gtest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9682F5A81519FB9200421C69 /* gtest.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -54,6 +54,7 @@
 		0D5CAC9A14EFE1B3006CDCD6 /* Transceiver.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Transceiver.hh; sourceTree = "<group>"; };
 		0D5CAC9B14EFE1CD006CDCD6 /* networking.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = networking.cc; sourceTree = "<group>"; };
 		0D5CAC9C14EFE1CD006CDCD6 /* networking.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = networking.hh; sourceTree = "<group>"; };
+		0DDFD17F151C8DFD00B77760 /* gtest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = gtest.framework; sourceTree = "<group>"; };
 		9023095F14FBEB89004C81D0 /* Message.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Message.cc; sourceTree = "<group>"; };
 		90487DEC14EF0A67006505C2 /* utilities.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utilities.hh; sourceTree = "<group>"; };
 		90487DEE14EF0A7B006505C2 /* utilities.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utilities.cc; sourceTree = "<group>"; };
@@ -69,7 +70,6 @@
 		966F0F9114E5AADB007FB278 /* SyncCFT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SyncCFT; sourceTree = BUILT_PRODUCTS_DIR; };
 		966F0F9514E5AADB007FB278 /* main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
 		966F0F9714E5AADB007FB278 /* SyncCFT.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = SyncCFT.1; sourceTree = "<group>"; };
-		9682F5A81519FB9200421C69 /* gtest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = gtest.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,7 +77,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9682F5A91519FB9200421C69 /* gtest.framework in Frameworks */,
+				0DDFD180151C8DFD00B77760 /* gtest.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -94,11 +94,11 @@
 		906B8BC014F94EBB0038163D /* UnitTests */ = {
 			isa = PBXGroup;
 			children = (
+				0DDFD17F151C8DFD00B77760 /* gtest.framework */,
 				906B8BD714F957B40038163D /* main.cc */,
 				907F833B14FD439D001C5E15 /* Message_unittest.cc */,
 				906B8BDB14F959B90038163D /* networking_unittest.cc */,
 				906B8BC314F94EBB0038163D /* UnitTests.1 */,
-				9682F5A81519FB9200421C69 /* gtest.framework */,
 			);
 			path = UnitTests;
 			sourceTree = "<group>";
