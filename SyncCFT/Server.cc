@@ -61,7 +61,7 @@ void* Server::handle(void* arg)
     
     cout << "Server handler" << endl;
     
-    struct sockaddr_in cliAddr;
+    struct sockaddr cliAddr;
     
     char recvBuffer[NETWORKING_MTU]; 
     
@@ -74,9 +74,51 @@ void* Server::handle(void* arg)
         
         cout << "Received " << recvLen << " bytes" << endl;
         
+        // Parse message headers
+        Message msg;
+        if (msg.parseFromBytes(recvBuffer, recvLen) < 0)
+            continue;
         
+        msg.printBytes();
+        msg.printInfo();
         
-        
+        int bytes;
+        switch (msg.getType()) {
+            case TYPE_ACK:
+                cout << "Received ACK message" << endl;
+                break;
+            case TYPE_HELLO:
+                cout << "Received HELLO message" << endl;
+                msg.incrSeqnum();
+                msg.setClientID(1);
+                msg.setType(TYPE_ACK);
+                
+                bytes = Networking::sendPacket(handler->_socket, recvBuffer, recvLen,  &cliAddr);
+                
+                
+                break;
+            case TYPE_DESCR:
+                cout << "Received DESCR message" << endl;
+                break;
+            case TYPE_DIFF:
+                cout << "Received DIFF message" << endl;
+                break;
+            case TYPE_GET:
+                cout << "Received GET message" << endl;
+                break;
+            case TYPE_FILE:
+                cout << "Received FILE message" << endl;
+                break;
+            case TYPE_QUIT:
+                cout << "Received QUIT message" << endl;
+                break;
+            case TYPE_NACK:
+                cout << "Received NACK message" << endl;
+                break;
+            default:
+                cout << "Unknown message type" << endl;
+                break;
+        }
     }
     
     return 0;
