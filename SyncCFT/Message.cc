@@ -75,6 +75,13 @@ int Message::parseFromBytes(const char* buffer, int len){
     _chunk |= ((buffer[14] & 0xFF) << 8);
     _chunk |= (buffer[15] & 0xFF);
     
+    //Set payload pointer
+    if(len > 16){
+        _payoad = buffer[16];
+    }else{
+        _payload = NULL;
+    }
+    
     return 0;
 }
 

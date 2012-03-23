@@ -42,7 +42,6 @@ public:
     Message();
     ~Message(){}
     
-    
     uint8_t getVersion(){return _version;}
     uint8_t getType(){return _type;}
     uint8_t getClientID(){return _clientID;}
@@ -54,6 +53,19 @@ public:
     bool isFirst(){return _begin;}
     bool isLast(){return _end;}
 
+    
+    void setVersion(uint8_t v){_version = v;}
+    void setType(MsgType t){_type = t;}
+    void setClientID(uint8_t id){_clientID = id;}
+    void setChecksum(uint8_t c){_checksum = c;}
+    void setLength(uint16_t l){_length = l;}
+    void setWindow(uint16_t w){_window = w;}
+    void setSeqnum(uint32_t s){_seqnum = s;}
+    void setChunk(uint32_t c){_chunk = c;};
+    void setFirst(){_begin = true;}
+    void setLast(){_end = true;}
+    
+    void incrSeqnum(){_seqnum++;}
     
     void initHeader(uint8_t version, uint8_t type, uint8_t clientID, uint8_t checksum, uint16_t length, uint16_t window, uint32_t seqnum, uint32_t chunk);
     
