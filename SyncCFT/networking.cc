@@ -22,13 +22,15 @@
 #include "networking.hh"
 
 
-
 /*
  * Compare two IPv4 address
  */
 bool Networking::cmpIPv4Addr(sockaddr_in* addr1, sockaddr_in* addr2){
     
-    cout << "CMP " << endl;
+    //Check for NULL pointers
+    if((addr1 == NULL) || (addr2 == NULL)){
+        return false;
+    }
     //Compare address
     if(addr1->sin_addr.s_addr != addr2->sin_addr.s_addr){
         return false;
@@ -41,11 +43,15 @@ bool Networking::cmpIPv4Addr(sockaddr_in* addr1, sockaddr_in* addr2){
 }
 
 
-
 /*
  * Compare two IPv6 address
  */
 bool Networking::cmpIPv6Addr(sockaddr_in6* addr1, sockaddr_in6* addr2){
+    
+    //Check for NULL pointers
+    if((addr1 == NULL) || (addr2 == NULL)){
+        return false;
+    }
     //Compare address
     if(!memcmp(addr1->sin6_addr.s6_addr, addr2->sin6_addr.s6_addr, 16)){
         return false;
@@ -58,7 +64,6 @@ bool Networking::cmpIPv6Addr(sockaddr_in6* addr1, sockaddr_in6* addr2){
 }
 
 
-
 /*
  * Compare two addresses.
  * @param first address
@@ -67,11 +72,14 @@ bool Networking::cmpIPv6Addr(sockaddr_in6* addr1, sockaddr_in6* addr2){
  */
 bool Networking::cmpAddr(sockaddr* addr1, sockaddr* addr2){
     
+    //Check for NULL pointers
+    if((addr1 == NULL) || (addr2 == NULL)){
+        return false;
+    }
     //Check if both are IPv4 or IPv6
     if(addr1->sa_family != addr2->sa_family){
         return false;
     }
-    
     //Compare IPv4 addresses
     if(addr1->sa_family == AF_INET){
         return cmpIPv4Addr((sockaddr_in*)addr1, (sockaddr_in*)addr2);
