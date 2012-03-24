@@ -31,10 +31,19 @@ TEST(MessageTest, AllZeroHeader) {
 TEST(MessageTest, MaxValues) {
     
     Message msg;
-    msg.initHeader(7, 255, 255, 255, 65535, 65535, 4294967295, 4294967295);
+    //msg.initHeader(7, 255, 255, 255, 65535, 65535, 4294967295, 4294967295);
+    msg.setVersion(7);
+    msg.setType((MsgType)255);
+    msg.setClientID(255);
+    msg.setChecksum(255);
+    msg.setWindow(65535);
+    msg.setSeqnum(4294967295);
+    msg.setChunk(4294967295);
+    msg.setPayload(NULL, 0);
+    
     char header[HEADER_SIZE];
     msg.parseToBytes(header);
-    const uint8_t mask[16] = {0xe0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+    const uint8_t mask[16] = {0xe0, 0xff, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
     
     for (int i = 0; i < 16; i++)
         EXPECT_TRUE((memcmp(&header[i], &mask[i], 1)) == 0);
@@ -56,11 +65,11 @@ TEST(MessageTest, parseFromBytes){
     EXPECT_EQ(1, msg.getVersion());
     EXPECT_TRUE(msg.isFirst());
     EXPECT_FALSE(msg.isLast());
-    EXPECT_TRUE(msg.getType() == 1);
-    EXPECT_TRUE(msg.getClientID() == 2);
-    EXPECT_TRUE(msg.getChecksum() == 255);
-    EXPECT_TRUE(msg.getLength() == 255);
-    EXPECT_TRUE(msg.getWindow() == 65280);
-    EXPECT_TRUE(msg.getSeqnum() == 1);
-    EXPECT_TRUE(msg.getChunk() == 2);
+    EXPECT_EQ(1, msg.getType());
+    EXPECT_EQ(2, msg.getClientID());
+    EXPECT_EQ(255, msg.getChecksum());
+    EXPECT_EQ(0, msg.getPayloadLength());   //Payload is NULL -> parseFromBytes sets length to 0
+    EXPECT_EQ(65280, msg.getWindow());
+    EXPECT_EQ(1, msg.getSeqnum());
+    EXPECT_EQ(2, msg.getChunk());
 }

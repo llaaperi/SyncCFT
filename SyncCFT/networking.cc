@@ -24,6 +24,65 @@
 
 
 /*
+ * Compare two IPv4 address
+ */
+bool Networking::cmpIPv4Addr(sockaddr_in* addr1, sockaddr_in* addr2){
+    
+    cout << "CMP " << endl;
+    //Compare address
+    if(addr1->sin_addr.s_addr != addr2->sin_addr.s_addr){
+        return false;
+    }
+    //Compare port
+    if(addr1->sin_port != addr2->sin_port){
+        return false;
+    }
+    return true;
+}
+
+
+
+/*
+ * Compare two IPv6 address
+ */
+bool Networking::cmpIPv6Addr(sockaddr_in6* addr1, sockaddr_in6* addr2){
+    //Compare address
+    if(!memcmp(addr1->sin6_addr.s6_addr, addr2->sin6_addr.s6_addr, 16)){
+        return false;
+    }
+    //Compare port
+    if(addr1->sin6_port != addr2->sin6_port){
+        return false;
+    }
+    return true; 
+}
+
+
+
+/*
+ * Compare two addresses.
+ * @param first address
+ * @param second address
+ * @return true if addresses match, false if not
+ */
+bool Networking::cmpAddr(sockaddr* addr1, sockaddr* addr2){
+    
+    //Check if both are IPv4 or IPv6
+    if(addr1->sa_family != addr2->sa_family){
+        return false;
+    }
+    
+    //Compare IPv4 addresses
+    if(addr1->sa_family == AF_INET){
+        return cmpIPv4Addr((sockaddr_in*)addr1, (sockaddr_in*)addr2);
+    }//Compare IPv6 addresses
+    else{
+        return cmpIPv6Addr((sockaddr_in6*)addr1, (sockaddr_in6*)addr2);
+    }
+}
+
+
+/*
  * Find out IP address type (IPv4 or IPv6)
  * @param address, Struct where address information is stored
  * @return Correct address for IP type
