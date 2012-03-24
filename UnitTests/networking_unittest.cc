@@ -83,18 +83,36 @@ TEST_F(NetworkingTest, ServerResponse) {
 }
 
 
-TEST_F(NetworkingTest, IPv4AddressCompare){
+TEST_F(NetworkingTest, CompareAddress){
     
-    struct addrinfo hint, *serverInfo;
-    hint.ai_family = AF_INET;
+    struct sockaddr cliAddr;
+    char data[] = "TESTIVIESTI"; // Length 12
+    char buffer[1500];
     
-    //struct sockaddr addr1, addr2;
+    //Get sockaddr struct
+    write(clientSocket, data, sizeof(data));
+    Networking::receivePacket(serverSocket, buffer, &cliAddr, 5);
     
-    getaddrinfo("127.0.0.1", "55500", &hint, &serverInfo);
+    //Comapre NULL addresses
+    EXPECT_FALSE(Networking::cmpAddr(NULL, NULL));
+    EXPECT_FALSE(Networking::cmpAddr(&cliAddr, NULL));
+    EXPECT_FALSE(Networking::cmpAddr(NULL, &cliAddr));
     
-    //cout << "addr1 port=" << ((sockaddr_in*)addr1)->sin_port << endl;
+    //Matching addresses
+    EXPECT_TRUE(Networking::cmpAddr(&cliAddr, &cliAddr));
     
-    //EXPECT_TRUE(Networking::cmpIPv4Addr((sockaddr_in*)(serverInfo->ai_addr), (sockaddr_in*)(serverInfo->ai_addr)));
+    //Mismatching ports
+    struct sockaddr cliAddr2;
+    memcpy(&cliAddr2, &cliAddr, sizeof(struct sockaddr));
+    ((sockaddr_in*)&cliAddr2)->sin_port = 500;
+    EXPECT_FALSE(Networking::cmpAddr(&cliAddr, &cliAddr2));
+    EXPECT_FALSE(Networking::cmpAddr(&cliAddr2, &cliAddr));
     
+    //Mismatching addresses
+    struct sockaddr cliAddr3;
+    memcpy(&cliAddr3, &cliAddr, sizeof(struct sockaddr));
+    ((sockaddr_in*)&cliAddr3)->sin_addr.s_addr = 500;
+    EXPECT_FALSE(Networking::cmpAddr(&cliAddr, &cliAddr3));
+    EXPECT_FALSE(Networking::cmpAddr(&cliAddr3, &cliAddr));
 }
 
