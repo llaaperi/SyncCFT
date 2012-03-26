@@ -12,10 +12,20 @@
 #include "Message.hh"
 
 
-
+/*
+ * Constructor
+ */
 Message::Message() : _version(0), _type(0), _clientID(0), _checksum(0), _payloadLen(0),
                     _window(0), _seqnum(0), _chunk(0), _hello(false), _quit(false), _begin(false), _end(false), 
                     _payload(0){
+}
+
+
+/*
+ * Destructor frees the existing payload
+ */
+Message::~Message(){
+    clearPayload();
 }
 
 
@@ -45,8 +55,19 @@ void Message::initHeader(uint8_t type) {
     _window = DEFAULT_WINDOW;
     _seqnum = rand();
     _chunk = 0;
-    _hello = false;
-    _quit = false;
+    
+    //Init HELLO flag
+    if(type == TYPE_HELLO){
+        _hello = true;
+    }else{
+        _hello = false;
+    }
+    //Init QUIT flag
+    if(type == TYPE_QUIT){
+        _quit = true;
+    }else{
+        _quit = false;
+    }
     _begin = false;
     _end = false;
 }

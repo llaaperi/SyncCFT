@@ -47,7 +47,7 @@ class Message {
     
 public:
     Message();
-    ~Message(){}
+    ~Message();
     
     uint8_t getVersion(){return _version;}
     uint8_t getType(){return _type;}
