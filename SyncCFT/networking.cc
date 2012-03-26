@@ -290,7 +290,7 @@ void printIPv4Address(struct sockaddr_in* addr);
 void printIPv4Address(struct sockaddr_in* addr){
 
     long ip = addr->sin_addr.s_addr;
-    int port = addr->sin_port;
+    unsigned int port = ((addr->sin_port & 0xFF) << 8) | ((addr->sin_port) >> 8);
     
     //Print ip (hton) and port
     cout << (ip & 0xFF) << "." << ((ip >> 8) & 0xFF) << "." << ((ip >> 16) & 0xFF) << "." << ((ip >> 24) & 0xFF) << ":" << port;
