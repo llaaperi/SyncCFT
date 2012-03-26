@@ -45,6 +45,8 @@ void Message::initHeader(uint8_t type) {
     _window = DEFAULT_WINDOW;
     _seqnum = rand();
     _chunk = 0;
+    _hello = false;
+    _quit = false;
     _begin = false;
     _end = false;
 }
@@ -76,6 +78,8 @@ void Message::clear(){
     _window = 0;
     _seqnum = 0;
     _chunk = 0;
+    _hello = false;
+    _quit = false;
     _begin = false;
     _end = false;
 }
