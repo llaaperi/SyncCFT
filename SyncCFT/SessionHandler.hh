@@ -10,6 +10,7 @@
 #define SyncCFT_SessionHandler_hh
 
 #include "networking.hh"
+#include "Transceiver.hh"
 #include "Message.hh"
 
 using namespace std;
@@ -17,10 +18,10 @@ using namespace std;
 class SessionHandler {
     
     uint8_t _id;
-    struct sockaddr _cliAddr;
+    Transceiver* _trns;
     
 public:
-    SessionHandler(uint8_t id, sockaddr cliAddr);
+    SessionHandler(int socket, struct sockaddr* cliAddr, uint8_t id);
     ~SessionHandler();
     
     void newMessage(Message* msg);
@@ -31,6 +32,7 @@ private:
     SessionHandler& operator=(SessionHandler const& other);
     
     bool isValidSource();
+    void descrHandler(Message* msg);
 };
 
 #endif

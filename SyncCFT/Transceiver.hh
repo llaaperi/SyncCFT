@@ -13,8 +13,6 @@
 
 #include "Message.hh"
 
-
-
 using namespace std;
 
 class Transceiver {

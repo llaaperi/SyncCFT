@@ -114,8 +114,9 @@ void Message::setPayload(const char *payload, int length){
     //Clear existing payload
     clearPayload();
     //Allocate memory and copy new palyload
-    _payload = (char*)malloc(length);
+    _payload = (char*)malloc(length + 1);
     memcpy(_payload, payload, length);
+    _payload[length] = 0;   //Add terminating null in case payload is printed
     _payloadLen = length;
 }
 

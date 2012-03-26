@@ -56,9 +56,10 @@ bool Transceiver::sendMsg(int socket, Message* msg, struct sockaddr* destAddr, i
     }
     
     msg->parseToBytes(sendBuffer);
-    int sentBytes = Networking::sendPacket(socket, sendBuffer, HEADER_SIZE,  destAddr, timeout);
+    int pktLen = HEADER_SIZE + msg->getPayloadLength();
+    int sentBytes = Networking::sendPacket(socket, sendBuffer, pktLen,  destAddr, timeout);
     
-    if(sentBytes < (HEADER_SIZE + msg->getPayloadLength())){
+    if(sentBytes < pktLen){
         return false;
     }
     

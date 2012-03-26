@@ -82,7 +82,7 @@ void* Client::handle(void* arg)
         handler->startSession(*serverInfo->ai_addr);
         
         //Metafile handler
-        //TODO
+        handler->metafileHandler(*serverInfo->ai_addr);
         
         //File transfers
         //TODO
@@ -99,6 +99,38 @@ void* Client::handle(void* arg)
 
 
 
+void Client::metafileHandler(sockaddr servAddr){
+    
+    cout << "[CLIENT] Obtaining metafile from ";
+    Networking::printAddress(&servAddr);
+    cout << endl;
+    
+    Message msg;
+    //TODO sequence numbers
+    msg.init(TYPE_DESCR);
+    msg.setClientID(_id);
+    
+    if(!Transceiver::sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_SEND)){
+        return;
+    }
+    
+    //Receive DIFF from the server
+    if(!Transceiver::recvMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_HELLO)){
+        return;
+    }
+    
+    //Check that received DIFF message
+    if(msg.getType() != TYPE_DIFF){
+        return;
+    }
+    
+    msg.printInfo();
+    
+    cout << "[CLIENT] Received DIFF:" << endl << msg.getPayload() << endl;
+}
+
+
+
 /*
  * Function tries to start session with a server.
  */
@@ -111,7 +143,7 @@ void Client::startSession(sockaddr servAddr){
         if(started){
             cout << "[CLIENT] Session started succesfully" << endl;
         }else{
-            cout << "[CLIENT] Session start failed" << endl;
+            cout << "[CLIENT] Session start failed, retrying in " << CLIENT_TIMEOUT_BACKOFF << " seconds" << endl;
             sleep(CLIENT_TIMEOUT_BACKOFF);
         }
     }while(!started);
@@ -131,7 +163,7 @@ void Client::endSession(sockaddr servAddr){
         if(terminated){
             cout << "[CLIENT] Session terminated succesfully" << endl;
         }else{
-            cout << "[CLIENT] Session termination failed" << endl;
+            cout << "[CLIENT] Session termination failed, retrying in " << CLIENT_TIMEOUT_BACKOFF << " seconds" << endl;
             sleep(CLIENT_TIMEOUT_BACKOFF);
         }
     }while(!terminated);
@@ -162,6 +194,9 @@ bool Client::handshakeHandler(sockaddr servAddr){
     if(msg.getType() != TYPE_ACK){
         return false;
     }
+    
+    //Save id
+    _id = msg.getClientID();
     
     //Reply with final HELLOACK
     msg.incrSeqnum();
@@ -195,6 +230,9 @@ bool Client::terminateHandler(sockaddr servAddr){
     if(msg.getType() != TYPE_ACK){
         return false;
     }
+    
+    //Remove id
+    _id = 0;
     
     //Reply with final QUITACK
     msg.incrSeqnum();

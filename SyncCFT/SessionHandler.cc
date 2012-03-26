@@ -9,13 +9,17 @@
 #include <iostream>
 
 #include "SessionHandler.hh"
-
+#include "Transceiver.hh"
+#include "Metafile.hh"
+#include "Server.hh"
 
 /*
  * Constructor
  */
-SessionHandler::SessionHandler(uint8_t id, sockaddr cliAddr) : _id(id), _cliAddr(cliAddr){
+SessionHandler::SessionHandler(int socket, struct sockaddr* cliAddr, uint8_t id) : _id(id){
     cout << "[SESSION] New session with id " << (unsigned int)id << " accepted"<< endl;
+    //Create new tranceiver for this session
+    _trns = new Transceiver(socket, *cliAddr);
 }
 
 
@@ -24,6 +28,7 @@ SessionHandler::SessionHandler(uint8_t id, sockaddr cliAddr) : _id(id), _cliAddr
  */
 SessionHandler::~SessionHandler(){
     cout << "[SESSION] Session " << (unsigned int)_id << " terminated"<< endl;
+    delete(_trns);
 }
 
 
@@ -38,6 +43,7 @@ void SessionHandler::newMessage(Message* msg){
             break;
         case TYPE_DESCR:
             cout << "[SESSION] Received DESCR message" << endl;
+            descrHandler(msg);
             break;
         case TYPE_DIFF:
             cout << "[SESSION] Received DIFF message" << endl;
@@ -66,4 +72,38 @@ void SessionHandler::newMessage(Message* msg){
  */
 bool SessionHandler::isValidSource(){
     return true;
+}
+
+/*
+ * Handles DESCR messages
+ */
+void SessionHandler::descrHandler(Message* msg){
+    
+    cout << "[SESSION] Description handler started" << endl;
+    
+    MetaFile mFile(METAFILE);
+    //mFile.print();
+    
+    msg->setType(TYPE_DIFF);
+    msg->setFirst(true);
+    msg->setLast(true);
+    
+    //Payload
+    char buffer[NETWORKING_MTU];
+    int idx = 0;
+    list<Element> list = mFile.getData();
+    
+    for(Element e : list){
+        string str = mFile.elementToStr(e);
+        memcpy(&buffer[idx], str.c_str(), str.length());
+        idx += str.length();
+        buffer[idx++] = '\n';
+    }
+    buffer[idx++] = 0;
+    msg->setPayload(buffer, idx);
+    
+    msg->printInfo();
+    
+    //Send diff
+    _trns->send(msg, SERVER_TIMEOUT_SEND);
 }

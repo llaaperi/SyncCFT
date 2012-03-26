@@ -12,6 +12,7 @@
 #include <list>
 #include <fstream>
 
+#define METAFILE ".sync.cft"
 #define FT_FILE     8
 #define FT_FOLDER   4
 

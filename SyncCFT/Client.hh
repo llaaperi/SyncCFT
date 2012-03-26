@@ -30,6 +30,7 @@ class Client {
     string _sport;
     bool _running;
     int _socket;
+    uint8_t _id;
     
 public:
     
@@ -64,6 +65,7 @@ private:
     
     bool handshakeHandler(sockaddr servAddr);
     bool terminateHandler(sockaddr servAddr);
+    void metafileHandler(sockaddr servAddr);
 };
 
 #endif

@@ -175,7 +175,7 @@ void Server::handshakeHandler(Message* msg, sockaddr cliAddr){
         
         //Allocate resources when client ACKs the handshake
         if(msg->getClientID() == clientID){
-            _sessionHandlers[clientID] = new SessionHandler(clientID, cliAddr);
+            _sessionHandlers[clientID] = new SessionHandler(_socket, &cliAddr, clientID);
         }
         return;
     }

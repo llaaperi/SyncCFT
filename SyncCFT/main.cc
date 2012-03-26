@@ -14,7 +14,6 @@
 #include "Client.hh"
 #include "Server.hh"
 
-#define METAFILE ".sync.cft"
 #define HELP "Usage: synccft [-c <client port>] [-s <server port>] [-p <p>] [-q <q>] <hosts>"
 
 int main (int argc, const char * argv[])
