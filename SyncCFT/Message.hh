@@ -41,7 +41,7 @@ class Message {
     bool _end;
     
     //char _binaryHeader[HEADER_SIZE];
-    const char* _payload;
+    char* _payload;
     
 public:
     Message();
@@ -72,8 +72,9 @@ public:
     
     void incrSeqnum(){_seqnum++;}
     
-    
+    void init(uint8_t type);
     void initHeader(uint8_t type);
+    void clear();
     void parseToBytes(char* buffer);
     
     /*

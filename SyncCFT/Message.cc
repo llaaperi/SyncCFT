@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <stdlib.h>
 #include <string.h>
 #include "Message.hh"
 
@@ -15,7 +16,20 @@
 Message::Message() : _version(0), _type(0), _clientID(0), _checksum(0), _payloadLen(0),
                     _window(0), _seqnum(0), _chunk(0), _begin(false), _end(false), 
                     _payload(0){
-    }
+}
+
+
+/*
+ * Initializes the whole message. Existing payload is freed.
+ */
+void Message::init(uint8_t type){
+    
+    //Clear message
+    clear();
+    //Init header
+    initHeader(type);
+}
+
 
 /*
  * Initialize all header values
@@ -36,12 +50,42 @@ void Message::initHeader(uint8_t type) {
 }
 
 
+/*
+ *
+ */
+void Message::clear(){
+    
+    //Free payload if exists
+    if((_payloadLen > 0) && (_payload != NULL)){
+        free(_payload);
+        _payload = NULL;
+    }
+    //Clear attributes
+    _version = 0;
+    _type = 0;
+    _clientID = 0;
+    _checksum = 0;
+    _window = 0;
+    _seqnum = 0;
+    _chunk = 0;
+    _begin = false;
+    _end = false;
+}
 
+
+/*
+ * Parses message from byte array. 
+ * Memory is allocated for the possible payload and existing payload is freed.
+ */
 bool Message::parseFromBytes(const char* buffer, int len){
-
+    
+    //Check that message can contain atleas header
     if(len < HEADER_SIZE){
         return false;
     }
+    
+    //Clear message (init header and free payload)
+    clear();
     
     _version = ((buffer[0] & 0xE0) >> 5);   //3 MSBs
     
@@ -69,10 +113,11 @@ bool Message::parseFromBytes(const char* buffer, int len){
     _chunk |= ((buffer[14] & 0xFF) << 8);
     _chunk |= (buffer[15] & 0xFF);
     
-    //Set payload pointer
+    //Allocate memory for the payload and copy content from the buffer
     if(len > HEADER_SIZE){
-        _payload = &buffer[HEADER_SIZE];
         _payloadLen = len - HEADER_SIZE;
+        _payload = (char*)malloc(_payloadLen);
+        memcpy(_payload, &buffer[HEADER_SIZE], _payloadLen);
     }else{
         _payload = NULL;
         _payloadLen = 0;
@@ -82,7 +127,9 @@ bool Message::parseFromBytes(const char* buffer, int len){
 }
 
 
-// Convert message header into binary format
+/*
+ * Convert message header into binary format
+ */
 void Message::parseToBytes(char* buffer) {
     
     //Init memory
@@ -122,7 +169,9 @@ void Message::parseToBytes(char* buffer) {
 }
 
 
-// Print contents of the header
+/*
+ * Print contents of the header in hex
+ */
 void Message::printBytes() {
     
     char buffer[16];
@@ -134,6 +183,9 @@ void Message::printBytes() {
 }
 
 
+/*
+ * Print text representation of the message header.
+ */
 void Message::printInfo(){
     
     cout << "Message header:" << endl;
