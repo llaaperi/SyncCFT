@@ -87,6 +87,8 @@ void* Client::handle(void* arg)
         //File transfers
         //TODO
         
+        sleep(1);
+        
         //Terminate session
         handler->endSession(*serverInfo->ai_addr);
         
@@ -193,5 +195,11 @@ bool Client::terminateHandler(sockaddr servAddr){
     if(msg.getType() != TYPE_ACK){
         return false;
     }
+    
+    //Reply with final QUITACK
+    msg.incrSeqnum();
+    msg.clearPayload();
+    Transceiver::sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_HELLO);
+    
     return true;
 }

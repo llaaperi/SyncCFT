@@ -21,7 +21,7 @@ class SessionHandler {
     
 public:
     SessionHandler(uint8_t id, sockaddr cliAddr);
-    ~SessionHandler(){};
+    ~SessionHandler();
     
     void newMessage(Message* msg);
     

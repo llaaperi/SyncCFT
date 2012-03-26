@@ -82,25 +82,27 @@ void* Server::handle(void* arg){
     while(handler->_running){
         
         //Wait incoming packets
-        cout << "[SERVER] Server: waiting packets..." << endl;
+        cout << "[SERVER] Waiting packets..." << endl;
         while(!Transceiver::recvMsg(handler->_socket, &msg, &cliAddr, SERVER_TIMEOUT_RECV));        
         
         //msg.printBytes();
         //msg.printInfo();
         
         //Server handles HELLO and QUIT messages
-        switch(msg.getType()){
-            case TYPE_HELLO:    //Handle new handshake requests
-                handler->handshakeHandler(&msg, cliAddr);
-                continue;
-            case TYPE_QUIT:     //Handle termination requests
-                handler->terminateHandler(&msg, cliAddr);
-                continue;
+        if(msg.isHello()){  //Handle new handshake requests
+            handler->handshakeHandler(&msg, cliAddr);
+            continue;
+        }
+        if(msg.isQuit()){   //Handle termination requests
+            handler->terminateHandler(&msg, cliAddr);
+            continue;
         }
         
         //Forward existing connections to corresponding handler
         if((msg.getClientID() < SERVER_SESSION_HANDLERS) && (handler->_sessionHandlers[msg.getClientID()] != NULL)){
             handler->_sessionHandlers[msg.getClientID()]->newMessage(&msg);
+        }else{
+            cout << "[SERVER] Packet discarded" << endl;
         }
     }
     return 0;
@@ -131,27 +133,52 @@ int Server::getFreeID(){
 void Server::handshakeHandler(Message* msg, sockaddr cliAddr){
     
     cout << "[SERVER] Handshake handler started" << endl;
+    static int clientID = 0;
     
-    //Check that there are free client ID's
-    int id = getFreeID();
-    if(id < 0){
-        //Send NACK if ID's are depleted
-        cout << "[SERVER] Connection refused: ClientID's depleted" << endl;
+    //Hanshake is initiated
+    if(msg->getType() == TYPE_HELLO){
+        
+        cout << "[SERVER] HELLO received from ";
+        Networking::printAddress(&cliAddr);
+        cout << endl;
+        
+        //Check that there are free client ID's
+        int id = getFreeID();
+        if(id < 0){
+            //Send NACK if ID's are depleted
+            cout << "[SERVER] Connection refused: ClientID's depleted" << endl;
+            msg->incrSeqnum();
+            msg->setType(TYPE_NACK);
+            msg->clearPayload();
+            Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND);
+            return;
+        }
+        
+        //Reply with ACK and clientID
         msg->incrSeqnum();
-        msg->setType(TYPE_NACK);
-        Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND);
+        msg->setClientID(id);
+        msg->setType(TYPE_ACK);
+        msg->clearPayload();    //Clear payload if if exists
+        if(Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND)){
+            clientID = id; //Save id if packet was sent succesfully
+        }
+        
         return;
     }
     
-    //Allocate resources and send ACK
-    _sessionHandlers[id] = new SessionHandler(id, cliAddr);
-    msg->incrSeqnum();
-    msg->setClientID(id);
-    msg->setType(TYPE_ACK);
-    Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND);
-    
-    //Wait confimation HELLOACK
-    //TODO
+    //Handshake is completed
+    if(msg->getType() == TYPE_ACK){
+        
+        cout << "[SERVER] HELLOACK received from ";
+        Networking::printAddress(&cliAddr);
+        cout << endl;
+        
+        //Allocate resources when client ACKs the handshake
+        if(msg->getClientID() == clientID){
+            _sessionHandlers[clientID] = new SessionHandler(clientID, cliAddr);
+        }
+        return;
+    }
 }
 
 
@@ -163,10 +190,41 @@ void Server::terminateHandler(Message* msg, sockaddr cliAddr){
 
     cout << "[SERVER] Terminate handler started" << endl;
     
-    //Reply with final QUITACK
-    msg->setType(TYPE_ACK);
-    msg->incrSeqnum();
-    msg->setPayload(NULL, 0);
-    Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND);
+    static int clientID = 0;
     
+    //Termination is initiated
+    if(msg->getType() == TYPE_QUIT){
+        
+        cout << "[SERVER] QUIT received from ";
+        Networking::printAddress(&cliAddr);
+        cout << endl;
+        
+        int id = msg->getClientID();
+        
+        //Check source from session handler
+        //TODO
+        
+        //Reply with final QUITACK
+        msg->setType(TYPE_ACK);
+        msg->incrSeqnum();
+        msg->clearPayload();
+        if(Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND)){
+            clientID = id; //Save id if packet was sent succesfully
+        }
+        return;
+    }
+    
+    //Termination is confirmed and compeleted
+    if(msg->getType() == TYPE_ACK){
+        
+        cout << "[SERVER] QUITACK received from ";
+        Networking::printAddress(&cliAddr);
+        cout << endl;
+        
+        //Allocate resources when client ACKs the handshake
+        if(msg->getClientID() == clientID){
+            delete(_sessionHandlers[clientID]);
+            _sessionHandlers[clientID] = NULL;
+        }
+    }
 }
