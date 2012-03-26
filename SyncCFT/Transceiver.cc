@@ -12,6 +12,37 @@
 #include "networking.hh"
 
 
+/*
+ * Function sends the message to the client.
+ * @return  true if message was sent successfully, 
+ *          false if send failed or timeouted
+ */
+bool Transceiver::send(Message* msg, int timeout){
+    return sendMsg(_socket, msg, &_cliAddr, timeout);
+}
+
+
+/*
+ * Function receives message from the client.
+ * @return  true if valid message was received from the client, 
+ *          false if ivalid message or wrong source.
+ */
+bool Transceiver::recv(Message* msg, int timeout){
+    
+    struct sockaddr srcAddr;
+    
+    //Receive valid message
+    if(!recvMsg(_socket, msg, &srcAddr, timeout)){
+        return false;
+    }
+    
+    //Check source
+    if(!Networking::cmpAddr(&srcAddr, &_cliAddr)){
+        return false;
+    }
+    return true;
+}
+
 
 /*
  *
@@ -35,13 +66,16 @@ bool Transceiver::sendMsg(int socket, Message* msg, struct sockaddr* destAddr, i
 }
 
 
-
 /*
  *
  */
 bool Transceiver::recvMsg(int socket, Message* msg, struct sockaddr* srcAddr, int timeout){
 
     char recvBuffer[NETWORKING_MTU];
+    
+    if(msg == NULL){
+        return false;
+    }
     
     int recvLen = Networking::receivePacket(socket, recvBuffer, srcAddr, timeout);
     

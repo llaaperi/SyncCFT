@@ -18,15 +18,15 @@
 using namespace std;
 
 class Transceiver {
-    int mSocket;
-
+    int _socket;
+    struct sockaddr _cliAddr;
     
 public:
-    Transceiver(){}
+    Transceiver(int socket, struct sockaddr cliAddr) : _socket(socket), _cliAddr(cliAddr){}
     ~Transceiver(){}
     
-    //int send(Message msg);
-    //int receive(Message msg);
+    bool send(Message* msg, int timeout);
+    bool recv(Message* msg, int timeout);
     
     static bool sendMsg(int socket, Message* msg, struct sockaddr* destAddr, int timeout);
     static bool recvMsg(int socket, Message* msg, struct sockaddr* srcAddr, int timeout);
