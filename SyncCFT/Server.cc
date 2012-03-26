@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include "Server.hh"
+#include "Transceiver.hh"
 #include "networking.hh"
 
 
@@ -75,28 +76,19 @@ void* Server::handle(void* arg){
     cout << "[SERVER] Server handler" << endl;
     
     struct sockaddr cliAddr;
-    
-    char recvBuffer[NETWORKING_MTU]; 
-    //char sendBuffer[NETWORKING_MTU]; 
+    Message msg;
     
     //Main loop
     while(handler->_running){
         
         //Wait incoming packets
         cout << "[SERVER] Server: waiting packets..." << endl;
-        int recvLen = Networking::receivePacket(handler->_socket, recvBuffer, &cliAddr, SERVER_TIMEOUT_RECV);
-        
-        cout << "[SERVER] Received " << recvLen << " bytes" << endl;
-        
-        // Parse message and discard invalid packets
-        Message msg;
-        if(!msg.parseFromBytes(recvBuffer, recvLen)){
-            continue;
-        }
+        while(!Transceiver::recvMsg(handler->_socket, &msg, &cliAddr, SERVER_TIMEOUT_RECV));        
         
         //msg.printBytes();
         //msg.printInfo();
         
+        //Server handles HELLO and QUIT messages
         switch(msg.getType()){
             case TYPE_HELLO:    //Handle new handshake requests
                 handler->handshakeHandler(&msg, cliAddr);
@@ -140,18 +132,14 @@ void Server::handshakeHandler(Message* msg, sockaddr cliAddr){
     
     cout << "[SERVER] Handshake handler started" << endl;
     
-    int bytes;
-    char sendBuffer[HEADER_SIZE];
-    
     //Check that there are free client ID's
     int id = getFreeID();
     if(id < 0){
-        cout << "[SERVER] Connection refused: ClientID's depleted" << endl;
-        
         //Send NACK if ID's are depleted
+        cout << "[SERVER] Connection refused: ClientID's depleted" << endl;
         msg->incrSeqnum();
         msg->setType(TYPE_NACK);
-        Networking::sendPacket(_socket, sendBuffer, HEADER_SIZE,  &cliAddr, SERVER_TIMEOUT_SEND);
+        Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND);
         return;
     }
     
@@ -160,8 +148,7 @@ void Server::handshakeHandler(Message* msg, sockaddr cliAddr){
     msg->incrSeqnum();
     msg->setClientID(id);
     msg->setType(TYPE_ACK);
-    msg->parseToBytes(sendBuffer);
-    bytes = Networking::sendPacket(_socket, sendBuffer, HEADER_SIZE,  &cliAddr, SERVER_TIMEOUT_SEND);
+    Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND);
     
     //Wait confimation HELLOACK
     //TODO
@@ -176,14 +163,10 @@ void Server::terminateHandler(Message* msg, sockaddr cliAddr){
 
     cout << "[SERVER] Terminate handler started" << endl;
     
-    int bytes = 0;
-    char sendBuffer[HEADER_SIZE];
-    
     //Reply with final QUITACK
     msg->setType(TYPE_ACK);
     msg->incrSeqnum();
     msg->setPayload(NULL, 0);
-    msg->parseToBytes(sendBuffer);
-    bytes = Networking::sendPacket(_socket, sendBuffer, HEADER_SIZE, &cliAddr, SERVER_TIMEOUT_SEND);
+    Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND);
     
 }

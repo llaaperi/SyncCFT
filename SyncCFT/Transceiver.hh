@@ -22,13 +22,14 @@ class Transceiver {
 
     
 public:
-    Transceiver(list<string>& hosts, string port){}
+    Transceiver(){}
     ~Transceiver(){}
     
+    //int send(Message msg);
+    //int receive(Message msg);
     
-    int send(Message msg);
-    
-    int receive(Message msg);
+    static bool sendMsg(int socket, Message* msg, struct sockaddr* destAddr, int timeout);
+    static bool recvMsg(int socket, Message* msg, struct sockaddr* srcAddr, int timeout);
     
 private:
     Transceiver& operator=(Transceiver const& other);

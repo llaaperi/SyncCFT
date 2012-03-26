@@ -61,9 +61,6 @@ void* Client::handle(void* arg)
     
     cout << "[CLIENT] Client handler" << endl;
     
-    //char sendBuffer[NETWORKING_MTU];
-    //char recvBuffer[NETWORKING_MTU];
-    
     struct addrinfo hints, *serverInfo;
     
     bzero(&hints, sizeof(struct addrinfo)); // Zero struct values
@@ -146,28 +143,16 @@ void Client::endSession(sockaddr servAddr){
  */
 bool Client::handshakeHandler(sockaddr servAddr){
     
-    int bytes = 0;
-    char sendBuffer[NETWORKING_MTU];
-    char recvBuffer[NETWORKING_MTU];
-    
-    //Create HELLO message
     Message msg;
-    msg.initHeader(TYPE_HELLO);
-    msg.parseToBytes(sendBuffer);
     
     //Send HELLO message
-    bytes = Networking::sendPacket(_socket, sendBuffer, HEADER_SIZE, &servAddr, CLIENT_TIMEOUT_SEND);
-    
-    //If send timeouted
-    if(bytes < 0){
+    msg.initHeader(TYPE_HELLO);
+    if(!Transceiver::sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_SEND)){
         return false;
     }
     
     //Receive reply from the server
-    bytes = Networking::receivePacket(_socket, recvBuffer, &servAddr, CLIENT_TIMEOUT_HELLO);
-    
-    //If recv HELLOACK timeouted or packet was invalid
-    if((bytes < 0) || !msg.parseFromBytes(recvBuffer, bytes)){
+    if(!Transceiver::recvMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_HELLO)){
         return false;
     }
     
@@ -179,8 +164,7 @@ bool Client::handshakeHandler(sockaddr servAddr){
     //Reply with final HELLOACK
     msg.incrSeqnum();
     msg.setPayload(NULL, 0);
-    msg.parseToBytes(sendBuffer);
-    bytes = Networking::sendPacket(_socket, sendBuffer, HEADER_SIZE, &servAddr, CLIENT_TIMEOUT_SEND);
+    Transceiver::sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_HELLO);
     
     return true;
 }
@@ -192,28 +176,16 @@ bool Client::handshakeHandler(sockaddr servAddr){
  */
 bool Client::terminateHandler(sockaddr servAddr){
     
-    int bytes = 0;
-    char sendBuffer[NETWORKING_MTU];
-    char recvBuffer[NETWORKING_MTU];
-    
-    //Create QUIT message
     Message msg;
-    msg.initHeader(TYPE_QUIT);
-    msg.parseToBytes(sendBuffer);
     
     //Send QUIT message
-    bytes = Networking::sendPacket(_socket, sendBuffer, HEADER_SIZE, &servAddr, CLIENT_TIMEOUT_SEND);
-    
-    //If send timeouted
-    if(bytes < 0){
+    msg.initHeader(TYPE_QUIT);
+    if(!Transceiver::sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_SEND)){
         return false;
     }
     
     //Receive reply from the server
-    bytes = Networking::receivePacket(_socket, recvBuffer, &servAddr, CLIENT_TIMEOUT_QUIT);
-    
-    //If recv ACK timeouted or packet was invalid
-    if((bytes < 0) || !msg.parseFromBytes(recvBuffer, bytes)){
+    if(!Transceiver::recvMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_QUIT)){
         return false;
     }
     
