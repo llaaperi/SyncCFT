@@ -14,7 +14,7 @@
 
 
 Message::Message() : _version(0), _type(0), _clientID(0), _checksum(0), _payloadLen(0),
-                    _window(0), _seqnum(0), _chunk(0), _begin(false), _end(false), 
+                    _window(0), _seqnum(0), _chunk(0), _hello(false), _quit(false), _begin(false), _end(false), 
                     _payload(0){
 }
 
@@ -50,16 +50,24 @@ void Message::initHeader(uint8_t type) {
 }
 
 
+void Message::clearPayload(){
+    
+    //Free payload if exists
+    if((_payloadLen > 0) && (_payload != NULL)){
+        free(_payload);
+        _payload = NULL;
+        _payloadLen = 0;
+    }
+}
+
+
 /*
  *
  */
 void Message::clear(){
     
     //Free payload if exists
-    if((_payloadLen > 0) && (_payload != NULL)){
-        free(_payload);
-        _payload = NULL;
-    }
+    clearPayload();
     //Clear attributes
     _version = 0;
     _type = 0;
@@ -71,6 +79,21 @@ void Message::clear(){
     _begin = false;
     _end = false;
 }
+
+
+/*
+ *
+ */
+void Message::setPayload(const char *payload, int length){
+    
+    //Clear existing payload
+    clearPayload();
+    //Allocate memory and copy new palyload
+    _payload = (char*)malloc(length);
+    memcpy(_payload, payload, length);
+    _payloadLen = length;
+}
+
 
 
 /*
@@ -91,9 +114,15 @@ bool Message::parseFromBytes(const char* buffer, int len){
     
     //Flags
     if(buffer[0] & 0x01){
-        _begin = true;
+        _hello = true;
     }
     if(buffer[0] & 0x02){
+        _quit = true;
+    }
+    if(buffer[0] & 0x04){
+        _begin = true;
+    }
+    if(buffer[0] & 0x08){
         _end = true;
     }
     
@@ -135,8 +164,10 @@ void Message::parseToBytes(char* buffer) {
     //Init memory
     memset(buffer, 0, HEADER_SIZE);
     
-    // Version and flags    
-	buffer[0] = ((_version & 0x07) << 5) | (_begin & 0x01) | (_end & 0x02);
+    // Version
+	buffer[0] = (_version & 0x07) << 5;
+    //Flags
+    buffer[0] |= (_hello & 0x01) | ((_quit & 0x01) << 1) | ((_begin & 0x01) << 2) | ((_end & 0x01) << 3);
     // Type
 	buffer[1] =  (_type & 0xFF);
     // Client ID
@@ -184,7 +215,7 @@ void Message::printBytes() {
 
 
 /*
- * Print text representation of the message header.
+ * Print text representation of the message header and payload.
  */
 void Message::printInfo(){
     
@@ -199,6 +230,12 @@ void Message::printInfo(){
     cout << "Chunk = " << getChunk() << endl;
     
     cout << "Flags: " << endl;
+    cout << "Hello = " << (isHello()?"true":"false") << endl;
+    cout << "Quit = " << (isQuit()?"true":"false") << endl;
     cout << "Begin = " << (isFirst()?"true":"false") << endl;
     cout << "End = " << (isLast()?"true":"false") << endl;
+    
+    if(getPayloadLength() > 0){
+        cout << "Payload:" << endl << "\"" << getPayload() << "\"" << endl;
+    }
 }

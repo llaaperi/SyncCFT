@@ -37,6 +37,8 @@ class Message {
     uint32_t _seqnum;
     uint32_t _chunk;
     // Flags
+    bool _hello;
+    bool _quit;
     bool _begin;
     bool _end;
     
@@ -56,6 +58,9 @@ public:
     uint32_t getSeqnum(){return _seqnum;}
     uint32_t getChunk(){return _chunk;}
     const char* getPayload() const {return _payload;}
+    
+    bool isHello(){return _hello;}
+    bool isQuit(){return _quit;}
     bool isFirst(){return _begin;}
     bool isLast(){return _end;}
     
@@ -65,16 +70,21 @@ public:
     void setChecksum(uint8_t c){_checksum = c;}
     void setWindow(uint16_t w){_window = w;}
     void setSeqnum(uint32_t s){_seqnum = s;}
-    void setChunk(uint32_t c){_chunk = c;};
-    void setFirst(){_begin = true;}
-    void setLast(){_end = true;}
-    void setPayload(char* payload, int length) {_payload = payload; _payloadLen = length;}
+    void setChunk(uint32_t c){_chunk = c;}
+    
+    void setPayload(const char* payload, int length);
+    
+    void setHello(bool b){_hello = b;}
+    void setQuit(bool b){_quit = b;}
+    void setFirst(bool b){_begin = b;}
+    void setLast(bool b){_end = b;}
     
     void incrSeqnum(){_seqnum++;}
     
     void init(uint8_t type);
     void initHeader(uint8_t type);
     void clear();
+    void clearPayload();
     void parseToBytes(char* buffer);
     
     /*
