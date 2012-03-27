@@ -38,13 +38,12 @@ public:
 };
 
 class MetaFile {    
-    const string fileName;
-    fstream metafile;
-    list<Element> metadata;
+    const string _fileName;
+    fstream _metafile;
+    list<Element> _metadata;
     
 public:
-    list<Element>& getData() {return metadata;};
-
+    list<Element>& getData() {return _metadata;};
     
     MetaFile(string fName);
     MetaFile(const char* buffer, int len);

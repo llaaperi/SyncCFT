@@ -28,7 +28,7 @@
 #include "utilities.hh"
 
 
-MetaFile::MetaFile(string fName) : fileName(fName) {
+MetaFile::MetaFile(string fName) : _fileName(fName) {
     
     // Read metadata file
     read();
@@ -45,14 +45,12 @@ MetaFile::MetaFile(string fName) : fileName(fName) {
  */
 MetaFile:: MetaFile(const char* buffer, int len) {
     string line;
-    string content(buffer, len);
+    string content(buffer, len+1);
 	istringstream stream(content);
-    getline(stream, line);
-    while (!line.empty()) {
+    while (getline(stream, line)) {
         Element ele;
         if (strToElement(line, ele))
-            metadata.push_back(ele);
-        getline(stream, line);
+            _metadata.push_back(ele);
     }    
 }
 
@@ -63,14 +61,14 @@ MetaFile:: MetaFile(const char* buffer, int len) {
  * @return Reference to the found element
  */
 Element& MetaFile::find(string const& name, bool& found) {
-    for (list<Element>::iterator iter = metadata.begin(); iter != metadata.end(); iter++) {
+    for (list<Element>::iterator iter = _metadata.begin(); iter != _metadata.end(); iter++) {
         if (iter->getName() == name) {
             found = true;
             return *iter;
         }
     }
     found = false;
-    return *metadata.end();
+    return *_metadata.end();
 }
 
 /*
@@ -135,17 +133,17 @@ void MetaFile::read(void) {
     string line;
     
     // Try to open directory metafile
-    metafile.open(fileName.c_str(), fstream::in);
-    if (metafile.is_open()) { // Old metafile found
+    _metafile.open(_fileName.c_str(), fstream::in);
+    if (_metafile.is_open()) { // Old metafile found
         cout << "Metafile found" << endl;
         
         // Read configuration file line by line and save data into an array
-        while (getline(metafile, line)) {
+        while (getline(_metafile, line)) {
             Element newFile;
             if(strToElement(line, newFile))
-                metadata.push_back(newFile);
+                _metadata.push_back(newFile);
         }
-        metafile.close();   
+        _metafile.close();   
     }   
 }
 
@@ -153,11 +151,11 @@ void MetaFile::read(void) {
  * Overwrite to the metatile
  */
 bool MetaFile::write(void) {
-    metafile.open(fileName.c_str(), fstream::out | fstream::trunc);
-    if (metafile.is_open()) {
-        for (list<Element>::const_iterator iter = metadata.begin(); iter != metadata.end(); iter++)
-            metafile << elementToStr(*iter) << endl;
-        metafile.close();
+    _metafile.open(_fileName.c_str(), fstream::out | fstream::trunc);
+    if (_metafile.is_open()) {
+        for (list<Element>::const_iterator iter = _metadata.begin(); iter != _metadata.end(); iter++)
+            _metafile << elementToStr(*iter) << endl;
+        _metafile.close();
         return true;
     } else
         return false; 
@@ -211,7 +209,7 @@ bool MetaFile::updateAll(void) {
                         oldFile = newFile;
                     continue;
                 }
-                metadata.push_back(newFile);
+                _metadata.push_back(newFile);
             } else if (FT_FOLDER) {
                 //cout << "Skip folder" << endl;
             } else
@@ -230,7 +228,7 @@ bool MetaFile::updateAll(void) {
  * Print metadata
  */
 void MetaFile::print(void) const{
-    for (list<Element>::const_iterator iter = metadata.begin(); iter != metadata.end(); iter++) {
+    for (list<Element>::const_iterator iter = _metadata.begin(); iter != _metadata.end(); iter++) {
         cout << elementToStr(*iter) << endl;
     }
 }
