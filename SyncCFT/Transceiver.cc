@@ -71,7 +71,7 @@ bool Transceiver::sendMsg(int socket, Message* msg, struct sockaddr* destAddr, i
  *
  */
 bool Transceiver::recvMsg(int socket, Message* msg, struct sockaddr* srcAddr, int timeout){
-
+    
     char recvBuffer[NETWORKING_MTU];
     
     if(msg == NULL){
@@ -79,6 +79,8 @@ bool Transceiver::recvMsg(int socket, Message* msg, struct sockaddr* srcAddr, in
     }
     
     int recvLen = Networking::receivePacket(socket, recvBuffer, srcAddr, timeout);
+    
+    msg->setAddr(*srcAddr);
     
     // Parse message and discard invalid packets
     if(!msg->parseFromBytes(recvBuffer, recvLen)){

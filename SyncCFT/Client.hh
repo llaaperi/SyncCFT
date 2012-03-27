@@ -65,7 +65,8 @@ private:
     
     bool handshakeHandler(sockaddr servAddr);
     bool terminateHandler(sockaddr servAddr);
-    void metafileHandler(sockaddr servAddr);
+    void metafileHandler(sockaddr servAddr, MetaFile** diff);
+    void fileTransfer(sockaddr servAddr, MetaFile* diff);
 };
 
 #endif

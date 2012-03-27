@@ -82,9 +82,11 @@ void* Client::handle(void* arg)
         handler->startSession(*serverInfo->ai_addr);
         
         //Metafile handler
-        handler->metafileHandler(*serverInfo->ai_addr);
+        MetaFile* diff;
+        handler->metafileHandler(*serverInfo->ai_addr, &diff);
         
         //File transfers
+        handler->fileTransfer(*serverInfo->ai_addr, diff);
         //TODO
         
         sleep(1);
@@ -99,7 +101,7 @@ void* Client::handle(void* arg)
 
 
 
-void Client::metafileHandler(sockaddr servAddr){
+void Client::metafileHandler(sockaddr servAddr, MetaFile** diff){
     
     cout << "[CLIENT] Obtaining metafile from ";
     Networking::printAddress(&servAddr);
@@ -110,6 +112,7 @@ void Client::metafileHandler(sockaddr servAddr){
     msg.init(TYPE_DESCR);
     msg.setClientID(_id);
     
+    //TODO add metafile to payload
     if(!Transceiver::sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_SEND)){
         return;
     }
@@ -124,11 +127,30 @@ void Client::metafileHandler(sockaddr servAddr){
         return;
     }
     
-    msg.printInfo();
+    //msg.printInfo();
+    *diff = new MetaFile(msg.getPayload(), msg.getPayloadLength());
     
-    cout << "[CLIENT] Received DIFF:" << endl << msg.getPayload() << endl;
+    cout << "[CLIENT] Received DIFF:" << endl;
+    (*diff)->print();
 }
 
+
+/*
+ *
+ */
+void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
+    
+    cout << "[CLIENT] File transfer started" << endl;
+    
+    Message msg;
+    
+    list<Element> elements = diff->getData();
+    
+    for(Element e : elements){
+        cout << "[CLIENT] Request file" << e.getName() << endl;
+        
+    }
+}
 
 
 /*

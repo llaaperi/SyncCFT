@@ -12,11 +12,12 @@
 #include "Transceiver.hh"
 #include "Metafile.hh"
 #include "Server.hh"
+#include "utilities.hh"
 
 /*
  * Constructor
  */
-SessionHandler::SessionHandler(int socket, struct sockaddr* cliAddr, uint8_t id) : _id(id){
+SessionHandler::SessionHandler(int socket, struct sockaddr* cliAddr, uint8_t id, uint32_t seqnum) : _id(id), _seqnum(seqnum){
     cout << "[SESSION] New session with id " << (unsigned int)id << " accepted"<< endl;
     //Create new tranceiver for this session
     _trns = new Transceiver(socket, *cliAddr);
@@ -37,6 +38,7 @@ void SessionHandler::newMessage(Message* msg){
     switch (msg->getType()) {
         case TYPE_ACK:
             cout << "[SESSION] Received ACK message" << endl;
+            fileTransfer(msg);
             break;
         case TYPE_HELLO:
             cout << "[SESSION] Received HELLO message" << endl;
@@ -50,6 +52,8 @@ void SessionHandler::newMessage(Message* msg){
             break;
         case TYPE_GET:
             cout << "[SESSION] Received GET message" << endl;
+            getHandler(msg);
+            fileTransfer(msg);
             break;
         case TYPE_FILE:
             cout << "[SESSION] Received FILE message" << endl;
@@ -70,9 +74,36 @@ void SessionHandler::newMessage(Message* msg){
 /*
  * Function for checking if source is valid for this session
  */
-bool SessionHandler::isValidSource(){
+bool SessionHandler::isValidSource(Message *msg){
+    
+    //Compare message address to the Transceiver address
+    if(!Networking::cmpAddr(msg->getAddr(), _trns->getAddr())){
+        return false;
+    }
     return true;
 }
+
+
+/*
+ * 
+ */
+bool SessionHandler::isValidMessage(Message *msg){
+    
+    //Compare source address
+    if(!isValidSource(msg)){
+        cout << "Invalid source address" << endl;
+        return false;
+    }
+    
+    //Compare sequence number
+    if((msg->getSeqnum() < _seqnum) && (msg->getSeqnum() > (_seqnum + 7))){
+        cout << "Invalid sequence number" << endl;
+        return false;
+    }
+    
+    return true;
+}
+
 
 /*
  * Handles DESCR messages
@@ -102,8 +133,64 @@ void SessionHandler::descrHandler(Message* msg){
     buffer[idx++] = 0;
     msg->setPayload(buffer, idx);
     
-    msg->printInfo();
+    //msg->printInfo();
     
     //Send diff
     _trns->send(msg, SERVER_TIMEOUT_SEND);
+}
+
+
+
+/*
+ *
+ */
+void SessionHandler::getHandler(Message* msg){
+    
+    cout << "[SESSION] Get handler started" << endl;
+    
+    //Check message validity
+    if(!isValidMessage(msg)){
+        return; //Discard invalid packets
+    }
+    
+    //const char* payload = msg->getPayload();
+    string line(msg->getPayload());
+    vector<string> parts; 
+    int size = Utilities::split(line, ";", parts);
+    
+    //Validity check (file1.txt;0-0)
+    if(size != 2){
+        return;
+    }
+    
+    MetaFile mFile(METAFILE);
+    bool found = false;
+    mFile.find(parts[0], found);
+    
+    //TODO MORE CHECKING
+    
+    if(!found){
+        //Send NACK if file not found
+        cout << "[SESSION] Requested non-existing file" << endl;
+        msg->incrSeqnum();
+        msg->setType(TYPE_NACK);
+        msg->clearPayload();
+        _trns->send(msg, SERVER_TIMEOUT_SEND);
+    }else{
+        //Send ACK
+        cout << "[SESSION] Requested file" << parts[0] << endl;
+        msg->incrSeqnum();
+        msg->setType(TYPE_ACK);
+        msg->clearPayload();
+        _trns->send(msg, SERVER_TIMEOUT_SEND);
+    }
+}
+
+
+/*
+ *
+ */
+void SessionHandler::fileTransfer(Message* msg){
+    
+    cout << "[SESSION] File transfer started" << endl;
 }
