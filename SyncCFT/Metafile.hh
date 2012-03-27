@@ -47,6 +47,7 @@ public:
 
     
     MetaFile(string fName);
+    MetaFile(const char* buffer, int len);
     ~MetaFile(){}
     
     /*
@@ -94,6 +95,16 @@ public:
      * Print metadata
      */
     void print(void) const;
+    
+    /*
+     * Diff
+     */
+    void getDiff(void) const;
+    
+    /*
+     *
+     */
+    
     
 private:
     // Rule of three

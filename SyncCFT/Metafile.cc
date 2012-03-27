@@ -40,6 +40,21 @@ MetaFile::MetaFile(string fName) : fileName(fName) {
     write();
 }
 
+/*
+ * Construct metafile from received data
+ */
+MetaFile:: MetaFile(const char* buffer, int len) {
+    string line;
+    string content(buffer, len);
+	istringstream stream(content);
+    getline(stream, line);
+    while (!line.empty()) {
+        Element ele;
+        if (strToElement(line, ele))
+            metadata.push_back(ele);
+        getline(stream, line);
+    }    
+}
 
 /*
  * Find element
