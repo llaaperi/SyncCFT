@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "Message.hh"
+#include "networking.hh"
 
 
 /*
@@ -260,6 +261,10 @@ void Message::printInfo(){
     cout << "Quit = " << (isQuit()?"true":"false") << endl;
     cout << "Begin = " << (isFirst()?"true":"false") << endl;
     cout << "End = " << (isLast()?"true":"false") << endl;
+    
+    cout << "Source = ";
+    Networking::printAddress(&_addrInfo);
+    cout << endl;
     
     if(getPayloadLength() > 0){
         cout << "Payload:" << endl << "\"" << getPayload() << "\"" << endl;

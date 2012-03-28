@@ -25,7 +25,7 @@
 /*
  * Compare two IPv4 address
  */
-bool Networking::cmpIPv4Addr(sockaddr_in* addr1, sockaddr_in* addr2){
+bool Networking::cmpIPv4Addr(const sockaddr_in* addr1, const sockaddr_in* addr2){
     
     //Check for NULL pointers
     if((addr1 == NULL) || (addr2 == NULL)){
@@ -46,7 +46,7 @@ bool Networking::cmpIPv4Addr(sockaddr_in* addr1, sockaddr_in* addr2){
 /*
  * Compare two IPv6 address
  */
-bool Networking::cmpIPv6Addr(sockaddr_in6* addr1, sockaddr_in6* addr2){
+bool Networking::cmpIPv6Addr(const sockaddr_in6* addr1, const sockaddr_in6* addr2){
     
     //Check for NULL pointers
     if((addr1 == NULL) || (addr2 == NULL)){
@@ -70,7 +70,7 @@ bool Networking::cmpIPv6Addr(sockaddr_in6* addr1, sockaddr_in6* addr2){
  * @param second address
  * @return true if addresses match, false if not
  */
-bool Networking::cmpAddr(sockaddr* addr1, sockaddr* addr2){
+bool Networking::cmpAddr(const sockaddr* addr1, const sockaddr* addr2){
     
     //Check for NULL pointers
     if((addr1 == NULL) || (addr2 == NULL)){

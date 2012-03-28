@@ -18,10 +18,11 @@ using namespace std;
 class SessionHandler {
     
     uint8_t _id;
+    uint32_t _seqnum;
     Transceiver* _trns;
     
 public:
-    SessionHandler(int socket, struct sockaddr* cliAddr, uint8_t id);
+    SessionHandler(int socket, struct sockaddr* cliAddr, uint8_t id, uint32_t seqnum);
     ~SessionHandler();
     
     void newMessage(Message* msg);
@@ -31,8 +32,12 @@ private:
     SessionHandler(SessionHandler const& other);
     SessionHandler& operator=(SessionHandler const& other);
     
-    bool isValidSource();
+    bool isValidSource(Message* msg);
+    bool isValidMessage(Message* msg);
+    
     void descrHandler(Message* msg);
+    void getHandler(Message* msg);
+    void fileTransfer(Message* msg);
 };
 
 #endif

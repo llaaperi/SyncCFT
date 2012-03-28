@@ -25,7 +25,7 @@ enum MsgType {TYPE_ACK, TYPE_HELLO, TYPE_DESCR, TYPE_DIFF, TYPE_GET, TYPE_FILE, 
 using namespace std;
 
 class Message {
-    struct sockaddr_in _addrInfo;
+    struct sockaddr _addrInfo;
     
     // Header
     uint8_t _version;
@@ -59,6 +59,8 @@ public:
     uint32_t getChunk(){return _chunk;}
     const char* getPayload() const {return _payload;}
     
+    sockaddr* getAddr(){return &_addrInfo;}
+    
     bool isHello(){return _hello;}
     bool isQuit(){return _quit;}
     bool isFirst(){return _begin;}
@@ -73,6 +75,8 @@ public:
     void setChunk(uint32_t c){_chunk = c;}
     
     void setPayload(const char* payload, int length);
+    
+    void setAddr(struct sockaddr addr){_addrInfo = addr;}
     
     void setHello(bool b){_hello = b;}
     void setQuit(bool b){_quit = b;}

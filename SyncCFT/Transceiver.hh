@@ -29,6 +29,8 @@ public:
     static bool sendMsg(int socket, Message* msg, struct sockaddr* destAddr, int timeout);
     static bool recvMsg(int socket, Message* msg, struct sockaddr* srcAddr, int timeout);
     
+    const sockaddr* getAddr(){return &_cliAddr;}
+    
 private:
     Transceiver& operator=(Transceiver const& other);
     Transceiver(Transceiver const& other);

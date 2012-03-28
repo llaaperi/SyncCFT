@@ -30,7 +30,7 @@ namespace Networking {
      * @param second address
      * @return true if addresses match, false if not
      */
-    bool cmpAddr(sockaddr* addr1, sockaddr* addr2);
+    bool cmpAddr(const sockaddr* addr1, const sockaddr* addr2);
     
     
     
@@ -40,7 +40,7 @@ namespace Networking {
      * @param second address
      * @return true if addresses match, false if not
      */
-    bool cmpIPv4Addr(sockaddr_in* addr1, sockaddr_in* addr2);
+    bool cmpIPv4Addr(const sockaddr_in* addr1, const sockaddr_in* addr2);
     
     
     
@@ -50,7 +50,7 @@ namespace Networking {
      * @param second address
      * @return true if addresses match, false if not
      */
-    bool cmpIPv6Addr(sockaddr_in6* addr1, sockaddr_in6* addr2);
+    bool cmpIPv6Addr(const sockaddr_in6* addr1, const sockaddr_in6* addr2);
     
     
     
