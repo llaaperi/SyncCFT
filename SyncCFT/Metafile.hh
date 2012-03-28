@@ -34,7 +34,7 @@ public:
     void setHash(string const& newHash) {_hash = newHash;}
     time_t getTimeStamp() const {return _timestamp;}
     void setTimeStamp(time_t const timestamp) {_timestamp = timestamp;}
-    
+    int compare(Element const& other);
 };
 
 class MetaFile {    
@@ -95,15 +95,18 @@ public:
      */
     void print(void) const;
     
+    
     /*
      * Diff
      */
-    void getDiff(void) const;
+    string getDiff(MetaFile& other);
+    
     
     /*
-     *
+     * Return the metadata
      */
-    
+    list<Element> getMetadata() const {return _metadata;}
+
     
 private:
     // Rule of three
@@ -112,6 +115,9 @@ private:
 
 };
 
-
+/*
+ * Print metadata to stream
+ */
+ostream& operator<<(ostream& os, const MetaFile& m);
 
 #endif

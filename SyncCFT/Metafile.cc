@@ -27,6 +27,22 @@
 #include "metafile.hh"
 #include "utilities.hh"
 
+/*
+ * Compare two elements
+ * @param other The element being compared to
+ * @return Returns 0 if elements are identical, +1 if this element is newer, or
+ * -1 if the other element is newer or same age
+ */
+int Element::compare(Element const& other) {
+    if (getHash() == other.getHash())
+        return 0;
+    else {
+        if (getTimeStamp() > other.getTimeStamp())
+            return 1;
+        else
+            return -1;
+    }       
+}
 
 MetaFile::MetaFile(string fName) : _fileName(fName) {
     
@@ -232,3 +248,50 @@ void MetaFile::print(void) const{
         cout << elementToStr(*iter) << endl;
     }
 }
+
+/*
+ * Print metadata to stream
+ */
+std::ostream& operator<<(std::ostream& os, const MetaFile& m) {
+    ostringstream strs;
+    string collect;
+    list<Element> data = m.getMetadata();
+    for (list<Element>::const_iterator iter = data.begin(); iter != data.end(); iter++) {
+        collect += m.elementToStr(*iter) + "\n";
+    }
+    return os << collect;
+}
+
+
+/*
+ * Compares two MetaFiles and returns all the elements, which cannot be be found
+ * on the other-Metafile. In case an element has been modified the newer element
+ * is chosen. If the timestamps match, the other-element is chosen.
+ * @param other MetaFile to which the comparison is performed
+ * @return String containing all the different elements
+ */
+string MetaFile::getDiff(MetaFile& other) {
+    string different = "";
+    for (Element e : _metadata) {
+        bool found = false;
+        Element& otherElement = other.find(e.getName(), found);
+        if(!found) { // Element not found
+            different += elementToStr(e) + "\n";
+            continue;
+        }
+        // Compare element hashes and timestamps
+        int comparison = e.compare(otherElement);
+        if (comparison <= 0)  // Identical elements or the other elements is 
+            continue;         // newer
+        else // Own element is newr
+            different += elementToStr(e) + "\n";
+    }
+    // Remove extra newline
+    if (!different.empty())
+        different = different.substr(0,different.length()-1);
+    return different;
+}
+
+
+
+

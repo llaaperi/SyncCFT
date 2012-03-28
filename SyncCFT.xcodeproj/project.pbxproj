@@ -8,10 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		0D5CAC9D14EFE1CD006CDCD6 /* networking.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0D5CAC9B14EFE1CD006CDCD6 /* networking.cc */; };
-		0DDFD180151C8DFD00B77760 /* gtest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDFD17F151C8DFD00B77760 /* gtest.framework */; };
+		0D84213315208ABB005ACCB7 /* gtest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDFD17F151C8DFD00B77760 /* gtest.framework */; };
 		0DDFD182151CBFED00B77760 /* SessionHandler.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0DDFD181151CBFED00B77760 /* SessionHandler.cc */; };
 		9023096014FBEB89004C81D0 /* Message.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9023095F14FBEB89004C81D0 /* Message.cc */; };
 		90487DEF14EF0A7B006505C2 /* utilities.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90487DEE14EF0A7B006505C2 /* utilities.cc */; };
+		90501D851521D5C80043E0DB /* Metafile_unittest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90501D841521D5C80043E0DB /* Metafile_unittest.cc */; };
+		90501D861521D8B30043E0DB /* Metafile.cc in Sources */ = {isa = PBXBuildFile; fileRef = 906FAC2714E5C5A000D78FF6 /* Metafile.cc */; };
+		90501D871521D8D40043E0DB /* utilities.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90487DEE14EF0A7B006505C2 /* utilities.cc */; };
 		906B8BC414F94EBB0038163D /* UnitTests.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 906B8BC314F94EBB0038163D /* UnitTests.1 */; };
 		906B8BD814F957B40038163D /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 906B8BD714F957B40038163D /* main.cc */; };
 		906B8BDC14F959B90038163D /* networking_unittest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 906B8BDB14F959B90038163D /* networking_unittest.cc */; };
@@ -62,6 +65,7 @@
 		9023095F14FBEB89004C81D0 /* Message.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Message.cc; sourceTree = "<group>"; };
 		90487DEC14EF0A67006505C2 /* utilities.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utilities.hh; sourceTree = "<group>"; };
 		90487DEE14EF0A7B006505C2 /* utilities.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utilities.cc; sourceTree = "<group>"; };
+		90501D841521D5C80043E0DB /* Metafile_unittest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Metafile_unittest.cc; sourceTree = "<group>"; };
 		906B8BBE14F94EBB0038163D /* UnitTests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = UnitTests; sourceTree = BUILT_PRODUCTS_DIR; };
 		906B8BC314F94EBB0038163D /* UnitTests.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = UnitTests.1; sourceTree = "<group>"; };
 		906B8BD714F957B40038163D /* main.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
@@ -82,7 +86,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0DDFD180151C8DFD00B77760 /* gtest.framework in Frameworks */,
+				0D84213315208ABB005ACCB7 /* gtest.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,6 +107,7 @@
 				906B8BD714F957B40038163D /* main.cc */,
 				907F833B14FD439D001C5E15 /* Message_unittest.cc */,
 				906B8BDB14F959B90038163D /* networking_unittest.cc */,
+				90501D841521D5C80043E0DB /* Metafile_unittest.cc */,
 				906B8BC314F94EBB0038163D /* UnitTests.1 */,
 			);
 			path = UnitTests;
@@ -144,9 +149,9 @@
 				9023095F14FBEB89004C81D0 /* Message.cc */,
 				0D5CAC9A14EFE1B3006CDCD6 /* Transceiver.hh */,
 				969340BF152003E800BAC8CA /* Transceiver.cc */,
-				966F0F9714E5AADB007FB278 /* SyncCFT.1 */,
 				0DDFD183151CC00300B77760 /* SessionHandler.hh */,
 				0DDFD181151CBFED00B77760 /* SessionHandler.cc */,
+				966F0F9714E5AADB007FB278 /* SyncCFT.1 */,
 			);
 			path = SyncCFT;
 			sourceTree = "<group>";
@@ -222,9 +227,12 @@
 			files = (
 				906B8BD814F957B40038163D /* main.cc in Sources */,
 				906B8BDC14F959B90038163D /* networking_unittest.cc in Sources */,
+				90501D861521D8B30043E0DB /* Metafile.cc in Sources */,
+				90501D871521D8D40043E0DB /* utilities.cc in Sources */,
 				907F833914FD4378001C5E15 /* Message.cc in Sources */,
 				906B8BDD14F95BB70038163D /* networking.cc in Sources */,
 				907F833C14FD439D001C5E15 /* Message_unittest.cc in Sources */,
+				90501D851521D5C80043E0DB /* Metafile_unittest.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
