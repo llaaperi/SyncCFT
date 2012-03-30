@@ -291,7 +291,3 @@ string MetaFile::getDiff(MetaFile& other) {
         different = different.substr(0,different.length()-1);
     return different;
 }
-
-
-
-

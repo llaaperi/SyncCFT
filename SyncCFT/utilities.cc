@@ -31,3 +31,31 @@ int Utilities::split(string str, string separator, vector<string>& results) {
     	
     return (int)results.size();
 }
+
+
+/*
+ * Markov process
+ */
+bool Utilities::packetLost(int state, double p, double q) {
+    
+    static bool init = true;
+    if (init) { 
+        srand((unsigned int)time(0));
+        init = false;
+    }
+    
+    double randomValue = (double)rand()/(double)RAND_MAX;
+    cout << "Random value: " << randomValue << endl;
+    
+    if (state == STATE_LOST) {
+        if (randomValue < q)
+            return true;
+        else 
+            return false;
+    } else {
+        if (randomValue < p)
+            return true;
+        else
+            return false;
+    }
+}

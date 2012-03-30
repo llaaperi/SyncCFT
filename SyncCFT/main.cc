@@ -23,7 +23,8 @@ int main (int argc, const char * argv[])
     //Default values
     string cport = "5063";
     string sport = "5062";
-    string p, q;
+    string p = "0";
+    string q = "0";
     list<string> hosts;
     
 	// Long versions of command line parameters

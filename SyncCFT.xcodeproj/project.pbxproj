@@ -24,6 +24,7 @@
 		907F833C14FD439D001C5E15 /* Message_unittest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 907F833B14FD439D001C5E15 /* Message_unittest.cc */; };
 		90B291DB1503779C00E57979 /* Client.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90B291DA1503779B00E57979 /* Client.cc */; };
 		90B291DD150377A900E57979 /* Server.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90B291DC150377A900E57979 /* Server.cc */; };
+		90C011AD1524E9A800AA4294 /* utilities_unittest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90C011AC1524E9A800AA4294 /* utilities_unittest.cc */; };
 		966F0F9614E5AADB007FB278 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966F0F9514E5AADB007FB278 /* main.cc */; };
 		966F0F9814E5AADB007FB278 /* SyncCFT.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 966F0F9714E5AADB007FB278 /* SyncCFT.1 */; };
 		969340C0152003E800BAC8CA /* Transceiver.cc in Sources */ = {isa = PBXBuildFile; fileRef = 969340BF152003E800BAC8CA /* Transceiver.cc */; };
@@ -75,6 +76,7 @@
 		907F833B14FD439D001C5E15 /* Message_unittest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Message_unittest.cc; sourceTree = "<group>"; };
 		90B291DA1503779B00E57979 /* Client.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Client.cc; sourceTree = "<group>"; };
 		90B291DC150377A900E57979 /* Server.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Server.cc; sourceTree = "<group>"; };
+		90C011AC1524E9A800AA4294 /* utilities_unittest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utilities_unittest.cc; sourceTree = "<group>"; };
 		966F0F9114E5AADB007FB278 /* SyncCFT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SyncCFT; sourceTree = BUILT_PRODUCTS_DIR; };
 		966F0F9514E5AADB007FB278 /* main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
 		966F0F9714E5AADB007FB278 /* SyncCFT.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = SyncCFT.1; sourceTree = "<group>"; };
@@ -108,6 +110,7 @@
 				907F833B14FD439D001C5E15 /* Message_unittest.cc */,
 				906B8BDB14F959B90038163D /* networking_unittest.cc */,
 				90501D841521D5C80043E0DB /* Metafile_unittest.cc */,
+				90C011AC1524E9A800AA4294 /* utilities_unittest.cc */,
 				906B8BC314F94EBB0038163D /* UnitTests.1 */,
 			);
 			path = UnitTests;
@@ -233,6 +236,7 @@
 				906B8BDD14F95BB70038163D /* networking.cc in Sources */,
 				907F833C14FD439D001C5E15 /* Message_unittest.cc in Sources */,
 				90501D851521D5C80043E0DB /* Metafile_unittest.cc in Sources */,
+				90C011AD1524E9A800AA4294 /* utilities_unittest.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

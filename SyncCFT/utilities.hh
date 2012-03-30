@@ -12,6 +12,10 @@
 #include <string>
 #include <vector>
 
+#define STATE_LOST 0
+#define STATE_NOT_LOST 1
+
+
 using namespace std;
 
 namespace Utilities {
@@ -23,6 +27,12 @@ namespace Utilities {
      * @return Size of vector results
      */
     int split(string str, string separator, vector<string>& results);
+    
+    
+    /*
+     * Markov process
+     */
+    bool packetLost(int state, double p, double q);
+        
 }
-
 #endif
