@@ -164,6 +164,25 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
     for(Element e : elements){
         cout << "[CLIENT] Request file" << e.getName() << endl;
         
+        msg.initHeader(TYPE_GET);
+        
+        char buf[NETWORKING_MTU];
+        sprintf(buf, "%s;%d-%d", e.getName().c_str(), 0, 0);
+        msg.setPayload(buf, (int)strlen(buf));
+        
+        if(!Transceiver::sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_SEND)){
+            return;
+        }
+        
+        cout << "[CLIENT] Get payload: " << endl << msg.getPayload() << endl;
+        
+        bool ready = false;
+        while(!ready){
+        
+            
+            sleep(1);
+            ready = true;
+        }
     }
 }
 

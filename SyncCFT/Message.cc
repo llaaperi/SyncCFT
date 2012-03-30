@@ -122,7 +122,6 @@ void Message::setPayload(const char *payload, int length){
 }
 
 
-
 /*
  * Parses message from byte array. 
  * Memory is allocated for the possible payload and existing payload is freed.
