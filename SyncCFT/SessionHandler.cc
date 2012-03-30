@@ -21,6 +21,7 @@ SessionHandler::SessionHandler(int socket, struct sockaddr* cliAddr, uint8_t id,
     cout << "[SESSION] New session with id " << (unsigned int)id << " accepted"<< endl;
     //Create new tranceiver for this session
     _trns = new Transceiver(socket, *cliAddr);
+    memset(_fFlows, 0, SESSIONHANDLER_MAX_TRANSFERS * sizeof(FileTransfer*));
 }
 
 
@@ -179,9 +180,12 @@ void SessionHandler::getHandler(Message* msg){
     if(found){
         //If already int transfer
         //TODO own functions
-        for(FileTransfer* f : _fFlows){
-            if(f != NULL){
-                file == f->getElement();
+        for(int i = 0; i < SESSIONHANDLER_MAX_TRANSFERS; i++){
+        
+            FileTransfer* ft = _fFlows[i];
+            
+            if(ft != NULL){
+                file == ft->getElement();
                 isTransferring = true;
                 break;
             }
