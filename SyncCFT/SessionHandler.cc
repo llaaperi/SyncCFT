@@ -135,6 +135,21 @@ void SessionHandler::descrHandler(Message* msg){
 
 
 /*
+ * Function for requesting next free client id
+ * Return: -1 if no free ID's are available or free id
+ */
+int SessionHandler::getFreeFlow(){
+    
+    for(int i = 0; i < SESSIONHANDLER_MAX_TRANSFERS; i++){
+        if(_fFlows[i] == NULL){
+            return i;
+        }
+    }
+    return -1;
+}
+
+
+/*
  *
  */
 void SessionHandler::getHandler(Message* msg){
@@ -158,7 +173,20 @@ void SessionHandler::getHandler(Message* msg){
     
     MetaFile mFile(METAFILE);
     bool found = false;
-    mFile.find(parts[0], found);
+    Element file = mFile.find(parts[0], found);
+    
+    bool isTransferring = false;
+    if(found){
+        //If already int transfer
+        //TODO own functions
+        for(FileTransfer* f : _fFlows){
+            if(f != NULL){
+                file == f->getElement();
+                isTransferring = true;
+                break;
+            }
+        }
+    }
     
     //TODO MORE CHECKING
     
@@ -170,6 +198,14 @@ void SessionHandler::getHandler(Message* msg){
         msg->clearPayload();
         _trns->send(msg, SERVER_TIMEOUT_SEND);
     }else{
+        
+        //If this file is not already in transrer, create new FileTransfer object
+        if(!isTransferring){
+            
+            _fFlows[getFreeFlow()] = new FileTransfer(_trns, file, 0);
+            
+        }
+        
         //Send ACK
         cout << "[SESSION] Requested file" << parts[0] << endl;
         msg->incrSeqnum();

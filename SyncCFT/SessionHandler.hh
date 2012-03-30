@@ -11,7 +11,11 @@
 
 #include "networking.hh"
 #include "Transceiver.hh"
+#include "FileTransfer.hh"
 #include "Message.hh"
+
+
+#define SESSIONHANDLER_MAX_TRANSFERS 1
 
 using namespace std;
 
@@ -20,6 +24,7 @@ class SessionHandler {
     uint8_t _id;
     uint32_t _seqnum;
     Transceiver* _trns;
+    FileTransfer* _fFlows[SESSIONHANDLER_MAX_TRANSFERS];
     
 public:
     SessionHandler(int socket, struct sockaddr* cliAddr, uint8_t id, uint32_t seqnum);
@@ -38,6 +43,8 @@ private:
     void descrHandler(Message* msg);
     void getHandler(Message* msg);
     void fileTransfer(Message* msg);
+    
+    int getFreeFlow();
 };
 
 #endif

@@ -28,6 +28,7 @@
 		966F0F9614E5AADB007FB278 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966F0F9514E5AADB007FB278 /* main.cc */; };
 		966F0F9814E5AADB007FB278 /* SyncCFT.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 966F0F9714E5AADB007FB278 /* SyncCFT.1 */; };
 		969340C0152003E800BAC8CA /* Transceiver.cc in Sources */ = {isa = PBXBuildFile; fileRef = 969340BF152003E800BAC8CA /* Transceiver.cc */; };
+		96E8C2541525CCE600688FFE /* FileTransfer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96E8C2531525CCE600688FFE /* FileTransfer.cc */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -81,6 +82,8 @@
 		966F0F9514E5AADB007FB278 /* main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
 		966F0F9714E5AADB007FB278 /* SyncCFT.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = SyncCFT.1; sourceTree = "<group>"; };
 		969340BF152003E800BAC8CA /* Transceiver.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Transceiver.cc; sourceTree = "<group>"; };
+		96E8C2511525CCD500688FFE /* FileTransfer.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FileTransfer.hh; sourceTree = "<group>"; };
+		96E8C2531525CCE600688FFE /* FileTransfer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileTransfer.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -155,6 +158,8 @@
 				0DDFD183151CC00300B77760 /* SessionHandler.hh */,
 				0DDFD181151CBFED00B77760 /* SessionHandler.cc */,
 				966F0F9714E5AADB007FB278 /* SyncCFT.1 */,
+				96E8C2511525CCD500688FFE /* FileTransfer.hh */,
+				96E8C2531525CCE600688FFE /* FileTransfer.cc */,
 			);
 			path = SyncCFT;
 			sourceTree = "<group>";
@@ -253,6 +258,7 @@
 				90B291DD150377A900E57979 /* Server.cc in Sources */,
 				0DDFD182151CBFED00B77760 /* SessionHandler.cc in Sources */,
 				969340C0152003E800BAC8CA /* Transceiver.cc in Sources */,
+				96E8C2541525CCE600688FFE /* FileTransfer.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
