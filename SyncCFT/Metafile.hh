@@ -12,30 +12,14 @@
 #include <list>
 #include <fstream>
 
+#include "Element.hh"
+
 #define METAFILE ".sync.cft"
 #define FT_FILE     8
 #define FT_FOLDER   4
 
 
 using namespace std;
-
-class Element {
-    string _name;  
-    size_t _size;
-    string _hash;
-    time_t _timestamp;  
-    
-public:
-    string getName() const {return _name;}
-    void setName(string const& newName) {_name = newName;}
-    size_t getSize() const {return _size;}
-    void setSize(size_t const size) {_size = size;}
-    string getHash() const {return _hash;}
-    void setHash(string const& newHash) {_hash = newHash;}
-    time_t getTimeStamp() const {return _timestamp;}
-    void setTimeStamp(time_t const timestamp) {_timestamp = timestamp;}
-    int compare(Element const& other) const;
-};
 
 class MetaFile {    
     const string _fileName;

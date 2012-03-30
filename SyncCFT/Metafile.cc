@@ -27,23 +27,6 @@
 #include "metafile.hh"
 #include "utilities.hh"
 
-/*
- * Compare two elements
- * @param other The element being compared to
- * @return Returns 0 if elements are identical, +1 if this element is newer, or
- * -1 if the other element is newer or same age
- */
-int Element::compare(Element const& other) const{
-    if (getHash() == other.getHash())
-        return 0;
-    else {
-        if (getTimeStamp() > other.getTimeStamp())
-            return 1;
-        else
-            return -1;
-    }       
-}
-
 MetaFile::MetaFile(string fName) : _fileName(fName) {
     
     // Read metadata file
@@ -86,6 +69,7 @@ Element& MetaFile::find(string const& name, bool& found) {
     found = false;
     return *_metadata.end();
 }
+
 
 /*
  * Convert string to Element
