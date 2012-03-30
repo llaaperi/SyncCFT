@@ -61,7 +61,7 @@ MetaFile::MetaFile(string fName) : _fileName(fName) {
  */
 MetaFile:: MetaFile(const char* buffer, int len) {
     string line;
-    string content(buffer, len+1);
+    string content(buffer, len);
 	istringstream stream(content);
     while (getline(stream, line)) {
         Element ele;

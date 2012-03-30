@@ -18,13 +18,15 @@
  */
 Server::Server(Client* clientHandler, string port) throw(invalid_argument,runtime_error) : _port(port), _running(false){
     
+    _clientHandler = clientHandler;
+    /*
     if(clientHandler != NULL){
         _clientHandler = clientHandler;
     }
     else{
         throw invalid_argument("[SERVER] NULL Client");
     }
-    
+    */
     _socket = Networking::createUnconnectedSocket(_port);
     if(_socket < 0){
         throw runtime_error("[SERVER] Socket creation failed");

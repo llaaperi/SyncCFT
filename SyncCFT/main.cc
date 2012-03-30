@@ -86,25 +86,33 @@ int main (int argc, const char * argv[])
     MetaFile mFile(METAFILE);
     mFile.print();
     
+    bool startClient = true;
+    bool startServer = true;
+    
     // Start client first
     Client* clientHandler = NULL;
-    try {
-        clientHandler = new Client(hosts, cport, sport);
-        clientHandler->start();
-    } catch (...) {
-        cout << "Creating client handler failed." << endl;
-        return 0;
+    if(startClient){
+        try {
+            clientHandler = new Client(hosts, cport, sport);
+            clientHandler->start();
+        } catch (...) {
+            cout << "Creating client handler failed." << endl;
+            return 0;
+        }
     }
+    
     
     // Pass reference to client object to the server
     // Start client first
     Server* serverHandler = NULL;
-    try {
-        serverHandler = new Server(clientHandler, sport);
-        serverHandler->start();
-    } catch (...) {
-        cout << "Creating server handler failed." << endl;
-        return 0;
+    if(startServer){
+        try {
+            serverHandler = new Server(clientHandler, sport);
+            serverHandler->start();
+        } catch (...) {
+            cout << "Creating server handler failed." << endl;
+            return 0;
+        }
     }
         
     while(true){

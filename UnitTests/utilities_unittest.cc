@@ -16,11 +16,10 @@
  */
 TEST(UtilitiesTest, MarkovChain) {
     
-    Utilities::packetLost(STATE_LOST, 0.5, 0.5);
-    Utilities::packetLost(STATE_NOT_LOST, 0.5, 0.5);
-    Utilities::packetLost(STATE_NOT_LOST, 0.5, 0.5);
-    Utilities::packetLost(STATE_NOT_LOST, 0.5, 0.5);
-    Utilities::packetLost(STATE_NOT_LOST, 0.5, 0.5);
-    Utilities::packetLost(STATE_NOT_LOST, 0.5, 0.5);
-      
+    //Utilities::packetLost(STATE_LOST, 0.5, 0.5);
+    //Utilities::packetLost(STATE_NOT_LOST, 0.5, 0.5);
+    //Utilities::packetLost(STATE_NOT_LOST, 0.5, 0.5);
+    //Utilities::packetLost(STATE_NOT_LOST, 0.5, 0.5);
+    //Utilities::packetLost(STATE_NOT_LOST, 0.5, 0.5);
+    //Utilities::packetLost(STATE_NOT_LOST, 0.5, 0.5);
 }

@@ -224,7 +224,7 @@ int Networking::receivePacket(int socketFd, char* buffer, struct sockaddr* cliAd
      
      // Handling of timeout
      else if (j == 0) {
-         perror("Connection timed out.");
+         //perror("Connection timed out.");
          return 0;
      }
      if (FD_ISSET(socketFd, &readSet)) { // Check if fd is active         
