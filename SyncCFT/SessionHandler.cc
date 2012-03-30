@@ -201,9 +201,7 @@ void SessionHandler::getHandler(Message* msg){
         
         //If this file is not already in transrer, create new FileTransfer object
         if(!isTransferring){
-            
             _fFlows[getFreeFlow()] = new FileTransfer(_trns, file, 0);
-            
         }
         
         //Send ACK

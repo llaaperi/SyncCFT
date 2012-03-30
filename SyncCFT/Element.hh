@@ -18,6 +18,7 @@ class Element {
     time_t _timestamp;  
     
 public:
+    Element(){};
     Element(Element const& other);
     Element(string name, size_t size, string hash, time_t timestamp) : 
         _name(name), _size(size), _hash(hash), _timestamp(timestamp) {};

@@ -7,3 +7,16 @@
 //
 
 #include <iostream>
+
+#include "FileTransfer.hh"
+
+/*
+ * FileTransfer constructor
+ */
+FileTransfer::FileTransfer(Transceiver* trns, Element file, int seqnum) : _trns(trns), _file(file), _seqnum(seqnum){
+    cout << "[FILE] Transfer created" << endl;
+}
+
+FileTransfer::~FileTransfer(){
+    cout << "[FILE] Transfer destroyed" << endl;
+}

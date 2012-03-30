@@ -10,10 +10,9 @@
 #define SyncCFT_FileTransfer_hh
 
 #include "networking.hh"
-#include "SessionHandler.hh"
 #include "Transceiver.hh"
 #include "Message.hh"
-#include "Metafile.hh"
+#include "Element.hh"
 
 using namespace std;
 
@@ -21,6 +20,7 @@ class FileTransfer{
     
     Element _file;
     Transceiver* _trns;
+    int _seqnum;
     
 public:
     FileTransfer(Transceiver* trns, Element file, int seqnum);
