@@ -119,24 +119,17 @@ void SessionHandler::descrHandler(Message* msg){
     msg->setFirst(true);
     msg->setLast(true);
     
-    //Payload
-    char buffer[NETWORKING_MTU];
-    int idx = 0;
-    list<Element> list = mFile.getData();
+    MetaFile clientFile(msg->getPayload(), msg->getPayloadLength());
+    string diff = mFile.getDiff(clientFile);
     
-    for(Element e : list){
-        string str = mFile.elementToStr(e);
-        memcpy(&buffer[idx], str.c_str(), str.length());
-        idx += str.length();
-        buffer[idx++] = '\n';
-    }
-    buffer[idx++] = 0;
-    msg->setPayload(buffer, idx);
+    //cout << "[SESSION] Diff file:" << endl << diff << endl;
+    msg->setPayload(diff.c_str(), (int)diff.length());
     
     //msg->printInfo();
     
     //Send diff
     _trns->send(msg, SERVER_TIMEOUT_SEND);
+    cout << "[SESSION] Description handler finished" << endl;
 }
 
 

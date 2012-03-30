@@ -151,7 +151,7 @@ void MetaFile::read(void) {
     // Try to open directory metafile
     _metafile.open(_fileName.c_str(), fstream::in);
     if (_metafile.is_open()) { // Old metafile found
-        cout << "Metafile found" << endl;
+        //cout << "Metafile found" << endl;
         
         // Read configuration file line by line and save data into an array
         while (getline(_metafile, line)) {
@@ -259,6 +259,7 @@ std::ostream& operator<<(std::ostream& os, const MetaFile& m) {
     for (list<Element>::const_iterator iter = data.begin(); iter != data.end(); iter++) {
         collect += m.elementToStr(*iter) + "\n";
     }
+    collect = collect.substr(0,collect.length()-1);
     return os << collect;
 }
 
@@ -290,4 +291,14 @@ string MetaFile::getDiff(MetaFile& other) {
     if (!different.empty())
         different = different.substr(0,different.length()-1);
     return different;
+}
+
+
+/*
+ *
+ */
+string MetaFile::getDescr(){
+    stringstream sStream;
+    sStream << *this; 
+    return sStream.str();
 }

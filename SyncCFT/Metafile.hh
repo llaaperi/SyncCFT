@@ -103,6 +103,12 @@ public:
     
     
     /*
+     *
+     */
+    string getDescr();
+    
+    
+    /*
      * Return the metadata
      */
     list<Element> getMetadata() const {return _metadata;}

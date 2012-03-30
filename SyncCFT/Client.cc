@@ -7,7 +7,7 @@
 //
 
 #include <iostream>
-
+#include <sstream>
 #include "Client.hh"
 #include "networking.hh"
 
@@ -86,8 +86,9 @@ void* Client::handle(void* arg)
         handler->metafileHandler(*serverInfo->ai_addr, &diff);
         
         //File transfers
-        handler->fileTransfer(*serverInfo->ai_addr, diff);
-        //TODO
+        if(diff != NULL){
+            handler->fileTransfer(*serverInfo->ai_addr, diff);
+        }
         
         sleep(1);
         
@@ -100,7 +101,9 @@ void* Client::handle(void* arg)
 }
 
 
-
+/*
+ *
+ */
 void Client::metafileHandler(sockaddr servAddr, MetaFile** diff){
     
     cout << "[CLIENT] Obtaining metafile from ";
@@ -112,7 +115,13 @@ void Client::metafileHandler(sockaddr servAddr, MetaFile** diff){
     msg.init(TYPE_DESCR);
     msg.setClientID(_id);
     
+    MetaFile mFile(METAFILE);
+    
     //TODO add metafile to payload
+    string payload = mFile.getDescr();
+    //cout << "[CLIENT] Own descriptio:" << endl;
+    //cout << payload << endl;
+    msg.setPayload(payload.c_str(), (int)payload.length());
     if(!Transceiver::sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_SEND)){
         return;
     }
@@ -128,10 +137,16 @@ void Client::metafileHandler(sockaddr servAddr, MetaFile** diff){
     }
     
     //msg.printInfo();
-    *diff = new MetaFile(msg.getPayload(), msg.getPayloadLength());
+    //TODO Possible refactoring to MetaFile constructior to throw invalid argument exception
+    if(msg.getPayloadLength() > 0){
+        *diff = new MetaFile(msg.getPayload(), msg.getPayloadLength());
+        cout << "[CLIENT] Received DIFF:" << endl;
+        (*diff)->print();
+    }else{
+        *diff = NULL;
+        cout << "[CLIENT] Received empty DIFF" << endl;
+    }
     
-    cout << "[CLIENT] Received DIFF:" << endl;
-    (*diff)->print();
 }
 
 
