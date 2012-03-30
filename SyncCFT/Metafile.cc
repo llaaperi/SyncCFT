@@ -33,7 +33,7 @@
  * @return Returns 0 if elements are identical, +1 if this element is newer, or
  * -1 if the other element is newer or same age
  */
-int Element::compare(Element const& other) {
+int Element::compare(Element const& other) const{
     if (getHash() == other.getHash())
         return 0;
     else {

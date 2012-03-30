@@ -47,3 +47,24 @@ TEST(MetafileTest, Diff) {
     string rDifference = "SyncCFT copy 2;30036;5da40dcd1199938f42f5670cd0a56234;1329557575\nSyncCFT copy 3;30036;4da40dcd1199938f42f5670cd0a56234;1329852729";
     EXPECT_TRUE(difference == rDifference);
 }
+
+
+/*
+ * Test MetaFile == operator
+ */
+TEST(MetafileTest, EqualsOperator) {
+    
+    Element ele1;
+    ele1.setName("asd1");
+    ele1.setSize(12);
+    ele1.setTimeStamp(123);
+    ele1.setHash("asdasdasd");
+    
+    Element ele2;
+    ele2.setName("asd1");
+    ele2.setSize(12);
+    ele2.setTimeStamp(123);
+    ele2.setHash("asdasdasd");
+
+    EXPECT_TRUE(ele1 == ele2);    
+}

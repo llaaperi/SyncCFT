@@ -34,7 +34,7 @@ public:
     void setHash(string const& newHash) {_hash = newHash;}
     time_t getTimeStamp() const {return _timestamp;}
     void setTimeStamp(time_t const timestamp) {_timestamp = timestamp;}
-    int compare(Element const& other);
+    int compare(Element const& other) const;
 };
 
 class MetaFile {    
@@ -125,5 +125,17 @@ private:
  * Print metadata to stream
  */
 ostream& operator<<(ostream& os, const MetaFile& m);
+
+inline bool operator==(const Element& lhs, const Element& rhs) { 
+    if (lhs.getName() != rhs.getName())
+        return false;
+    if (lhs.getSize() != rhs.getSize())
+        return false;
+    if (lhs.getHash() != rhs.getHash())
+        return false;
+    if (lhs.getTimeStamp() != rhs.getTimeStamp())
+        return false;
+    return true; 
+}
 
 #endif
