@@ -33,6 +33,13 @@ namespace Utilities {
      * Markov process
      */
     bool packetLost(int state, double p, double q);
-        
+    
+    
+    /* Calculates a 32-byte SHA256 hash from the given data
+     * @param A buffer where to store the hash
+     * @param message Data
+     * @return A pointer to the 32-byte hash
+     */
+    void SHA256Hash(unsigned char* buffer, unsigned char const* message, long const length);
 }
 #endif

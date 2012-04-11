@@ -22,6 +22,10 @@
 		906FAC2814E5C5A000D78FF6 /* Metafile.cc in Sources */ = {isa = PBXBuildFile; fileRef = 906FAC2714E5C5A000D78FF6 /* Metafile.cc */; };
 		907F833914FD4378001C5E15 /* Message.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9023095F14FBEB89004C81D0 /* Message.cc */; };
 		907F833C14FD439D001C5E15 /* Message_unittest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 907F833B14FD439D001C5E15 /* Message_unittest.cc */; };
+		9085F0081535BEDC00583D25 /* SessionHandler_unittest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9085F0071535BEDC00583D25 /* SessionHandler_unittest.cc */; };
+		9085F00A1535BFC300583D25 /* SessionHandler.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0DDFD181151CBFED00B77760 /* SessionHandler.cc */; };
+		9085F00B1535C03C00583D25 /* FileTransfer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96E8C2531525CCE600688FFE /* FileTransfer.cc */; };
+		9085F00C1535C03F00583D25 /* Transceiver.cc in Sources */ = {isa = PBXBuildFile; fileRef = 969340BF152003E800BAC8CA /* Transceiver.cc */; };
 		90B291DB1503779C00E57979 /* Client.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90B291DA1503779B00E57979 /* Client.cc */; };
 		90B291DD150377A900E57979 /* Server.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90B291DC150377A900E57979 /* Server.cc */; };
 		90C011AD1524E9A800AA4294 /* utilities_unittest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90C011AC1524E9A800AA4294 /* utilities_unittest.cc */; };
@@ -77,6 +81,7 @@
 		906FAC2714E5C5A000D78FF6 /* Metafile.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Metafile.cc; sourceTree = "<group>"; };
 		906FAC2914E5C5B900D78FF6 /* Metafile.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Metafile.hh; sourceTree = "<group>"; };
 		907F833B14FD439D001C5E15 /* Message_unittest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Message_unittest.cc; sourceTree = "<group>"; };
+		9085F0071535BEDC00583D25 /* SessionHandler_unittest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SessionHandler_unittest.cc; sourceTree = "<group>"; };
 		90B291DA1503779B00E57979 /* Client.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Client.cc; sourceTree = "<group>"; };
 		90B291DC150377A900E57979 /* Server.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Server.cc; sourceTree = "<group>"; };
 		90C011AC1524E9A800AA4294 /* utilities_unittest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utilities_unittest.cc; sourceTree = "<group>"; };
@@ -115,6 +120,7 @@
 				0DDFD17F151C8DFD00B77760 /* gtest.framework */,
 				906B8BD714F957B40038163D /* main.cc */,
 				907F833B14FD439D001C5E15 /* Message_unittest.cc */,
+				9085F0071535BEDC00583D25 /* SessionHandler_unittest.cc */,
 				906B8BDB14F959B90038163D /* networking_unittest.cc */,
 				90501D841521D5C80043E0DB /* Metafile_unittest.cc */,
 				90C011AC1524E9A800AA4294 /* utilities_unittest.cc */,
@@ -246,9 +252,13 @@
 				907F833914FD4378001C5E15 /* Message.cc in Sources */,
 				90CB6D641525E5CC001B7F0C /* Element.cc in Sources */,
 				906B8BDD14F95BB70038163D /* networking.cc in Sources */,
+				9085F00A1535BFC300583D25 /* SessionHandler.cc in Sources */,
 				907F833C14FD439D001C5E15 /* Message_unittest.cc in Sources */,
+				9085F00C1535C03F00583D25 /* Transceiver.cc in Sources */,
+				9085F00B1535C03C00583D25 /* FileTransfer.cc in Sources */,
 				90501D851521D5C80043E0DB /* Metafile_unittest.cc in Sources */,
 				90C011AD1524E9A800AA4294 /* utilities_unittest.cc in Sources */,
+				9085F0081535BEDC00583D25 /* SessionHandler_unittest.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

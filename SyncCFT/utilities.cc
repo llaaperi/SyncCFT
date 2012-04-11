@@ -12,6 +12,7 @@
 #include <iostream>
 #include <sys/time.h>
 #include <time.h>
+#include <openssl/sha.h>
 
 int Utilities::split(string str, string separator, vector<string>& results) {
     results.clear();
@@ -58,4 +59,18 @@ bool Utilities::packetLost(int state, double p, double q) {
         else
             return false;
     }
+}
+
+/* Calculates a 32-byte SHA256 hash from the given data
+ * @param A buffer where to store the hash
+ * @param message Data
+ * @return A pointer to the 32-byte hash
+ */
+void Utilities::SHA256Hash(unsigned char* buffer, unsigned char const* message, long const length)
+{
+    SHA256_CTX context;
+    
+    SHA256_Init(&context);
+    SHA256_Update(&context, message, length);
+    SHA256_Final(buffer, &context);
 }

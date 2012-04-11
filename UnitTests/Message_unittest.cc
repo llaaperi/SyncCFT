@@ -131,3 +131,28 @@ TEST(MessageTest, parseTest){
     EXPECT_EQ(msg1.isLast(), msg2.isLast());
 
 }
+
+/*
+ * Test SHA256 hash calculation
+ */
+TEST(MessageTest, SHA256Test)
+{
+    
+    const unsigned char msg[7] = "123456";
+    unsigned char hash[32];
+    Utilities::SHA256Hash(hash, msg, 7);
+    
+    /*
+    cout <<"[ ";
+    for (int i = 0; i < 32; i++)
+        printf("%02x ", hash[i]);
+    cout << "]" << endl;
+    */
+    
+    const uint8_t sampleHash[32] = {0xb3 , 0xda , 0x60 , 0x82 , 0xb1 , 0x2f , 0xe3 , 0x97 , 0x18 , 0xe0 , 0x13 , 0x43 , 0x2d , 0xbb , 0x90 , 0xa0 , 0xb9 , 0x7e , 0x47 , 0x0c , 0xc6 , 0x0c , 0x96 , 0x53 , 0xc5 , 0xf3 , 0xf5 , 0x59 , 0x77 , 0xa1 , 0xba , 0x68};
+    
+    for (int i = 0; i < 16; i++)
+        EXPECT_TRUE((memcmp(&hash[i], &sampleHash[i], 1)) == 0);
+    
+    
+}

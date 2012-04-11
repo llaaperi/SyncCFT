@@ -26,10 +26,22 @@ class SessionHandler {
     Transceiver* _trns;
     FileTransfer* _fFlows[SESSIONHANDLER_MAX_TRANSFERS];
     
+    unsigned char _sessionKey[32];
+    
 public:
+    SessionHandler(){};
     SessionHandler(int socket, struct sockaddr* cliAddr, uint8_t id, uint32_t seqnum);
     ~SessionHandler();
     
+    /*
+     * Creates a session key from two nonces and the secret key
+     * @param nonce1 First 16-byte random nonce
+     * @param nonce2 Second 16-byte random nonce
+     * @param secretKey Stored  64-byte secret key
+     */ 
+    void createSessionKey(unsigned char* nonce1, unsigned char* nonce2, unsigned char* secretKey);
+    const unsigned char* getSessionKey() {return _sessionKey;}
+
     void newMessage(Message* msg);
     
 private:

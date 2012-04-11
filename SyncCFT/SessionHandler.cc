@@ -29,8 +29,9 @@ SessionHandler::SessionHandler(int socket, struct sockaddr* cliAddr, uint8_t id,
  * Destructor
  */
 SessionHandler::~SessionHandler(){
-    cout << "[SESSION] Session " << (unsigned int)_id << " terminated"<< endl;
-    delete(_trns);
+    // Commented to enable unit testing
+    //cout << "[SESSION] Session " << (unsigned int)_id << " terminated"<< endl;
+    //delete(_trns);
 }
 
 
@@ -185,7 +186,7 @@ void SessionHandler::getHandler(Message* msg){
             FileTransfer* ft = _fFlows[i];
             
             if(ft != NULL){
-                file == ft->getElement();
+                file = ft->getElement();
                 isTransferring = true;
                 break;
             }
@@ -224,4 +225,27 @@ void SessionHandler::getHandler(Message* msg){
 void SessionHandler::fileTransfer(Message* msg){
     
     cout << "[SESSION] File transfer started" << endl;
+}
+
+
+/*
+ * Creates a 256-bit session key from two nonces and the secret key
+ * @param nonce1 First 16-byte random nonce
+ * @param nonce2 Second 16-byte random nonce
+ * @param secretKey Stored  64-byte secret key
+ */ 
+void SessionHandler::createSessionKey(unsigned char* nonce1, unsigned char* nonce2, unsigned char* secretKey)
+{
+    unsigned char data[96]; // 16+16+64
+    unsigned char* dataPointer = data;
+    memset(data, 0, 96);
+    
+    // Combine key paramters
+    memcpy(dataPointer, nonce1, 16);
+    dataPointer += 16;
+    memcpy(dataPointer, nonce2, 16);
+    dataPointer += 16;
+    memcpy(dataPointer, secretKey, 16);
+
+    Utilities::SHA256Hash(_sessionKey, data, 96);
 }

@@ -12,7 +12,6 @@
 #include "Message.hh"
 #include "networking.hh"
 
-
 /*
  * Constructor
  */
