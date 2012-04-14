@@ -41,5 +41,12 @@ namespace Utilities {
      * @return A pointer to the 32-byte hash
      */
     void SHA256Hash(unsigned char* buffer, unsigned char const* message, long const length);
+    
+    /*
+     * Create N bytes of random data
+     * @param buf Buffer where to store the random data
+     * @param lenth The length of the buffer
+     */
+    void randomBytes(unsigned char* buf, int length);
 }
 #endif

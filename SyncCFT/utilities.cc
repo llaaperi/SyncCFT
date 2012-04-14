@@ -12,7 +12,9 @@
 #include <iostream>
 #include <sys/time.h>
 #include <time.h>
+
 #include <openssl/sha.h>
+#include <openssl/rand.h>
 
 int Utilities::split(string str, string separator, vector<string>& results) {
     results.clear();
@@ -74,3 +76,25 @@ void Utilities::SHA256Hash(unsigned char* buffer, unsigned char const* message, 
     SHA256_Update(&context, message, length);
     SHA256_Final(buffer, &context);
 }
+
+
+/*
+ * Create N bytes of random data
+ * @param buf Buffer where to store the random data
+ * @param lenth The length of the buffer
+ */
+void Utilities::randomBytes(unsigned char* buf, int length)
+{
+    if (!RAND_bytes(buf, length)) {
+        cout << "Rand bytes failed" << endl;
+        buf = NULL;
+        return;
+    }
+    /*
+    cout <<"[ ";
+    for (int i = 0; i < length; i++)
+        printf("%02x ", buf[i]);
+    cout << "]" << endl;
+    */
+}
+

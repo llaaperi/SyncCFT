@@ -33,6 +33,13 @@ public:
     SessionHandler(int socket, struct sockaddr* cliAddr, uint8_t id, uint32_t seqnum);
     ~SessionHandler();
     
+    
+    /*
+     * Creates a random 16-byte nonce
+     * @param bug 16-byte buffer to store the nonce
+     */ 
+    void createNonce(unsigned char* buf) {Utilities::randomBytes(buf, 16);}
+    
     /*
      * Creates a session key from two nonces and the secret key
      * @param nonce1 First 16-byte random nonce

@@ -43,4 +43,10 @@ TEST(SessionHandlerTest, SessionKeyGenerationTest)
     
     for (int i = 0; i < 32; i++)
         EXPECT_TRUE((memcmp(&key[i], &sampleKey[i], 1)) == 0);
+    /*
+    Utilities::randomBytes(nonce1, 16);
+    Utilities::randomBytes(nonce2, 16);
+    Utilities::randomBytes(secretkey, 64);
+    */
+
 }
