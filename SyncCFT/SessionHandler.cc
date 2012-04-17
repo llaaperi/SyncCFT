@@ -36,7 +36,7 @@ SessionHandler::~SessionHandler(){
 }
 
 
-void SessionHandler::newMessage(Message* msg){
+void SessionHandler::newMessage(const Message* msg){
 
     switch (msg->getType()) {
         case TYPE_ACK:
@@ -77,7 +77,7 @@ void SessionHandler::newMessage(Message* msg){
 /*
  * Function for checking if source is valid for this session
  */
-bool SessionHandler::isValidSource(Message *msg){
+bool SessionHandler::isValidSource(const Message *msg){
     
     //Compare message address to the Transceiver address
     if(!Networking::cmpAddr(msg->getAddr(), _trns->getAddr())){
@@ -90,7 +90,7 @@ bool SessionHandler::isValidSource(Message *msg){
 /*
  * 
  */
-bool SessionHandler::isValidMessage(Message *msg){
+bool SessionHandler::isValidMessage(const Message *msg){
     
     //Compare source address
     if(!isValidSource(msg)){
@@ -111,27 +111,28 @@ bool SessionHandler::isValidMessage(Message *msg){
 /*
  * Handles DESCR messages
  */
-void SessionHandler::descrHandler(Message* msg){
+void SessionHandler::descrHandler(const Message* msg){
     
     cout << "[SESSION] Description handler started" << endl;
     
     MetaFile mFile(METAFILE);
     //mFile.print();
     
-    msg->setType(TYPE_DIFF);
-    msg->setFirst(true);
-    msg->setLast(true);
+    Message reply(*msg);
+    reply.setType(TYPE_DIFF);
+    reply.setFirst(true);
+    reply.setLast(true);
     
     MetaFile clientFile(msg->getPayload(), msg->getPayloadLength());
     string diff = mFile.getDiff(clientFile);
     
     //cout << "[SESSION] Diff file:" << endl << diff << endl;
-    msg->setPayload(diff.c_str(), (int)diff.length());
+    reply.setPayload(diff.c_str(), (int)diff.length());
     
     //msg->printInfo();
     
     //Send diff
-    _trns->send(msg, SERVER_TIMEOUT_SEND);
+    _trns->send(&reply, SERVER_TIMEOUT_SEND);
     cout << "[SESSION] Description handler finished" << endl;
 }
 
@@ -155,7 +156,7 @@ int SessionHandler::getFreeFlow(){
 /*
  *
  */
-void SessionHandler::getHandler(Message* msg){
+void SessionHandler::getHandler(const Message* msg){
     
     cout << "[SESSION] Get handler started" << endl;
     
@@ -195,14 +196,12 @@ void SessionHandler::getHandler(Message* msg){
     }
     
     //TODO MORE CHECKING
-    
+    Message reply(*msg);
     if(!found){
         //Send NACK if file not found
         cout << "[SESSION] Requested non-existing file" << endl;
-        msg->incrSeqnum();
-        msg->setType(TYPE_NACK);
-        msg->clearPayload();
-        _trns->send(msg, SERVER_TIMEOUT_SEND);
+        reply.setType(TYPE_NACK);
+        _trns->send(&reply, SERVER_TIMEOUT_SEND);
     }else{
         
         //If this file is not already in transrer, create new FileTransfer object
@@ -212,10 +211,8 @@ void SessionHandler::getHandler(Message* msg){
         
         //Send ACK
         cout << "[SESSION] Requested file" << parts[0] << endl;
-        msg->incrSeqnum();
-        msg->setType(TYPE_ACK);
-        msg->clearPayload();
-        _trns->send(msg, SERVER_TIMEOUT_SEND);
+        reply.setType(TYPE_ACK);
+        _trns->send(&reply, SERVER_TIMEOUT_SEND);
     }
 }
 
@@ -223,14 +220,14 @@ void SessionHandler::getHandler(Message* msg){
 /*
  *
  */
-void SessionHandler::fileHandler(Message* msg){
+void SessionHandler::fileHandler(const Message* msg){
     
     cout << "[SESSION] File handler started" << endl;
     
     int flowID = 0;
     //Chose file transfer from messages flow index
     //TODO
-    FileTransfer* flow = _flows[flowID];
+    FileTransfer* flow = _fFlows[flowID];
     
     //Check that flow is valid and active
     if(flow == NULL){
@@ -243,7 +240,7 @@ void SessionHandler::fileHandler(Message* msg){
     //File is transferred successfully
     if(finished){
         delete(flow);
-        _flows[flowID] = NULL;
+        _fFlows[flowID] = NULL;
     }
 }
 

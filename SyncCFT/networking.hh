@@ -110,7 +110,7 @@ namespace Networking {
      * Print address IP:Port (127.0.0.1:5062)
      * @param adress to be printed
      */
-    void printAddress(struct sockaddr* addr);
+    void printAddress(const struct sockaddr* addr);
 
 }
     
