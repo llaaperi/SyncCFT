@@ -68,7 +68,7 @@ void* Client::handle(void* arg)
     hints.ai_socktype = SOCK_DGRAM; // UDP socket
     
     //Get address information in struct addrinfo format. Works for IPv4 and IPv6.
-    if(getaddrinfo("86.50.135.185", handler->_sport.c_str(), &hints, &serverInfo)) { //getaddrinfo returns 0 on success
+    if(getaddrinfo("86.50.135.39", handler->_sport.c_str(), &hints, &serverInfo)) { //getaddrinfo returns 0 on success
         perror("[CLIENT] Running getaddrinfo failed.");
         return 0;
     }
@@ -257,6 +257,7 @@ bool Client::handshakeHandler(sockaddr servAddr){
     //Reply with final HELLOACK
     msg.incrSeqnum();
     msg.setPayload(NULL, 0);
+    msg.setHello(true);
     Transceiver::sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_HELLO);
     
     return true;
@@ -293,6 +294,7 @@ bool Client::terminateHandler(sockaddr servAddr){
     //Reply with final QUITACK
     msg.incrSeqnum();
     msg.clearPayload();
+    msg.setQuit(true);
     Transceiver::sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_HELLO);
     
     return true;
