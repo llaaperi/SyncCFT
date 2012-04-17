@@ -61,7 +61,7 @@ private:
     
     void descrHandler(Message* msg);
     void getHandler(Message* msg);
-    void fileTransfer(Message* msg);
+    void fileHandler(Message* msg);
     
     int getFreeFlow();
 };
