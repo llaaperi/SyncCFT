@@ -20,3 +20,23 @@ FileTransfer::FileTransfer(Transceiver* trns, Element file, int seqnum) : _trns(
 FileTransfer::~FileTransfer(){
     cout << "[FILE] Transfer destroyed" << endl;
 }
+
+
+bool FileTransfer::transferFile(Message* msg)
+{
+    
+    
+    
+    
+    
+    return false;
+}
+
+bool FileTransfer::sendChunk(unsigned long chunk)
+{
+    
+    
+    
+    
+    return true;
+}

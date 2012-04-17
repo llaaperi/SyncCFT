@@ -23,12 +23,19 @@ class FileTransfer{
     int _seqnum;
     
 public:
+    
     FileTransfer(Transceiver* trns, Element file, int seqnum);
     ~FileTransfer();
     
     const Element& getElement(){return _file;}
+    void recvChunck();
+    
+    bool transferFile(Message* msg);
     
 private:
+    
+    bool sendChunk(unsigned long chunk);
+    
     // Rule of three
     FileTransfer(FileTransfer const& other);
     FileTransfer& operator=(FileTransfer const& other);

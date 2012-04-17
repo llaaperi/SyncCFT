@@ -68,7 +68,7 @@ bool Utilities::packetLost(int state, double p, double q) {
  * @param message Data
  * @return A pointer to the 32-byte hash
  */
-void Utilities::SHA256Hash(unsigned char* buffer, unsigned char const* message, long const length)
+void Utilities::SHA256Hash(unsigned char* buffer, unsigned char const* message, long length)
 {
     SHA256_CTX context;
     
