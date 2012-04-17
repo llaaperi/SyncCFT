@@ -301,7 +301,7 @@ void printIPv4Address(struct sockaddr_in* addr){
  * Print address IP:Port (127.0.0.1:5062)
  * @param adress to be printed
  */
-void Networking::printAddress(struct sockaddr* addr){
+void Networking::printAddress(const struct sockaddr* addr){
     
     //Check for NULL pointer
     if(addr == NULL){

@@ -105,6 +105,7 @@ void* Server::handle(void* arg){
             handler->_sessionHandlers[msg.getClientID()]->newMessage(&msg);
         }else{
             cout << "[SERVER] Packet discarded" << endl;
+            msg.printInfo();
         }
     }
     return 0;
@@ -208,6 +209,7 @@ void Server::terminateHandler(Message* msg, sockaddr cliAddr){
         
         //Reply with final QUITACK
         msg->setType(TYPE_ACK);
+        msg->setQuit(true);
         msg->incrSeqnum();
         msg->clearPayload();
         if(Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND)){
@@ -230,3 +232,4 @@ void Server::terminateHandler(Message* msg, sockaddr cliAddr){
         }
     }
 }
+

@@ -14,27 +14,40 @@
 #include "Message.hh"
 #include "Element.hh"
 
+
+#define CHUNK_SIZE 10000    //10KB chunks
+#define CHUNK_TYPE_BEGIN 0
+#define CHUNK_TYPE_END 1
+
 using namespace std;
 
 class FileTransfer{
     
-    Element _file;
+    Element _element;
     Transceiver* _trns;
     int _seqnum;
+    
+    FILE* _file;
+    char* _sendBuffer;
+    unsigned long _sendBufferLen;
+    
+    uint32_t _chunkBegin;
+    uint32_t _chunkEnd;
+    uint32_t _chunkCurrent;
     
 public:
     
     FileTransfer(Transceiver* trns, Element file, int seqnum);
     ~FileTransfer();
     
-    const Element& getElement(){return _file;}
+    const Element& getElement(){return _element;}
     void recvChunck();
     
-    bool transferFile(Message* msg);
+    bool transferFile(const Message* msg);
     
 private:
-    
-    bool sendChunk(unsigned long chunk);
+    bool sendWindow(int size);
+    bool sendChunk(int offset);
     
     // Rule of three
     FileTransfer(FileTransfer const& other);

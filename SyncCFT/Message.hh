@@ -47,24 +47,24 @@ class Message {
     
 public:
     Message();
+    Message(Message const& other);
     ~Message();
     
-    uint8_t getVersion(){return _version;}
-    uint8_t getType(){return _type;}
-    uint8_t getClientID(){return _clientID;}
-    uint8_t getChecksum(){return _checksum;}
-    uint16_t getPayloadLength(){return _payloadLen;}
-    uint16_t getWindow(){return _window;}
-    uint32_t getSeqnum(){return _seqnum;}
-    uint32_t getChunk(){return _chunk;}
+    uint8_t getVersion() const {return _version;}
+    uint8_t getType() const {return _type;}
+    uint8_t getClientID() const {return _clientID;}
+    uint8_t getChecksum() const {return _checksum;}
+    uint16_t getPayloadLength() const {return _payloadLen;}
+    uint16_t getWindow() const {return _window;}
+    uint32_t getSeqnum() const {return _seqnum;}
+    uint32_t getChunk() const {return _chunk;}
     const char* getPayload() const {return _payload;}
+    const sockaddr* getAddr() const {return &_addrInfo;}
     
-    sockaddr* getAddr(){return &_addrInfo;}
-    
-    bool isHello(){return _hello;}
-    bool isQuit(){return _quit;}
-    bool isFirst(){return _begin;}
-    bool isLast(){return _end;}
+    bool isHello() const {return _hello;}
+    bool isQuit() const {return _quit;}
+    bool isFirst() const {return _begin;}
+    bool isLast() const {return _end;}
     
     void setVersion(uint8_t v){_version = v;}
     void setType(MsgType t){_type = t;}
@@ -89,7 +89,7 @@ public:
     void initHeader(uint8_t type);
     void clear();
     void clearPayload();
-    void parseToBytes(char* buffer);
+    void parseToBytes(char* buffer) const;
     
     /*
      * Parse message from byte array.
@@ -97,12 +97,11 @@ public:
      */
     bool parseFromBytes(const char* buffer, int len);
     
-    void printBytes();
-    void printInfo();
+    void printBytes() const;
+    void printInfo() const;
 
 private:
     // Rule of three
-    Message(Message const& other);
     Message& operator=(Message const& other);
 };
 

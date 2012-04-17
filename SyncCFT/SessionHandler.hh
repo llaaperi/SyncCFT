@@ -49,19 +49,19 @@ public:
     void createSessionKey(unsigned char* nonce1, unsigned char* nonce2, unsigned char* secretKey);
     const unsigned char* getSessionKey() {return _sessionKey;}
 
-    void newMessage(Message* msg);
+    void newMessage(const Message* msg);
     
 private:
     // Rule of three
     SessionHandler(SessionHandler const& other);
     SessionHandler& operator=(SessionHandler const& other);
     
-    bool isValidSource(Message* msg);
-    bool isValidMessage(Message* msg);
+    bool isValidSource(const Message* msg);
+    bool isValidMessage(const Message* msg);
     
-    void descrHandler(Message* msg);
-    void getHandler(Message* msg);
-    void fileHandler(Message* msg);
+    void descrHandler(const Message* msg);
+    void getHandler(const Message* msg);
+    void fileHandler(const Message* msg);
     
     int getFreeFlow();
 };

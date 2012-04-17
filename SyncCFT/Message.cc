@@ -22,6 +22,33 @@ Message::Message() : _version(0), _type(0), _clientID(0), _checksum(0), _payload
 
 
 /*
+ * Copy constructor
+ */
+Message::Message(Message const& other){
+
+    //Copy attributes
+    _version = other.getVersion();
+    _type = other.getType();
+    _clientID = other.getClientID();
+    _checksum = other.getChecksum();
+    _window = other.getWindow();
+    _seqnum = other.getSeqnum();
+    _chunk = other.getChunk();
+    
+    
+    //Flags
+    _hello = other.isHello();
+    _quit = other.isQuit();
+    _begin = other.isFirst();
+    _end = other.isLast();
+    
+    //Payload
+    _payload = NULL;
+    _payloadLen = 0;
+}
+
+
+/*
  * Destructor frees the existing payload
  */
 Message::~Message(){
@@ -170,8 +197,9 @@ bool Message::parseFromBytes(const char* buffer, int len){
     //Allocate memory for the payload and copy content from the buffer
     if(len > HEADER_SIZE){
         _payloadLen = len - HEADER_SIZE;
-        _payload = (char*)malloc(_payloadLen);
+        _payload = (char*)malloc(_payloadLen + 1);
         memcpy(_payload, &buffer[HEADER_SIZE], _payloadLen);
+        _payload[_payloadLen] = 0;  //Add terminating null
     }else{
         _payload = NULL;
         _payloadLen = 0;
@@ -184,7 +212,7 @@ bool Message::parseFromBytes(const char* buffer, int len){
 /*
  * Convert message header into binary format
  */
-void Message::parseToBytes(char* buffer) {
+void Message::parseToBytes(char* buffer) const {
     
     //Init memory
     memset(buffer, 0, HEADER_SIZE);
@@ -228,7 +256,7 @@ void Message::parseToBytes(char* buffer) {
 /*
  * Print contents of the header in hex
  */
-void Message::printBytes() {
+void Message::printBytes() const {
     
     char buffer[16];
     parseToBytes(buffer);
@@ -242,7 +270,7 @@ void Message::printBytes() {
 /*
  * Print text representation of the message header and payload.
  */
-void Message::printInfo(){
+void Message::printInfo() const {
     
     cout << "Message header:" << endl;
     cout << "Version = " << (unsigned int)getVersion() << endl;
