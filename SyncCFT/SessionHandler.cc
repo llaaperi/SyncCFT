@@ -14,6 +14,7 @@
 #include "Server.hh"
 #include "utilities.hh"
 
+
 /*
  * Constructor
  */
@@ -30,8 +31,8 @@ SessionHandler::SessionHandler(int socket, struct sockaddr* cliAddr, uint8_t id,
  */
 SessionHandler::~SessionHandler(){
     // Commented to enable unit testing
-    //cout << "[SESSION] Session " << (unsigned int)_id << " terminated"<< endl;
-    //delete(_trns);
+    cout << "[SESSION] Session " << (unsigned int)_id << " terminated"<< endl;
+    delete(_trns);
 }
 
 
@@ -40,7 +41,7 @@ void SessionHandler::newMessage(Message* msg){
     switch (msg->getType()) {
         case TYPE_ACK:
             cout << "[SESSION] Received ACK message" << endl;
-            fileTransfer(msg);
+            fileHandler(msg);
             break;
         case TYPE_HELLO:
             cout << "[SESSION] Received HELLO message" << endl;
@@ -55,7 +56,7 @@ void SessionHandler::newMessage(Message* msg){
         case TYPE_GET:
             cout << "[SESSION] Received GET message" << endl;
             getHandler(msg);
-            fileTransfer(msg);
+            fileHandler(msg);
             break;
         case TYPE_FILE:
             cout << "[SESSION] Received FILE message" << endl;
@@ -222,9 +223,28 @@ void SessionHandler::getHandler(Message* msg){
 /*
  *
  */
-void SessionHandler::fileTransfer(Message* msg){
+void SessionHandler::fileHandler(Message* msg){
     
-    cout << "[SESSION] File transfer started" << endl;
+    cout << "[SESSION] File handler started" << endl;
+    
+    int flowID = 0;
+    //Chose file transfer from messages flow index
+    //TODO
+    FileTransfer* flow = _flows[flowID];
+    
+    //Check that flow is valid and active
+    if(flow == NULL){
+        return;
+    }
+    
+    bool finished = false;
+    finished = flow->transferFile(msg);    //Give chunk to the file transfer object
+    
+    //File is transferred successfully
+    if(finished){
+        delete(flow);
+        _flows[flowID] = NULL;
+    }
 }
 
 
