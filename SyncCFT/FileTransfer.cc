@@ -25,11 +25,17 @@ FileTransfer::~FileTransfer(){
     cout << "[FILE] Transfer destroyed" << endl;
 }
 
+/*
+ *
+ */
+bool FileTransfer::recvFile(const Message* msg){
+    return false;
+}
 
 /*
  * Return true when finished
  */
-bool FileTransfer::transferFile(const Message* msg){
+bool FileTransfer::sendFile(const Message* msg){
     
     //cout << "[TRANSFER] received: " << msg->getPayload() << endl;
     //cout << "[TRANSFER] received type: " << msg->getType() << endl;

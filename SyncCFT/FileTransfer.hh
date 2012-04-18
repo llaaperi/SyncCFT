@@ -43,7 +43,8 @@ public:
     const Element& getElement(){return _element;}
     void recvChunck();
     
-    bool transferFile(const Message* msg);
+    bool recvFile(const Message* msg);
+    bool sendFile(const Message* msg);
     
 private:
     bool sendWindow(int size);

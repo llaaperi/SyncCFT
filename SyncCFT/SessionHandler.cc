@@ -235,7 +235,7 @@ void SessionHandler::fileHandler(const Message* msg){
     }
     
     bool finished = false;
-    finished = flow->transferFile(msg);    //Give chunk to the file transfer object
+    finished = flow->sendFile(msg);    //Give chunk to the file transfer object
     
     //File is transferred successfully
     if(finished){
