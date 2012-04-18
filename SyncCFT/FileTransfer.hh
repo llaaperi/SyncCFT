@@ -30,6 +30,8 @@ class FileTransfer{
     FILE* _file;
     char* _sendBuffer;
     unsigned long _sendBufferLen;
+    char* _recvBuffer;
+    unsigned long _recvBufferLen;
     
     uint32_t _chunkBegin;
     uint32_t _chunkEnd;
@@ -42,6 +44,8 @@ public:
     
     const Element& getElement(){return _element;}
     void recvChunck();
+    
+    void initRecv(const Message* msg);
     
     bool recvFile(const Message* msg);
     bool sendFile(const Message* msg);

@@ -25,12 +25,57 @@ FileTransfer::~FileTransfer(){
     cout << "[FILE] Transfer destroyed" << endl;
 }
 
+void FileTransfer::initRecv(const Message* msg){
+    
+    //Open temp file
+    string fName = _element.getName() + ".tmp";
+    _file = fopen(fName.c_str(), "w");  //w or a
+    
+}
+
+
 /*
  *
  */
 bool FileTransfer::recvFile(const Message* msg){
+    
+    if(msg->getType() != TYPE_FILE){
+        return false;
+    }
+    
+    //Allocate window size amount of recv buffer
+    if((msg->getWindow() * CHUNK_SIZE) > _recvBufferLen){
+        _recvBufferLen = msg->getWindow() * CHUNK_SIZE;
+        _recvBuffer = (char*)realloc(_recvBuffer, _recvBufferLen);
+    }
+    
+    //Receive window
+    //recvWindow(msg->getWindow());
+    
+    
+    if(msg->isLast()){
+        Message reply(*msg);
+        reply.setType(TYPE_ACK);
+        reply.setLast(false);
+        _trns->send(&reply, CLIENT_TIMEOUT_SEND);
+        
+        cout << "[TRANSFER] Chunk " << msg->getChunk() << " received" << endl;
+        
+        if(msg->getChunk() == _chunkEnd){
+            cout << "[TRANSFER] File received" << endl;
+            return true;
+        }
+    }
+    
     return false;
 }
+
+
+/*
+ *
+ */
+//bool FileTransfer::recvWindow(int size){}
+
 
 /*
  * Return true when finished
@@ -40,6 +85,12 @@ bool FileTransfer::sendFile(const Message* msg){
     //cout << "[TRANSFER] received: " << msg->getPayload() << endl;
     //cout << "[TRANSFER] received type: " << msg->getType() << endl;
     msg->printInfo();
+    
+    //Allocate window size amount of send buffer
+    if((msg->getWindow() * CHUNK_SIZE) > _sendBufferLen){
+        _sendBufferLen = msg->getWindow() * CHUNK_SIZE;
+        _sendBuffer = (char*)realloc(_sendBuffer, _sendBufferLen);
+    }
     
     static bool init = false;
     if(!init && (msg->getType() == TYPE_GET)){
@@ -55,6 +106,10 @@ bool FileTransfer::sendFile(const Message* msg){
         
         sscanf(parts[1].c_str(), "%u-%u", &_chunkBegin, &_chunkEnd);
         _chunkCurrent = _chunkBegin;
+        if(_chunkEnd == 0){
+            _chunkEnd = ceil(_element.getSize() / CHUNK_SIZE);  //Set end to the end of the file
+        }
+        
         //cout << "[TRANSFER] chunkB: " << _chunkBegin << ", chunkE: " << _chunkEnd << endl;
         
         //Open FILE
@@ -64,23 +119,23 @@ bool FileTransfer::sendFile(const Message* msg){
             return true;    //File is transferred (Could be a better solution)
         }
         
-        //Allocate window size amount of send buffer
-        _sendBufferLen = msg->getWindow() * CHUNK_SIZE;
-        _sendBuffer = (char*)malloc(_sendBufferLen);
-        
-        
         sendWindow(msg->getWindow());
     }
     
+    //Handle FILE ACK's
     if(init && (msg->getType() == TYPE_ACK)){
         
+        //Check if whole file has been trasmitted
+        if(msg->getChunk() >= _chunkEnd){
+            return true;
+        }
         
-        return false;
+        //Acked succesfuly received chunk(s)
+        if(msg->getChunk() != _chunkCurrent){
+            _chunkCurrent = msg->getChunk();
+        }
+        sendWindow(msg->getWindow());
     }
-    
-    //Invalid packet received here
-    
-    
     return false;
 }
 
@@ -100,7 +155,7 @@ bool FileTransfer::sendWindow(int size){
     for(int i = 0; i < chunks; i++){
         sendChunk(_sendBuffer + (i * CHUNK_SIZE), _sendBufferLen, _chunkCurrent++);
     }
-    return false;
+    return true;
 }
 
 
