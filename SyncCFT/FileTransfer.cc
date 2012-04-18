@@ -12,6 +12,7 @@
 #include <math.h>
 
 #include "FileTransfer.hh"
+#include "Server.hh"
 
 /*
  * FileTransfer constructor
@@ -25,6 +26,9 @@ FileTransfer::~FileTransfer(){
 }
 
 
+/*
+ * Return true when finished
+ */
 bool FileTransfer::transferFile(const Message* msg){
     
     //cout << "[TRANSFER] received: " << msg->getPayload() << endl;
@@ -40,7 +44,7 @@ bool FileTransfer::transferFile(const Message* msg){
         vector<string> parts; 
         int size = Utilities::split(line, ";", parts);
         if(size < 2){
-            return false;
+            return true; //Finish transfer
         }
         
         sscanf(parts[1].c_str(), "%u-%u", &_chunkBegin, &_chunkEnd);
@@ -60,10 +64,10 @@ bool FileTransfer::transferFile(const Message* msg){
         
         
         sendWindow(msg->getWindow());
-        return false;
     }
     
     if(init && (msg->getType() == TYPE_ACK)){
+        
         
         return false;
     }
@@ -80,7 +84,7 @@ bool FileTransfer::transferFile(const Message* msg){
  */
 bool FileTransfer::sendWindow(int size){
     
-    //Load file fo buffer
+    //Load chunks fo buffer
     unsigned int bytes = 0;
     bytes = (unsigned int)fread(_sendBuffer, 1, size * CHUNK_SIZE, _file);
     _sendBufferLen = bytes;
@@ -88,16 +92,46 @@ bool FileTransfer::sendWindow(int size){
     int chunks = ceil(bytes / CHUNK_SIZE);  //Number of read chunks
     
     for(int i = 0; i < chunks; i++){
-        sendChunk(i);
+        sendChunk(_sendBuffer + (i * CHUNK_SIZE), _sendBufferLen, _chunkCurrent++);
     }
     return false;
 }
 
 
-bool FileTransfer::sendChunk(int offset){
+/*
+ *
+ */
+bool FileTransfer::sendChunk(const char* chunk, uint16_t len, uint32_t chunk_num){
     
+    Message msg;
+    msg.init(TYPE_FILE);
+    msg.setChunk(chunk_num);
+    msg.setSeqnum(0);
     
+    //TODO
+    //Flow id
     
+    //
+    msg.setFirst(true);
+    int i;
+    for(i = 0; i < len; i += MESSAGE_MTU){
+        
+        cout << "[TRANSFER] message " << i << " sent from chunk " << chunk_num << endl;
+        
+        msg.incrSeqnum();
+        msg.setPayload(chunk + i, MESSAGE_MTU);
+        _trns->send(&msg, SERVER_TIMEOUT_SEND);
+        
+        msg.setFirst(false);
+    }
+    //Send last message
+    msg.incrSeqnum();
+    msg.setLast(true);
+    msg.setPayload(chunk + i, len - (i - MESSAGE_MTU));
+    _trns->send(&msg, SERVER_TIMEOUT_SEND);
+    
+    cout << "[TRANSFER] message " << i << " sent from chunk " << chunk_num << endl;
+    cout << "[TRANSFER] last payload length " << msg.getPayloadLength() << endl;
     
     return true;
 }

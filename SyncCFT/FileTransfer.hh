@@ -47,7 +47,7 @@ public:
     
 private:
     bool sendWindow(int size);
-    bool sendChunk(int offset);
+    bool sendChunk(const char* chunk, uint16_t len, uint32_t chunk_num);
     
     // Rule of three
     FileTransfer(FileTransfer const& other);
