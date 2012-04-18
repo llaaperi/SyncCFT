@@ -187,7 +187,7 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
         bool ready = false;
         while(!ready){
             _trns->recv(&msg, CLIENT_TIMEOUT_ACK);
-            
+            cout << "[CLIENT] Received file message" << endl;
             ready = _fFlow->recvFile(&msg);
         }
     }
