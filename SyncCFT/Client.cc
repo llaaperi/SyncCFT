@@ -10,6 +10,7 @@
 #include <sstream>
 #include "Client.hh"
 #include "networking.hh"
+#include "FileTransfer.hh"
 
 Client::Client(list<string>& hosts, string cport, string sport) throw(invalid_argument, runtime_error) : _cport(cport), _sport(sport){
     
@@ -68,7 +69,7 @@ void* Client::handle(void* arg)
     hints.ai_socktype = SOCK_DGRAM; // UDP socket
     
     //Get address information in struct addrinfo format. Works for IPv4 and IPv6.
-    if(getaddrinfo("86.50.135.39", handler->_sport.c_str(), &hints, &serverInfo)) { //getaddrinfo returns 0 on success
+    if(getaddrinfo("86.50.130.170", handler->_sport.c_str(), &hints, &serverInfo)) { //getaddrinfo returns 0 on success
         perror("[CLIENT] Running getaddrinfo failed.");
         return 0;
     }
@@ -174,14 +175,20 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
             return;
         }
         
-        cout << "[CLIENT] Get payload: " << endl << msg.getPayload() << endl;
+        //cout << "[CLIENT] Get payload: " << endl << msg.getPayload() << endl;
         
+        _trns = new Transceiver(_socket, servAddr);
+        _fFlow = new FileTransfer(_trns, e, 0);
+        Message msg;
+        
+        // TODO: Handle ACK/NACK
+        _trns->recv(&msg, CLIENT_TIMEOUT_ACK);
+
         bool ready = false;
         while(!ready){
-        
+            _trns->recv(&msg, CLIENT_TIMEOUT_ACK);
             
-            sleep(1);
-            ready = true;
+            ready = _fFlow->recvFile(&msg);
         }
     }
 }

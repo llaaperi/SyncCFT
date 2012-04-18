@@ -10,12 +10,14 @@
 #define SyncCFT_Client_hh
 
 #include "Transceiver.hh"
+#include "FileTransfer.hh"
 #include "Metafile.hh"
 #include "Message.hh"
 #include <stdexcept>
 
 
 #define CLIENT_TIMEOUT_SEND 5
+#define CLIENT_TIMEOUT_ACK 5
 #define CLIENT_TIMEOUT_HELLO 5
 #define CLIENT_TIMEOUT_HELLOACK 5
 #define CLIENT_TIMEOUT_QUIT 5
@@ -31,6 +33,8 @@ class Client {
     bool _running;
     int _socket;
     uint8_t _id;
+    Transceiver* _trns;
+    FileTransfer* _fFlow;
     
 public:
     
