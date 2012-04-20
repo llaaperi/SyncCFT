@@ -17,7 +17,7 @@
 /*
  * FileTransfer constructor
  */
-FileTransfer::FileTransfer(Transceiver* trns, Element file, int seqnum) : _trns(trns), _element(file), _seqnum(seqnum){
+FileTransfer::FileTransfer(Transceiver* trns, Element file, int seqnum) : _trns(trns), _element(file), _seqnum(seqnum), _chunkBegin(0), _chunkEnd(0), _chunkCurrent(0), _sendBuffer(NULL), _sendBufferLen(0), _recvBuffer(NULL), _recvBufferLen(0){
     cout << "[FILE] Transfer created" << endl;
 }
 
@@ -84,7 +84,7 @@ bool FileTransfer::sendFile(const Message* msg){
     
     //cout << "[TRANSFER] received: " << msg->getPayload() << endl;
     //cout << "[TRANSFER] received type: " << msg->getType() << endl;
-    msg->printInfo();
+    //msg->printInfo();
     
     //Allocate window size amount of send buffer
     if((msg->getWindow() * CHUNK_SIZE) > _sendBufferLen){
@@ -107,10 +107,11 @@ bool FileTransfer::sendFile(const Message* msg){
         sscanf(parts[1].c_str(), "%u-%u", &_chunkBegin, &_chunkEnd);
         _chunkCurrent = _chunkBegin;
         if(_chunkEnd == 0){
-            _chunkEnd = ceil(_element.getSize() / CHUNK_SIZE);  //Set end to the end of the file
+            _chunkEnd = ceil((double)_element.getSize() / CHUNK_SIZE);  //Set end to the end of the file
         }
         
-        //cout << "[TRANSFER] chunkB: " << _chunkBegin << ", chunkE: " << _chunkEnd << endl;
+        cout << "[TRANSFER] chunkB: " << _chunkBegin << ", chunkE: " << _chunkEnd << endl;
+        cout << "[TRANSFER] file name: " << _element.getName() << " size: " << _element.getSize() << endl;
         
         //Open FILE
         _file = fopen(_element.getName().c_str(), "r");
@@ -145,12 +146,17 @@ bool FileTransfer::sendFile(const Message* msg){
  */
 bool FileTransfer::sendWindow(int size){
     
+    cout << "[TRANSFER] Sending window of size " << size << endl;
+    
     //Load chunks fo buffer
     unsigned int bytes = 0;
     bytes = (unsigned int)fread(_sendBuffer, 1, size * CHUNK_SIZE, _file);
     _sendBufferLen = bytes;
     
-    int chunks = ceil(bytes / CHUNK_SIZE);  //Number of read chunks
+    int chunks = ceil((double)bytes / CHUNK_SIZE);  //Number of read chunks
+    
+    cout << "Bytes " << bytes << endl;
+    cout << "Chunks " << chunks << endl;
     
     for(int i = 0; i < chunks; i++){
         sendChunk(_sendBuffer + (i * CHUNK_SIZE), _sendBufferLen, _chunkCurrent++);
