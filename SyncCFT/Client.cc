@@ -183,10 +183,13 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
         
         // TODO: Handle ACK/NACK
         _trns->recv(&msg, CLIENT_TIMEOUT_ACK);
-
+        cout << "[CLIENT] received first message after GET" << endl;
         bool ready = false;
         while(!ready){
-            _trns->recv(&msg, CLIENT_TIMEOUT_ACK);
+            if(!_trns->recv(&msg, CLIENT_TIMEOUT_ACK)) {
+                cout << "[CLIENT] Wait FILE timeout" << endl;
+                continue; // TODO: Timeout handler
+            }
             cout << "[CLIENT] Received file message" << endl;
             ready = _fFlow->recvFile(&msg);
         }
