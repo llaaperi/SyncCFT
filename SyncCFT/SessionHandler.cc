@@ -56,7 +56,6 @@ void SessionHandler::newMessage(const Message* msg){
         case TYPE_GET:
             cout << "[SESSION] Received GET message" << endl;
             getHandler(msg);
-            fileHandler(msg);
             break;
         case TYPE_FILE:
             cout << "[SESSION] Received FILE message" << endl;
@@ -154,66 +153,123 @@ int SessionHandler::getFreeFlow(){
 
 
 /*
+ * Check if Element file is being transferred already
+ * @return true if file is being transferred
+ */
+bool SessionHandler::isTransferring(Element* file){
+
+    //If already in transfer
+    for(int i = 0; i < SESSIONHANDLER_MAX_TRANSFERS; i++){
+        
+        FileTransfer* ft = _fFlows[i];
+        if((ft != NULL) && !file->compare(ft->getElement())){
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/*
+ * Send reply NACK to the message
+ */
+void SessionHandler::sendNack(const Message* msg){
+    Message reply(*msg);
+    reply.setType(TYPE_NACK);
+    _trns->send(&reply, SERVER_TIMEOUT_SEND);
+}
+
+
+/*
+ * Send reply ACK to the message
+ */
+void SessionHandler::sendAck(const Message* msg){
+    Message reply(*msg);
+    reply.setType(TYPE_ACK);
+    _trns->send(&reply, SERVER_TIMEOUT_SEND);
+}
+
+
+/*
  *
  */
-void SessionHandler::getHandler(const Message* msg){
-    
-    cout << "[SESSION] Get handler started" << endl;
+bool SessionHandler::parseGet(const Message* msg, Element* file, uint32_t* chunkBegin, uint32_t* chunkEnd){
     
     //Check message validity
     if(!isValidMessage(msg)){
-        return; //Discard invalid packets
+        cout << "[SESSION] Invalid message" << endl;
+        return false;
     }
     
-    //const char* payload = msg->getPayload();
+    //Parse GET message
     string line(msg->getPayload());
     vector<string> parts; 
     int size = Utilities::split(line, ";", parts);
     
     //Validity check (file1.txt;0-0)
     if(size != 2){
-        return;
+        cout << "[SESSION] Invalid GET message" << endl;
+        return false;
     }
     
+    //Get file
     MetaFile mFile(METAFILE);
     bool found = false;
-    Element file = mFile.find(parts[0], found);
+    Element fileTmp = mFile.find(parts[0], found);
     
-    bool isTransferring = false;
-    if(found){
-        //If already int transfer
-        //TODO own functions
-        for(int i = 0; i < SESSIONHANDLER_MAX_TRANSFERS; i++){
-        
-            FileTransfer* ft = _fFlows[i];
-            
-            if(ft != NULL){
-                file = ft->getElement();
-                isTransferring = true;
-                break;
-            }
-        }
-    }
-    
-    //TODO MORE CHECKING
-    Message reply(*msg);
+    //Reply wih NACK if file is not found
     if(!found){
-        //Send NACK if file not found
         cout << "[SESSION] Requested non-existing file" << endl;
-        reply.setType(TYPE_NACK);
-        _trns->send(&reply, SERVER_TIMEOUT_SEND);
-    }else{
-        
-        //If this file is not already in transrer, create new FileTransfer object
-        if(!isTransferring){
-            _fFlows[getFreeFlow()] = new FileTransfer(_trns, file, 0);
-        }
-        
-        //Send ACK
-        cout << "[SESSION] Requested file " << parts[0] << endl;
-        reply.setType(TYPE_ACK);
-        _trns->send(&reply, SERVER_TIMEOUT_SEND);
+        return false;
     }
+    
+    //Parse chunk numbers
+    uint32_t chunkBeginTmp = 0;
+    uint32_t chunkEndTmp = 0;
+    sscanf(parts[1].c_str(), "%u-%u", &chunkBeginTmp, &chunkEndTmp);
+    
+    //TODO check chunk numbers
+    
+    *chunkBegin = chunkBeginTmp;
+    *chunkEnd = chunkEndTmp;
+    *file = fileTmp; //Reference to the pointer
+    return true;
+}
+
+
+/*
+ *
+ */
+void SessionHandler::getHandler(const Message* msg){
+    
+    cout << "[SESSION] Get handler started: " << msg->getPayload() << endl;
+    uint32_t chunkBegin = 0;
+    uint32_t chunkEnd = 0;
+    Element file;
+    
+    //Parse GET message
+    if(!parseGet(msg, &file, &chunkBegin, &chunkEnd)){
+        cout << "[SESSION] Get parse failed" << endl;
+        return sendNack(msg);
+    }
+    
+    //Chek if file is being transferred
+    if(isTransferring(&file)){
+        cout << "[SESSION] Requested file alredy being transferred" << endl;
+        return; //This is probably a duplicate GET -> discard
+    }
+    
+    //Create new FileTransfer object
+    int flowIdx = getFreeFlow();
+    _fFlows[flowIdx] = new FileTransfer(_trns, file, 0);
+    _fFlows[flowIdx]->initSend(chunkBegin, chunkEnd);
+    
+    //Send ACK
+    //cout << "[SESSION] Requested file " << file.getName() << endl;
+    sendAck(msg);
+    
+    //Send first window
+    _fFlows[flowIdx]->sendFile(msg);
 }
 
 
@@ -234,11 +290,8 @@ void SessionHandler::fileHandler(const Message* msg){
         return;
     }
     
-    bool finished = false;
-    finished = flow->sendFile(msg);    //Give chunk to the file transfer object
-    
-    //File is transferred successfully
-    if(finished){
+    //Give chunk to the file transfer object
+    if(flow->sendFile(msg)){    //File is transferred successfully
         delete(flow);
         _fFlows[flowID] = NULL;
     }

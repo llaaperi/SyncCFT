@@ -45,7 +45,8 @@ public:
     const Element& getElement(){return _element;}
     void recvChunck();
     
-    void initRecv(const Message* msg);
+    bool initRecv(uint32_t chunkBegin, uint32_t chunkEnd);
+    bool initSend(uint32_t chunkBegin, uint32_t chunkEnd);
     
     bool recvFile(const Message* msg);
     bool sendFile(const Message* msg);
