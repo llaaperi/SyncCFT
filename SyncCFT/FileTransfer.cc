@@ -17,20 +17,39 @@
 /*
  * FileTransfer constructor
  */
-FileTransfer::FileTransfer(Transceiver* trns, Element file, int seqnum) : _trns(trns), _element(file), _seqnum(seqnum), _chunkBegin(0), _chunkEnd(0), _chunkCurrent(0), _sendBuffer(NULL), _sendBufferLen(0), _recvBuffer(NULL), _recvBufferLen(0){
+FileTransfer::FileTransfer(Transceiver* trns, Element file, int seqnum) : _trns(trns), _element(file), _seqnum(seqnum), _chunkBegin(0), _chunkEnd(0), _chunkCurrent(0), _sendBuffer(NULL), _sendBufferLen(0), _recvBuffer(NULL), _recvBufferLen(0), _file(NULL){
     cout << "[FILE] Transfer created" << endl;
 }
 
 FileTransfer::~FileTransfer(){
     cout << "[FILE] Transfer destroyed" << endl;
+    if(_file != NULL){
+        fclose(_file);
+    }
 }
 
-void FileTransfer::initRecv(const Message* msg){
+bool FileTransfer::initRecv(uint32_t chunkBegin, uint32_t chunkEnd){
+    
+    //Init chunk numbers
+    _chunkBegin = chunkBegin;
+    _chunkEnd = chunkEnd;
+    _chunkCurrent = _chunkBegin;
+    if(_chunkEnd == 0){
+        _chunkEnd = ceil((double)_element.getSize() / CHUNK_SIZE);  //Set end to the end of the file
+    }
+    
+    cout << "[TRANSFER] chunkB: " << _chunkBegin << ", chunkE: " << _chunkEnd << endl;
+    cout << "[TRANSFER] file name: " << _element.getName() << " size: " << _element.getSize() << endl;
     
     //Open temp file
     string fName = _element.getName() + ".tmp";
     _file = fopen(fName.c_str(), "w");  //w or a
     
+    if(_file == NULL){
+        cout << "[TRANSFER] File could not be opened" << endl;
+        return false;    //File is transferred (Could be a better solution)
+    }
+    return true;
 }
 
 
@@ -77,6 +96,33 @@ bool FileTransfer::recvFile(const Message* msg){
 //bool FileTransfer::recvWindow(int size){}
 
 
+
+/*
+ *
+ */
+bool FileTransfer::initSend(uint32_t chunkBegin, uint32_t chunkEnd){
+    
+    //Init chunk numbers
+    _chunkBegin = chunkBegin;
+    _chunkEnd = chunkEnd;
+    _chunkCurrent = _chunkBegin;
+    if(_chunkEnd == 0){
+        _chunkEnd = ceil((double)_element.getSize() / CHUNK_SIZE);  //Set end to the end of the file
+    }
+    
+    cout << "[TRANSFER] chunkB: " << _chunkBegin << ", chunkE: " << _chunkEnd << endl;
+    cout << "[TRANSFER] file name: " << _element.getName() << " size: " << _element.getSize() << endl;
+    
+    //Open FILE
+    _file = fopen(_element.getName().c_str(), "r");
+    if(_file == NULL){
+        cout << "[TRANSFER] File could not be opened" << endl;
+        return false;    //File is transferred (Could be a better solution)
+    }
+    
+    return true;
+}
+
 /*
  * Return true when finished
  */
@@ -92,39 +138,17 @@ bool FileTransfer::sendFile(const Message* msg){
         _sendBuffer = (char*)realloc(_sendBuffer, _sendBufferLen);
     }
     
-    static bool init = false;
-    if(!init && (msg->getType() == TYPE_GET)){
-        init = true;    //Make shure that this function is called only once
+    //Received GET (Duplicates discarded before this)
+    if(msg->getType() == TYPE_GET){
         
-        //Parse begin and end chunks
-        string line(msg->getPayload());
-        vector<string> parts; 
-        int size = Utilities::split(line, ";", parts);
-        if(size < 2){
-            return true; //Finish transfer
-        }
-        
-        sscanf(parts[1].c_str(), "%u-%u", &_chunkBegin, &_chunkEnd);
-        _chunkCurrent = _chunkBegin;
-        if(_chunkEnd == 0){
-            _chunkEnd = ceil((double)_element.getSize() / CHUNK_SIZE);  //Set end to the end of the file
-        }
-        
-        cout << "[TRANSFER] chunkB: " << _chunkBegin << ", chunkE: " << _chunkEnd << endl;
-        cout << "[TRANSFER] file name: " << _element.getName() << " size: " << _element.getSize() << endl;
-        
-        //Open FILE
-        _file = fopen(_element.getName().c_str(), "r");
-        if(_file == NULL){
-            cout << "[TRANSFER] File could not be opened" << endl;
-            return true;    //File is transferred (Could be a better solution)
-        }
-        
+        cout << "[TRANSFER] Send first window after GET" << endl;
         sendWindow(msg->getWindow());
     }
     
     //Handle FILE ACK's
-    if(init && (msg->getType() == TYPE_ACK)){
+    if(msg->getType() == TYPE_ACK){
+        
+        cout << "[TRANSFER] Client ACKed chunk " << msg->getChunk() << endl;
         
         //Check if whole file has been trasmitted
         if(msg->getChunk() >= _chunkEnd){
@@ -132,8 +156,8 @@ bool FileTransfer::sendFile(const Message* msg){
         }
         
         //Acked succesfuly received chunk(s)
-        if(msg->getChunk() != _chunkCurrent){
-            _chunkCurrent = msg->getChunk();
+        if(msg->getChunk() == _chunkCurrent){
+            ++_chunkCurrent;
         }
         sendWindow(msg->getWindow());
     }
@@ -155,11 +179,11 @@ bool FileTransfer::sendWindow(int size){
     
     int chunks = ceil((double)bytes / CHUNK_SIZE);  //Number of read chunks
     
-    cout << "Bytes " << bytes << endl;
-    cout << "Chunks " << chunks << endl;
+    //cout << "Bytes " << bytes << endl;
+    //cout << "Chunks " << chunks << endl;
     
     for(int i = 0; i < chunks; i++){
-        sendChunk(_sendBuffer + (i * CHUNK_SIZE), _sendBufferLen, _chunkCurrent++);
+        sendChunk(_sendBuffer + (i * CHUNK_SIZE), _sendBufferLen, _chunkCurrent);
     }
     return true;
 }

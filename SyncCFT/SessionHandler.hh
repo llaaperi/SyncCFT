@@ -58,12 +58,18 @@ private:
     
     bool isValidSource(const Message* msg);
     bool isValidMessage(const Message* msg);
+    bool isTransferring(Element* file);
     
     void descrHandler(const Message* msg);
     void getHandler(const Message* msg);
     void fileHandler(const Message* msg);
     
+    void sendNack(const Message* msg);
+    void sendAck(const Message* msg);
+    
     int getFreeFlow();
+    
+    bool parseGet(const Message* msg, Element* file, uint32_t* chunkBegin, uint32_t* chunkEnd);
 };
 
 #endif
