@@ -261,6 +261,11 @@ void SessionHandler::getHandler(const Message* msg){
     
     //Create new FileTransfer object
     int flowIdx = getFreeFlow();
+    if(flowIdx < 0){    //Check that there are free flows
+        cout << "[SESSION] No free flows available for file" << file.getName() << endl;
+        return sendNack(msg);
+    }
+    cout << "[SESSION] Flow " << flowIdx << " allocated for file " << file.getName() << endl;
     _fFlows[flowIdx] = new FileTransfer(_trns, file, 0);
     _fFlows[flowIdx]->initSend(chunkBegin, chunkEnd);
     

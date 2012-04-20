@@ -17,17 +17,31 @@
 /*
  * FileTransfer constructor
  */
-FileTransfer::FileTransfer(Transceiver* trns, Element file, int seqnum) : _trns(trns), _element(file), _seqnum(seqnum), _chunkBegin(0), _chunkEnd(0), _chunkCurrent(0), _sendBuffer(NULL), _sendBufferLen(0), _recvBuffer(NULL), _recvBufferLen(0), _file(NULL){
+FileTransfer::FileTransfer(Transceiver* trns, Element file, int seqnum) : _trns(trns), _element(file), _seqnum(seqnum), _chunkBegin(0), _chunkEnd(0), _chunkCurrent(0), _chunkAcked(0), _sendBuffer(NULL), _sendBufferLen(0), _recvBuffer(NULL), _recvBufferLen(0), _file(NULL){
     cout << "[FILE] Transfer created" << endl;
 }
 
+
+/*
+ *
+ */
 FileTransfer::~FileTransfer(){
     cout << "[FILE] Transfer destroyed" << endl;
     if(_file != NULL){
         fclose(_file);
     }
+    if(_sendBuffer != NULL){
+        free(_sendBuffer);
+    }
+    if(_recvBuffer != NULL){
+        free(_recvBuffer);
+    }
 }
 
+
+/*
+ *
+ */
 bool FileTransfer::initRecv(uint32_t chunkBegin, uint32_t chunkEnd){
     
     //Init chunk numbers
@@ -104,11 +118,15 @@ bool FileTransfer::initSend(uint32_t chunkBegin, uint32_t chunkEnd){
     
     //Init chunk numbers
     _chunkBegin = chunkBegin;
+    if(_chunkBegin == 0){   //If begin is 0 change it to 1 (first chunk)
+        _chunkBegin = 1;
+    }
     _chunkEnd = chunkEnd;
-    _chunkCurrent = _chunkBegin;
     if(_chunkEnd == 0){
         _chunkEnd = ceil((double)_element.getSize() / CHUNK_SIZE);  //Set end to the end of the file
     }
+    _chunkCurrent = _chunkBegin;
+    _chunkAcked =_chunkCurrent;
     
     cout << "[TRANSFER] chunkB: " << _chunkBegin << ", chunkE: " << _chunkEnd << endl;
     cout << "[TRANSFER] file name: " << _element.getName() << " size: " << _element.getSize() << endl;
@@ -142,6 +160,7 @@ bool FileTransfer::sendFile(const Message* msg){
     if(msg->getType() == TYPE_GET){
         
         cout << "[TRANSFER] Send first window after GET" << endl;
+        loadWindow(msg->getWindow());
         sendWindow(msg->getWindow());
     }
     
@@ -155,14 +174,39 @@ bool FileTransfer::sendFile(const Message* msg){
             return true;
         }
         
-        //Acked succesfuly received chunk(s)
-        if(msg->getChunk() == _chunkCurrent){
-            ++_chunkCurrent;
+        _chunkAcked = msg->getChunk();
+        
+        //Packet is lost
+        if(msg->getChunk() < (_chunkCurrent - 1)){
+            long int offset = ((_chunkCurrent - 1) - msg->getChunk()) * CHUNK_SIZE; //((curr - 1) - ack) * CSIZE 
+            fseek(_file, offset, SEEK_CUR); //Rewind file pointer to the acked position + 1
+            loadWindow(msg->getWindow());
+            return false;
         }
+        
+        //No packets lost
+        if(msg->getChunk() == (_chunkCurrent - 1)){
+            loadWindow(msg->getWindow());
+        }
+        
         sendWindow(msg->getWindow());
     }
     return false;
 }
+
+
+/*
+ * Load window size amount of data to send buffer
+ */
+void FileTransfer::loadWindow(int size){
+    
+    //cout << "[TRANSFER] Loading window data" << endl;
+    //Load chunks fo buffer
+    unsigned int bytes = 0;
+    bytes = (unsigned int)fread(_sendBuffer, 1, size * CHUNK_SIZE, _file);
+    _sendBufferLen = bytes;
+}
+
 
 /*
  * Send window.
@@ -172,16 +216,7 @@ bool FileTransfer::sendWindow(int size){
     
     cout << "[TRANSFER] Sending window of size " << size << endl;
     
-    //Load chunks fo buffer
-    unsigned int bytes = 0;
-    bytes = (unsigned int)fread(_sendBuffer, 1, size * CHUNK_SIZE, _file);
-    _sendBufferLen = bytes;
-    
-    int chunks = ceil((double)bytes / CHUNK_SIZE);  //Number of read chunks
-    
-    //cout << "Bytes " << bytes << endl;
-    //cout << "Chunks " << chunks << endl;
-    
+    int chunks = ceil((double)_sendBufferLen / CHUNK_SIZE);  //Number of read chunks
     for(int i = 0; i < chunks; i++){
         sendChunk(_sendBuffer + (i * CHUNK_SIZE), _sendBufferLen, _chunkCurrent);
     }
@@ -224,5 +259,6 @@ bool FileTransfer::sendChunk(const char* chunk, uint16_t len, uint32_t chunk_num
     cout << "[TRANSFER] message " << i << " sent from chunk " << chunk_num << endl;
     cout << "[TRANSFER] last payload length " << msg.getPayloadLength() << endl;
     
+    ++_chunkCurrent;    //Increment current chunk
     return true;
 }

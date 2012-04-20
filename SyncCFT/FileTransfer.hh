@@ -36,6 +36,7 @@ class FileTransfer{
     uint32_t _chunkBegin;
     uint32_t _chunkEnd;
     uint32_t _chunkCurrent;
+    uint32_t _chunkAcked;
     
 public:
     
@@ -52,6 +53,7 @@ public:
     bool sendFile(const Message* msg);
     
 private:
+    void loadWindow(int size);
     bool sendWindow(int size);
     bool sendChunk(const char* chunk, uint16_t len, uint32_t chunk_num);
     
