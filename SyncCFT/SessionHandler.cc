@@ -210,7 +210,7 @@ void SessionHandler::getHandler(const Message* msg){
         }
         
         //Send ACK
-        cout << "[SESSION] Requested file" << parts[0] << endl;
+        cout << "[SESSION] Requested file " << parts[0] << endl;
         reply.setType(TYPE_ACK);
         _trns->send(&reply, SERVER_TIMEOUT_SEND);
     }
