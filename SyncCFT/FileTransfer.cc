@@ -331,10 +331,9 @@ bool FileTransfer::sendChunk(const char* chunk, uint16_t len, uint16_t window, u
     //Flow id
     
     msg.setFirst(true);
-    int pktNum = 0; //Only for debug messaging
     while(len > 0){
     
-        cout << "[TRANSFER] message " << pktNum++ << " sent from chunk " << chunknum << endl;
+        cout << "[TRANSFER] message " << _seqCurrent << " sent from chunk " << chunknum << endl;
         
         //Send full packet
         if(len > MESSAGE_MTU){
