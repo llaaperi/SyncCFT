@@ -97,6 +97,9 @@ public:
      */
     bool parseFromBytes(const char* buffer, int len);
     
+    
+    static bool compare_seqnum(Message* msg1, Message* msg2);
+    
     void printBytes() const;
     void printInfo() const;
 
