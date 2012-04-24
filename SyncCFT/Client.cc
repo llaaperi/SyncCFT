@@ -158,6 +158,7 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
     
     cout << "[CLIENT] File transfer started" << endl;
     
+    _trns = new Transceiver(_socket, servAddr);
     Message msg;
     
     list<Element> elements = diff->getData();
@@ -178,7 +179,6 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
         
         //cout << "[CLIENT] Get payload: " << endl << msg.getPayload() << endl;
         
-        _trns = new Transceiver(_socket, servAddr);
         _fFlow = new FileTransfer(_trns, e, 0);
         if(!_fFlow->initRecv(0, 0)){    //Init FileTransfer
             continue;
@@ -198,6 +198,7 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
             cout << "[CLIENT] Received file message from Chunk: " << msg.getChunk() << ", Seqnum: " << msg.getSeqnum() << ", Size: " << msg.getPayloadLength() << ", Window size: " << msg.getWindow() << endl;
             ready = _fFlow->recvFile(&msg);
         }
+        delete(_fFlow);
     }
 }
 
