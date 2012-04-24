@@ -108,6 +108,8 @@ bool FileTransfer::recvFile(const Message* msg){
         //Continue reception of subsequent windows
         ++_chunkCurrent;
         ++_seqCurrent;
+        lastChunkReceived = false;
+        _recvList.clear();  //Remove all messages from the reception queue
     }
 
     return false;
