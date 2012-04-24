@@ -18,7 +18,7 @@
 /*
  * FileTransfer constructor
  */
-FileTransfer::FileTransfer(Transceiver* trns, Element file, int seqnum) : _trns(trns), _element(file), _seqnum(seqnum), _chunkBegin(0), _chunkEnd(0), _chunkCurrent(0), _chunkAcked(0), _sendBuffer(NULL), _sendBufferLen(0), _recvBuffer(NULL), _recvBufferLen(0), _file(NULL){
+FileTransfer::FileTransfer(Transceiver* trns, Element file, int seqnum) : _trns(trns), _element(file), _seqCurrent(seqnum), _chunkBegin(0), _chunkEnd(0), _chunkCurrent(0), _chunkAcked(0), _sendBuffer(NULL), _sendBufferLen(0), _recvBuffer(NULL), _recvBufferLen(0), _file(NULL){
     cout << "[FILE] Transfer created" << endl;
 }
 
@@ -57,7 +57,7 @@ bool FileTransfer::initRecv(uint32_t chunkBegin, uint32_t chunkEnd){
     _chunkCurrent = _chunkBegin;
     _chunkAcked =_chunkCurrent;
     
-    _seqBegin = _seqnum;
+    _seqBegin = _seqCurrent;
     
     cout << "[TRANSFER] chunkB: " << _chunkBegin << ", chunkE: " << _chunkEnd << endl;
     cout << "[TRANSFER] file name: " << _element.getName() << " size: " << _element.getSize() << endl;
@@ -100,8 +100,14 @@ bool FileTransfer::recvFile(const Message* msg){
             
         cout << "[TRANSFER] Window received" << endl;
         
+        //Whole file is received
+        if(_chunkCurrent == _chunkEnd){
+            return true;
+        }
         
-        return true;
+        //Continue reception of subsequent windows
+        ++_chunkCurrent;
+        ++_seqCurrent;
     }
 
     return false;
@@ -137,8 +143,8 @@ bool FileTransfer::recvFinish(){
     reply.setChunk(_recvList.back()->getChunk());
     _trns->send(&reply, CLIENT_TIMEOUT_SEND);
     
-    _chunkCurrent = _recvList.back()->getChunk() + 1;
-    _seqnum = _recvList.back()->getSeqnum() + 1;
+    _chunkCurrent = _recvList.back()->getChunk();
+    _seqCurrent = _recvList.back()->getSeqnum();
     
     return true;
 }
@@ -298,7 +304,7 @@ bool FileTransfer::sendWindow(uint16_t size){
         }
         
         //Send chunk
-        if(sendChunk(ptr, len, _window, _chunkCurrent, _seqnum)){
+        if(sendChunk(ptr, len, _window, _chunkCurrent, _seqCurrent)){
             ++_chunkCurrent;
         }
     }
@@ -343,12 +349,12 @@ bool FileTransfer::sendChunk(const char* chunk, uint16_t len, uint16_t window, u
             msg.setLast(true);
             msg.setPayload(chunk, len);
             _trns->send(&msg, SERVER_TIMEOUT_SEND);
-            ++_seqnum;
+            ++_seqCurrent;
             break;
         }
         
         msg.incrSeqnum();   //Increment seqnum for the next packet
-        ++_seqnum;
+        ++_seqCurrent;
     }
     
     cout << "[TRANSFER] last payload length " << msg.getPayloadLength() << endl;
