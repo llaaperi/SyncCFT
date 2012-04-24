@@ -69,7 +69,7 @@ void* Client::handle(void* arg)
     hints.ai_socktype = SOCK_DGRAM; // UDP socket
     
     //Get address information in struct addrinfo format. Works for IPv4 and IPv6.
-    if(getaddrinfo("86.50.130.170", handler->_sport.c_str(), &hints, &serverInfo)) { //getaddrinfo returns 0 on success
+    if(getaddrinfo("86.50.140.217", handler->_sport.c_str(), &hints, &serverInfo)) { //getaddrinfo returns 0 on success
         perror("[CLIENT] Running getaddrinfo failed.");
         return 0;
     }
@@ -163,9 +163,10 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
     list<Element> elements = diff->getData();
     
     for(Element e : elements){
-        cout << "[CLIENT] Request file" << e.getName() << endl;
+        cout << "[CLIENT] Request file: " << e.getName() << endl;
         
         msg.initHeader(TYPE_GET);
+		msg.setWindow(2);
         
         char buf[NETWORKING_MTU];
         sprintf(buf, "%s;%d-%d", e.getName().c_str(), 0, 0);
@@ -179,18 +180,19 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
         
         _trns = new Transceiver(_socket, servAddr);
         _fFlow = new FileTransfer(_trns, e, 0);
-        Message msg;
+        //Message msg;
         
         // TODO: Handle ACK/NACK
         _trns->recv(&msg, CLIENT_TIMEOUT_ACK);
         cout << "[CLIENT] received first message after GET" << endl;
+        
         bool ready = false;
         while(!ready){
             if(!_trns->recv(&msg, CLIENT_TIMEOUT_ACK)) {
                 cout << "[CLIENT] Wait FILE timeout" << endl;
                 continue; // TODO: Timeout handler
             }
-            cout << "[CLIENT] Received file message" << endl;
+            cout << "[CLIENT] Received file message from Chunk: " << msg.getChunk() << ", Seqnum: " << msg.getSeqnum() << ", Size: " << msg.getPayloadLength() << ", Window size: " << msg.getWindow() << endl;
             ready = _fFlow->recvFile(&msg);
         }
     }

@@ -84,7 +84,7 @@ bool FileTransfer::recvFile(const Message* msg){
     
     //Receive window
     //recvWindow(msg->getWindow());
-    
+    cout << "ChunkCurrent: " << _chunkCurrent << ", ChunEnd: " << _chunkEnd << endl;
     
     if(msg->isLast()){
         Message reply(*msg);
@@ -92,10 +92,10 @@ bool FileTransfer::recvFile(const Message* msg){
         reply.setLast(false);
         _trns->send(&reply, CLIENT_TIMEOUT_SEND);
         
-        cout << "[TRANSFER] Chunk " << msg->getChunk() << " received" << endl;
+        cout << "[TRANSFER] Chunk " << msg->getChunk() << " completed" << endl;
         
         if(msg->getChunk() == _chunkEnd){
-            cout << "[TRANSFER] File received" << endl;
+            cout << "[TRANSFER] File " << _element.getName() << " completed" << endl;
             return true;
         }
     }
