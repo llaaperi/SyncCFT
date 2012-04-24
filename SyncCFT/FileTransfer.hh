@@ -36,6 +36,8 @@ class FileTransfer{
     
     uint16_t _window;
     uint32_t _seqnum;
+    uint32_t _seqBegin;
+    uint32_t _seqEnd;
     
     uint32_t _chunkBegin;
     uint32_t _chunkEnd;

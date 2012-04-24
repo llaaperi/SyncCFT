@@ -57,6 +57,8 @@ bool FileTransfer::initRecv(uint32_t chunkBegin, uint32_t chunkEnd){
     _chunkCurrent = _chunkBegin;
     _chunkAcked =_chunkCurrent;
     
+    _seqBegin = _seqnum;
+    
     cout << "[TRANSFER] chunkB: " << _chunkBegin << ", chunkE: " << _chunkEnd << endl;
     cout << "[TRANSFER] file name: " << _element.getName() << " size: " << _element.getSize() << endl;
     
@@ -87,46 +89,21 @@ bool FileTransfer::recvFile(const Message* msg){
     
     _recvList.push_back(recvMsg);
     
-    uint16_t lastChunk = _chunkCurrent + msg->getWindow() - 1;
-    if((recvMsg->getChunk() >= lastChunk) && recvMsg->isLast()){
+    uint16_t lastChunknum = _chunkCurrent + msg->getWindow() - 1;
+    static bool lastChunkReceived = false;
+    if((recvMsg->getChunk() >= lastChunknum) && recvMsg->isLast()){
         
-        if(recvFinish()){
-            
-            cout << "[TRANSFER] Window received" << endl;
-            return false;
-            
-        }else{
-            
-            cout << "[TRANSFER] Window not received" << endl;
-            return false;
-        }
+        lastChunkReceived = true;
     }
     
-    /*
-    //Allocate window size amount of recv buffer
-    if((msg->getWindow() * CHUNK_SIZE) > _recvBufferLen){
-        _recvBufferLen = msg->getWindow() * CHUNK_SIZE;
-        _recvBuffer = (char*)realloc(_recvBuffer, _recvBufferLen);
-    }
-    
-    //Receive window
-    //recvWindow(msg->getWindow());
-    cout << "ChunkCurrent: " << _chunkCurrent << ", ChunEnd: " << _chunkEnd << endl;
-    
-    if(msg->isLast()){
-        Message reply(*msg);
-        reply.setType(TYPE_ACK);
-        reply.setLast(false);
-        _trns->send(&reply, CLIENT_TIMEOUT_SEND);
+    if(lastChunkReceived && recvFinish()){
+            
+        cout << "[TRANSFER] Window received" << endl;
         
-        cout << "[TRANSFER] Chunk " << msg->getChunk() << " completed" << endl;
         
-        if(msg->getChunk() == _chunkEnd){
-            cout << "[TRANSFER] File " << _element.getName() << " completed" << endl;
-            return true;
-        }
+        return true;
     }
-    */
+
     return false;
 }
 
@@ -138,14 +115,32 @@ bool FileTransfer::recvFinish(){
     
     cout << "[TRANSFER] Window finished " << endl;
     
+    //Sort reveice list according to sequence number
     _recvList.sort(Message::compare_seqnum);
     
+    //Check that rest of the messages are received 
     cout << "[TRANSFER] Recv List:" << endl;
+    uint32_t currentSeq = _seqBegin;
     for(Message *msg : _recvList){
+        
         cout << "seqnum=" << msg->getSeqnum() << ", chunk=" << msg->getChunk() << endl;
+        if(msg->getSeqnum() != currentSeq++){
+            cout << "Wrong sequence number" << endl;
+            return false;
+        }
     }
     
-    return false;
+    Message reply(*_recvList.back());
+    reply.setType(TYPE_ACK);
+    reply.setLast(false);
+    reply.setSeqnum(_recvList.back()->getSeqnum());
+    reply.setChunk(_recvList.back()->getChunk());
+    _trns->send(&reply, CLIENT_TIMEOUT_SEND);
+    
+    _chunkCurrent = _recvList.back()->getChunk() + 1;
+    _seqnum = _recvList.back()->getSeqnum() + 1;
+    
+    return true;
 }
 
 
@@ -348,10 +343,12 @@ bool FileTransfer::sendChunk(const char* chunk, uint16_t len, uint16_t window, u
             msg.setLast(true);
             msg.setPayload(chunk, len);
             _trns->send(&msg, SERVER_TIMEOUT_SEND);
+            ++_seqnum;
             break;
         }
         
         msg.incrSeqnum();   //Increment seqnum for the next packet
+        ++_seqnum;
     }
     
     cout << "[TRANSFER] last payload length " << msg.getPayloadLength() << endl;
