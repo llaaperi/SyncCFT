@@ -69,7 +69,7 @@ void* Client::handle(void* arg)
     hints.ai_socktype = SOCK_DGRAM; // UDP socket
     
     //Get address information in struct addrinfo format. Works for IPv4 and IPv6.
-    if(getaddrinfo("86.50.140.217", handler->_sport.c_str(), &hints, &serverInfo)) { //getaddrinfo returns 0 on success
+    if(getaddrinfo("86.50.128.129", handler->_sport.c_str(), &hints, &serverInfo)) { //getaddrinfo returns 0 on success
         perror("[CLIENT] Running getaddrinfo failed.");
         return 0;
     }

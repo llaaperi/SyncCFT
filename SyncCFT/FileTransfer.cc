@@ -90,7 +90,13 @@ bool FileTransfer::recvFile(const Message* msg){
     _recvList.push_back(recvMsg);
     
     uint16_t lastChunknum = _chunkCurrent + msg->getWindow() - 1;
+    if (lastChunknum > _chunkEnd) {
+        lastChunknum = _chunkEnd;
+    }
     static bool lastChunkReceived = false;
+    
+    cout << "lastChunkReceived: " << lastChunkReceived << " chunkCurrent: " << _chunkCurrent << ", lastChunk: " << lastChunknum << ", isLast: " << recvMsg->isLast() << ", Chunk: " << recvMsg->getChunk() << endl;
+    
     if((recvMsg->getChunk() >= lastChunknum) && recvMsg->isLast()){
         
         lastChunkReceived = true;
@@ -98,10 +104,17 @@ bool FileTransfer::recvFile(const Message* msg){
     
     if(lastChunkReceived && recvFinish()){
             
-        cout << "[TRANSFER] Window received" << endl;
+        cout << "[TRANSFER] Window completed" << endl;
+        
+        // Write data to a temp file
+        for(Message* ptr: _recvList) {
+            fwrite(ptr->getPayload(), 1, ptr->getPayloadLength(), _file);
+        }
         
         //Whole file is received
         if(_chunkCurrent == _chunkEnd){
+            cout << "[TRANSFER] Complete file received" << endl;
+            lastChunkReceived = false;
             return true;
         }
         
@@ -127,17 +140,18 @@ bool FileTransfer::recvFinish(){
     _recvList.sort(Message::compare_seqnum);
     
     //Check that rest of the messages are received 
-    cout << "[TRANSFER] Recv List:" << endl;
-    uint32_t currentSeq = _seqBegin;
+    cout << "[TRANSFER] Recv List: (size " << _recvList.size() << ")" << endl;
+    uint32_t currentSeq = _seqCurrent;
     for(Message *msg : _recvList){
         
-        cout << "seqnum=" << msg->getSeqnum() << ", chunk=" << msg->getChunk() << endl;
+        cout << "seqnum=" << msg->getSeqnum() << "(" << currentSeq << "), chunk=" << msg->getChunk() << endl;
         if(msg->getSeqnum() != currentSeq++){
-            cout << "Wrong sequence number" << endl;
+            cout << "Packet missing" << endl;
             return false;
         }
     }
-    
+    cout << "All packets found" << endl;
+
     Message reply(*_recvList.back());
     reply.setType(TYPE_ACK);
     reply.setLast(false);
