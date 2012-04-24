@@ -180,14 +180,10 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
         
         _trns = new Transceiver(_socket, servAddr);
         _fFlow = new FileTransfer(_trns, e, 0);
-<<<<<<< .merge_file_s2WDVB
-        //Message msg;
-=======
         if(!_fFlow->initRecv(0, 0)){    //Init FileTransfer
             continue;
         }
         Message msg;
->>>>>>> .merge_file_utqfji
         
         // TODO: Handle ACK/NACK
         _trns->recv(&msg, CLIENT_TIMEOUT_ACK);
