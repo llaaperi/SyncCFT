@@ -254,6 +254,18 @@ void Message::parseToBytes(char* buffer) const {
 
 
 /*
+ *
+ */
+bool Message::compare_seqnum(Message* msg1, Message* msg2){
+    
+    if(msg1->getSeqnum() < msg2->getSeqnum()){
+        return true;
+    }
+    return false;
+}
+
+
+/*
  * Print contents of the header in hex
  */
 void Message::printBytes() const {

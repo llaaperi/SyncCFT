@@ -15,13 +15,14 @@
 #include "Message.hh"
 #include <stdexcept>
 
-
-#define CLIENT_TIMEOUT_SEND 5
-#define CLIENT_TIMEOUT_ACK 5
-#define CLIENT_TIMEOUT_HELLO 5
-#define CLIENT_TIMEOUT_HELLOACK 5
-#define CLIENT_TIMEOUT_QUIT 5
-#define CLIENT_TIMEOUT_BACKOFF 5
+//Timeouts in milliseconds
+#define CLIENT_TIMEOUT_SEND 5000
+#define CLIENT_TIMEOUT_ACK 5000
+#define CLIENT_TIMEOUT_HELLO 5000
+#define CLIENT_TIMEOUT_HELLOACK 5000
+#define CLIENT_TIMEOUT_QUIT 5000
+#define CLIENT_TIMEOUT_BACKOFF 5000
+#define CLIENT_TIMEOUT_FILE 500
 
 using namespace std;
 

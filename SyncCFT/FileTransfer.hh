@@ -32,6 +32,8 @@ class FileTransfer{
     char* _recvBuffer;
     unsigned long _recvBufferLen;
     
+    list<Message*> _recvList;
+    
     uint16_t _window;
     uint32_t _seqnum;
     
@@ -52,11 +54,12 @@ public:
     bool initSend(uint32_t chunkBegin, uint32_t chunkEnd);
     
     bool recvFile(const Message* msg);
+    bool recvFinish();
     bool sendFile(const Message* msg);
     
 private:
-    void loadWindow(int size);
-    bool sendWindow(int size);
+    void loadWindow(uint16_t size);
+    bool sendWindow(uint16_t size);
     bool sendChunk(const char* chunk, uint16_t len, uint16_t window, uint32_t chunknum, uint32_t seqnum);
     
     // Rule of three

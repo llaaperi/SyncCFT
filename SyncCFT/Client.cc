@@ -179,6 +179,9 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
         
         _trns = new Transceiver(_socket, servAddr);
         _fFlow = new FileTransfer(_trns, e, 0);
+        if(!_fFlow->initRecv(0, 0)){    //Init FileTransfer
+            continue;
+        }
         Message msg;
         
         // TODO: Handle ACK/NACK

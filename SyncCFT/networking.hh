@@ -16,7 +16,6 @@
 #include <netdb.h>
 
 #define NETWORKING_MTU 1500
-#define TIMEOUT 5
 #define BACKLOG 50
 
 using namespace std;

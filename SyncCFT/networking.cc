@@ -201,7 +201,7 @@ int Networking::createConnectedSocket(std::string address, std::string port) {
  * @param socketFd socket from which to receive message
  * @param buffer Data buffer for storing received packets
  * @param cliAddr Structure for storing received address info
- * @param timeout Timeout value in seconds
+ * @param timeout Timeout value in milliseconds
  * @return Number of bytes received
  */
 int Networking::receivePacket(int socketFd, char* buffer, struct sockaddr* cliAddr, unsigned int timeout) {
@@ -209,8 +209,8 @@ int Networking::receivePacket(int socketFd, char* buffer, struct sockaddr* cliAd
      
      // Struct for setting responce timeout
      struct timeval tOut; 
-     tOut.tv_sec = TIMEOUT; // Sets server timeout to 5 sec  
-     tOut.tv_usec = 0;
+     tOut.tv_sec = timeout / 1000; // Sets server timeout to 5 sec  
+     tOut.tv_usec = (int)(timeout - (tOut.tv_sec * 1000)) * 1000;
      
      fd_set readSet; // Set for storing socket information
      
@@ -255,8 +255,8 @@ int Networking::sendPacket(int socketFd, char* data,int length, struct sockaddr*
     
     // Struct for setting responce timeout
     struct timeval tOut; 
-    tOut.tv_sec = 5; // Sets server timeout to 5 sec
-    tOut.tv_usec = 0;
+    tOut.tv_sec = timeout / 1000; // Sets server timeout to 5 sec  
+    tOut.tv_usec = (int)(timeout - (tOut.tv_sec * 1000)) * 1000;
     
     fd_set writeSet; // Set for storing socket information
     

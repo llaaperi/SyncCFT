@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <list>
 
 #include "FileTransfer.hh"
 #include "Server.hh"
@@ -46,11 +47,15 @@ bool FileTransfer::initRecv(uint32_t chunkBegin, uint32_t chunkEnd){
     
     //Init chunk numbers
     _chunkBegin = chunkBegin;
+    if(_chunkBegin == 0){   //If begin is 0 change it to 1 (first chunk)
+        _chunkBegin = 1;
+    }
     _chunkEnd = chunkEnd;
-    _chunkCurrent = _chunkBegin;
     if(_chunkEnd == 0){
         _chunkEnd = ceil((double)_element.getSize() / CHUNK_SIZE);  //Set end to the end of the file
     }
+    _chunkCurrent = _chunkBegin;
+    _chunkAcked =_chunkCurrent;
     
     cout << "[TRANSFER] chunkB: " << _chunkBegin << ", chunkE: " << _chunkEnd << endl;
     cout << "[TRANSFER] file name: " << _element.getName() << " size: " << _element.getSize() << endl;
@@ -63,6 +68,7 @@ bool FileTransfer::initRecv(uint32_t chunkBegin, uint32_t chunkEnd){
         cout << "[TRANSFER] File could not be opened" << endl;
         return false;    //File is transferred (Could be a better solution)
     }
+    
     return true;
 }
 
@@ -76,6 +82,27 @@ bool FileTransfer::recvFile(const Message* msg){
         return false;
     }
     
+    Message *recvMsg = new Message(*msg);
+    recvMsg->setPayload(msg->getPayload(), msg->getPayloadLength());
+    
+    _recvList.push_back(recvMsg);
+    
+    uint16_t lastChunk = _chunkCurrent + msg->getWindow() - 1;
+    if((recvMsg->getChunk() >= lastChunk) && recvMsg->isLast()){
+        
+        if(recvFinish()){
+            
+            cout << "[TRANSFER] Window received" << endl;
+            return false;
+            
+        }else{
+            
+            cout << "[TRANSFER] Window not received" << endl;
+            return false;
+        }
+    }
+    
+    /*
     //Allocate window size amount of recv buffer
     if((msg->getWindow() * CHUNK_SIZE) > _recvBufferLen){
         _recvBufferLen = msg->getWindow() * CHUNK_SIZE;
@@ -99,6 +126,24 @@ bool FileTransfer::recvFile(const Message* msg){
             return true;
         }
     }
+    */
+    return false;
+}
+
+
+/*
+ *
+ */
+bool FileTransfer::recvFinish(){
+    
+    cout << "[TRANSFER] Window finished " << endl;
+    
+    _recvList.sort(Message::compare_seqnum);
+    
+    cout << "[TRANSFER] Recv List:" << endl;
+    for(Message *msg : _recvList){
+        cout << "seqnum=" << msg->getSeqnum() << ", chunk=" << msg->getChunk() << endl;
+    }
     
     return false;
 }
@@ -107,8 +152,33 @@ bool FileTransfer::recvFile(const Message* msg){
 /*
  *
  */
-//bool FileTransfer::recvWindow(int size){}
+/*
+bool FileTransfer::recvWindow(uint16_t size){
+    
+    uint16_t packets = size * ceil((double)CHUNK_SIZE / MESSAGE_MTU);
+    uint8_t recvChunk[packets];
+    
+    cout << "[TRANSFER] Prepare to receive " << packets << " packets" << endl;
+    
+    for(int i = 0; i < packets; i++){}
+    
+    Message msg;
+    list<Message> recvMsg;
+    
+    bool finished = false;
+    while(finished){
+        
+        _trns->recv(&msg, CLIENT_TIMEOUT_FILE);
+        
+        if
+    
+    }
+    
+    
+}
+*/
 
+//bool FileTransfer::recvChunk(uint32_t chunknum, uint32_t seqnum){}
 
 
 /*
@@ -204,7 +274,7 @@ bool FileTransfer::sendFile(const Message* msg){
 /*
  * Load window size amount of data to send buffer
  */
-void FileTransfer::loadWindow(int size){
+void FileTransfer::loadWindow(uint16_t size){
     
     //cout << "[TRANSFER] Loading window data" << endl;
     //Load chunks fo buffer
@@ -219,7 +289,7 @@ void FileTransfer::loadWindow(int size){
  * Send window.
  * @param size  window size
  */
-bool FileTransfer::sendWindow(int size){
+bool FileTransfer::sendWindow(uint16_t size){
     
     cout << "[TRANSFER] Sending window of size " << size << endl;
     

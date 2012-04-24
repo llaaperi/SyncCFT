@@ -16,10 +16,10 @@
 #include "Client.hh"
 #include "stdexcept"
 
-
-#define SERVER_TIMEOUT_RECV 1000
-#define SERVER_TIMEOUT_SEND 5
-#define SERVER_TIMEOUT_HELLOACK 5
+//Timeouts in milliseconds
+#define SERVER_TIMEOUT_RECV 1000000
+#define SERVER_TIMEOUT_SEND 5000
+#define SERVER_TIMEOUT_HELLOACK 5000
 
 #define SERVER_SESSION_HANDLERS 3 //Number of handlers can be defined. Maximum value is 256.
 
