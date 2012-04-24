@@ -25,13 +25,15 @@ class FileTransfer{
     
     Element _element;
     Transceiver* _trns;
-    int _seqnum;
     
     FILE* _file;
     char* _sendBuffer;
     unsigned long _sendBufferLen;
     char* _recvBuffer;
     unsigned long _recvBufferLen;
+    
+    uint16_t _window;
+    uint32_t _seqnum;
     
     uint32_t _chunkBegin;
     uint32_t _chunkEnd;
@@ -55,7 +57,7 @@ public:
 private:
     void loadWindow(int size);
     bool sendWindow(int size);
-    bool sendChunk(const char* chunk, uint16_t len, uint32_t chunk_num);
+    bool sendChunk(const char* chunk, uint16_t len, uint16_t window, uint32_t chunknum, uint32_t seqnum);
     
     // Rule of three
     FileTransfer(FileTransfer const& other);

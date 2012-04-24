@@ -150,6 +150,9 @@ bool FileTransfer::sendFile(const Message* msg){
     //cout << "[TRANSFER] received type: " << msg->getType() << endl;
     //msg->printInfo();
     
+    //Parse message info
+    _window = msg->getWindow();
+    
     //Allocate window size amount of send buffer
     if((msg->getWindow() * CHUNK_SIZE) > _sendBufferLen){
         _sendBufferLen = msg->getWindow() * CHUNK_SIZE;
@@ -171,6 +174,7 @@ bool FileTransfer::sendFile(const Message* msg){
         
         //Check if whole file has been trasmitted
         if(msg->getChunk() >= _chunkEnd){
+            cout << "[TRASFER] All chunks ACKed: ACK=" << msg->getChunk() << " Current=" << _chunkCurrent << " End=" << _chunkEnd << endl;
             return true;
         }
         
@@ -178,17 +182,19 @@ bool FileTransfer::sendFile(const Message* msg){
         
         //Packet is lost
         if(msg->getChunk() < (_chunkCurrent - 1)){
-            long int offset = ((_chunkCurrent - 1) - msg->getChunk()) * CHUNK_SIZE; //((curr - 1) - ack) * CSIZE 
-            fseek(_file, offset, SEEK_CUR); //Rewind file pointer to the acked position + 1
-            loadWindow(msg->getWindow());
-            return false;
+            cout << "[TRANSFER] Packet lost: ACK=" << msg->getChunk() << " Current=" << _chunkCurrent << " End=" << _chunkEnd << endl;
+            //long int offset = ((_chunkCurrent - 1) - msg->getChunk()) * CHUNK_SIZE; //((curr - 1) - ack) * CSIZE 
+            //fseek(_file, offset, SEEK_CUR); //Rewind file pointer to the acked position + 1
+            //_chunkCurrent = msg->getChunk() + 1;    //
+            //return false;   //MUST BE REMOVED
         }
         
         //No packets lost
         if(msg->getChunk() == (_chunkCurrent - 1)){
-            loadWindow(msg->getWindow());
+            cout << "[TRANSFER] Send next window: ACK=" << msg->getChunk() << " Current=" << _chunkCurrent << " End=" << _chunkEnd << endl;
         }
         
+        loadWindow(msg->getWindow());
         sendWindow(msg->getWindow());
     }
     return false;
@@ -205,6 +211,7 @@ void FileTransfer::loadWindow(int size){
     unsigned int bytes = 0;
     bytes = (unsigned int)fread(_sendBuffer, 1, size * CHUNK_SIZE, _file);
     _sendBufferLen = bytes;
+    cout << "[TRANSFER] Loaded " << bytes << " bytes of data" << endl;
 }
 
 
@@ -218,7 +225,17 @@ bool FileTransfer::sendWindow(int size){
     
     int chunks = ceil((double)_sendBufferLen / CHUNK_SIZE);  //Number of read chunks
     for(int i = 0; i < chunks; i++){
-        sendChunk(_sendBuffer + (i * CHUNK_SIZE), _sendBufferLen, _chunkCurrent);
+        
+        char* ptr = _sendBuffer + (i * CHUNK_SIZE); //Chunk begin
+        uint16_t len = _sendBufferLen - (i * CHUNK_SIZE);   //Calculate chunk size
+        if(len > CHUNK_SIZE){
+            len = CHUNK_SIZE;
+        }
+        
+        //Send chunk
+        if(sendChunk(ptr, len, _window, _chunkCurrent, _seqnum)){
+            ++_chunkCurrent;
+        }
     }
     return true;
 }
@@ -227,38 +244,46 @@ bool FileTransfer::sendWindow(int size){
 /*
  *
  */
-bool FileTransfer::sendChunk(const char* chunk, uint16_t len, uint32_t chunk_num){
+bool FileTransfer::sendChunk(const char* chunk, uint16_t len, uint16_t window, uint32_t chunknum, uint32_t seqnum){
     
     Message msg;
     msg.init(TYPE_FILE);
-    msg.setChunk(chunk_num);
-    msg.setSeqnum(0);
+    msg.setWindow(window);
+    msg.setChunk(chunknum);
+    msg.setSeqnum(seqnum);
+    
+    cout << "[TRANSFER] Sending chunk " << chunknum << " of size " << len << endl;
     
     //TODO
     //Flow id
     
-    //
     msg.setFirst(true);
-    int i;
-    for(i = 0; i < len; i += MESSAGE_MTU){
+    int pktNum = 0; //Only for debug messaging
+    while(len > 0){
+    
+        cout << "[TRANSFER] message " << pktNum++ << " sent from chunk " << chunknum << endl;
         
-        cout << "[TRANSFER] message " << i << " sent from chunk " << chunk_num << endl;
+        //Send full packet
+        if(len > MESSAGE_MTU){
+            
+            msg.setPayload(chunk, MESSAGE_MTU);
+            _trns->send(&msg, SERVER_TIMEOUT_SEND);
+            
+            msg.setFirst(false);
+            
+            len -= MESSAGE_MTU; //Decrement remaining length
+            chunk += MESSAGE_MTU;   //Increment payload pointer
+        }else{  //Last packet
+            
+            msg.setLast(true);
+            msg.setPayload(chunk, len);
+            _trns->send(&msg, SERVER_TIMEOUT_SEND);
+            break;
+        }
         
-        msg.incrSeqnum();
-        msg.setPayload(chunk + i, MESSAGE_MTU);
-        _trns->send(&msg, SERVER_TIMEOUT_SEND);
-        
-        msg.setFirst(false);
+        msg.incrSeqnum();   //Increment seqnum for the next packet
     }
-    //Send last message
-    msg.incrSeqnum();
-    msg.setLast(true);
-    msg.setPayload(chunk + i, len - (i - MESSAGE_MTU));
-    _trns->send(&msg, SERVER_TIMEOUT_SEND);
     
-    cout << "[TRANSFER] message " << i << " sent from chunk " << chunk_num << endl;
     cout << "[TRANSFER] last payload length " << msg.getPayloadLength() << endl;
-    
-    ++_chunkCurrent;    //Increment current chunk
     return true;
 }
