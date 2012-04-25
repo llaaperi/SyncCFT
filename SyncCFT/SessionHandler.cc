@@ -266,9 +266,14 @@ void SessionHandler::getHandler(const Message* msg){
         return sendNack(msg);
     }
     cout << "[SESSION] Flow " << flowIdx << " allocated for file " << file.getName() << endl;
-    _fFlows[flowIdx] = new FileTransfer(_trns, file, 0);
-    _fFlows[flowIdx]->initSend(chunkBegin, chunkEnd);
     
+    try {
+        _fFlows[flowIdx] = new FileTransfer(_trns, file, 0, 0, 0, FILE_TRANSFER_TYPE_SERVER);
+    } catch (...) {
+        cout << "[SESSION] File could not be opened" << endl;
+        return sendNack(msg);
+    }
+
     //Send ACK
     //cout << "[SESSION] Requested file " << file.getName() << endl;
     sendAck(msg);

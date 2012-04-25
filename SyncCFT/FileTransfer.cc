@@ -18,13 +18,56 @@
 /*
  * FileTransfer constructor
  */
-FileTransfer::FileTransfer(Transceiver* trns, Element file, int seqnum) : _trns(trns), _element(file), _seqCurrent(seqnum), _chunkBegin(0), _chunkEnd(0), _chunkCurrent(0), _chunkAcked(0), _sendBuffer(NULL), _sendBufferLen(0), _recvBuffer(NULL), _recvBufferLen(0), _file(NULL){
+FileTransfer::FileTransfer(Transceiver* trns, Element file, uint32_t chunkBegin,
+                           uint32_t chunkEnd , int seqnum, int type)
+                            throw(std::runtime_error) : 
+                            _trns(trns),
+                            _element(file),
+                            _seqCurrent(seqnum),
+                            _seqBegin(seqnum),
+                            _chunkBegin(chunkBegin),
+                            _chunkEnd(chunkEnd),
+                            _chunkCurrent(chunkBegin),
+                            _chunkAcked(chunkBegin),
+                            _sendBuffer(NULL),
+                            _sendBufferLen(0),
+                            _recvBuffer(NULL),
+                            _recvBufferLen(0),
+                            _file(NULL) {
+                                
     cout << "[FILE] Transfer created" << endl;
+    
+    //Init chunk numbers
+    _chunkBegin = chunkBegin;
+    if(_chunkBegin == 0){   //If begin is 0 change it to 1 (first chunk)
+        _chunkBegin = 1;
+    }
+    _chunkEnd = chunkEnd;
+    if(_chunkEnd == 0){
+        _chunkEnd = ceil((double)_element.getSize() / CHUNK_SIZE);  //Set end to the end of the file
+    }
+    
+    cout << "[TRANSFER] file name: " << _element.getName() << " size: " << _element.getSize() << endl;
+    cout << "[TRANSFER] chunkB: " << _chunkBegin << ", chunkE: " << _chunkEnd << endl;
+    
+    if (type == FILE_TRANSFER_TYPE_CLIENT) {
+        //Open temp file for writing
+        string fName = _element.getName() + ".tmp";
+        _file = fopen(fName.c_str(), "w");  //w or a
+    } else {
+        // Open file for reading
+        _file = fopen(_element.getName().c_str(), "r");
+    }
+    
+    if(_file == NULL){
+        cout << "[TRANSFER] File could not be opened" << endl;
+        throw runtime_error("File could not be opened");
+    }
 }
 
 
 /*
- *
+ * Destructor for file transfer
  */
 FileTransfer::~FileTransfer(){
     cout << "[FILE] Transfer destroyed" << endl;
@@ -39,40 +82,6 @@ FileTransfer::~FileTransfer(){
     }
 }
 
-
-/*
- *
- */
-bool FileTransfer::initRecv(uint32_t chunkBegin, uint32_t chunkEnd){
-    
-    //Init chunk numbers
-    _chunkBegin = chunkBegin;
-    if(_chunkBegin == 0){   //If begin is 0 change it to 1 (first chunk)
-        _chunkBegin = 1;
-    }
-    _chunkEnd = chunkEnd;
-    if(_chunkEnd == 0){
-        _chunkEnd = ceil((double)_element.getSize() / CHUNK_SIZE);  //Set end to the end of the file
-    }
-    _chunkCurrent = _chunkBegin;
-    _chunkAcked =_chunkCurrent;
-    
-    _seqBegin = _seqCurrent;
-    
-    cout << "[TRANSFER] chunkB: " << _chunkBegin << ", chunkE: " << _chunkEnd << endl;
-    cout << "[TRANSFER] file name: " << _element.getName() << " size: " << _element.getSize() << endl;
-    
-    //Open temp file
-    string fName = _element.getName() + ".tmp";
-    _file = fopen(fName.c_str(), "w");  //w or a
-    
-    if(_file == NULL){
-        cout << "[TRANSFER] File could not be opened" << endl;
-        return false;    //File is transferred (Could be a better solution)
-    }
-    
-    return true;
-}
 
 
 /*
@@ -198,35 +207,7 @@ bool FileTransfer::recvWindow(uint16_t size){
 //bool FileTransfer::recvChunk(uint32_t chunknum, uint32_t seqnum){}
 
 
-/*
- *
- */
-bool FileTransfer::initSend(uint32_t chunkBegin, uint32_t chunkEnd){
-    
-    //Init chunk numbers
-    _chunkBegin = chunkBegin;
-    if(_chunkBegin == 0){   //If begin is 0 change it to 1 (first chunk)
-        _chunkBegin = 1;
-    }
-    _chunkEnd = chunkEnd;
-    if(_chunkEnd == 0){
-        _chunkEnd = ceil((double)_element.getSize() / CHUNK_SIZE);  //Set end to the end of the file
-    }
-    _chunkCurrent = _chunkBegin;
-    _chunkAcked =_chunkCurrent;
-    
-    cout << "[TRANSFER] chunkB: " << _chunkBegin << ", chunkE: " << _chunkEnd << endl;
-    cout << "[TRANSFER] file name: " << _element.getName() << " size: " << _element.getSize() << endl;
-    
-    //Open FILE
-    _file = fopen(_element.getName().c_str(), "r");
-    if(_file == NULL){
-        cout << "[TRANSFER] File could not be opened" << endl;
-        return false;    //File is transferred (Could be a better solution)
-    }
-    
-    return true;
-}
+
 
 /*
  * Return true when finished

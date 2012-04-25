@@ -14,10 +14,16 @@
 #include "Message.hh"
 #include "Element.hh"
 
+#include <stdexcept>
+
 
 #define CHUNK_SIZE 10000    //10KB chunks
 #define CHUNK_TYPE_BEGIN 0
 #define CHUNK_TYPE_END 1
+#define FILE_TRANSFER_TYPE_CLIENT 0
+#define FILE_TRANSFER_TYPE_SERVER 1
+
+
 
 using namespace std;
 
@@ -46,15 +52,13 @@ class FileTransfer{
     
 public:
     
-    FileTransfer(Transceiver* trns, Element file, int seqnum);
+    FileTransfer(Transceiver* trns, Element file, uint32_t chunkBegin,
+                 uint32_t chunkEnd , int seqnum, int type)throw(runtime_error);
     ~FileTransfer();
     
     const Element& getElement(){return _element;}
     void recvChunck();
-    
-    bool initRecv(uint32_t chunkBegin, uint32_t chunkEnd);
-    bool initSend(uint32_t chunkBegin, uint32_t chunkEnd);
-    
+        
     bool recvFile(const Message* msg);
     bool recvFinish();
     bool sendFile(const Message* msg);
@@ -62,7 +66,8 @@ public:
 private:
     void loadWindow(uint16_t size);
     bool sendWindow(uint16_t size);
-    bool sendChunk(const char* chunk, uint16_t len, uint16_t window, uint32_t chunknum, uint32_t seqnum);
+    bool sendChunk(const char* chunk, uint16_t len, uint16_t window,
+                   uint32_t chunknum, uint32_t seqnum);
     
     // Rule of three
     FileTransfer(FileTransfer const& other);

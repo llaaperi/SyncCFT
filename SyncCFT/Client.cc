@@ -179,10 +179,13 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
         
         //cout << "[CLIENT] Get payload: " << endl << msg.getPayload() << endl;
         
-        _fFlow = new FileTransfer(_trns, e, 0);
-        if(!_fFlow->initRecv(0, 0)){    //Init FileTransfer
+        try {
+            _fFlow = new FileTransfer(_trns, e, 0, 0, 0, FILE_TRANSFER_TYPE_CLIENT);
+        } catch (...) {
+            cout << "[CLIENT] File could not be opened" << endl;
             continue;
         }
+        
         Message msg;
         
         // TODO: Handle ACK/NACK
