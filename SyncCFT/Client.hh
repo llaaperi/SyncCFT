@@ -29,6 +29,7 @@ using namespace std;
 class Client {
     //Transceiver _transceiver;
     pthread_t _thread;
+    list<string> _hosts;
     string _cport;
     string _sport;
     bool _running;

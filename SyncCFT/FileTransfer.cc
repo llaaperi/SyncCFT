@@ -38,11 +38,11 @@ FileTransfer::FileTransfer(Transceiver* trns, Element file, uint32_t chunkBegin,
     cout << "[FILE] Transfer created" << endl;
     
     //Init chunk numbers
-    _chunkBegin = chunkBegin;
     if(_chunkBegin == 0){   //If begin is 0 change it to 1 (first chunk)
         _chunkBegin = 1;
     }
-    _chunkEnd = chunkEnd;
+    _chunkCurrent = _chunkBegin;    //Reset current to the beging
+                                
     if(_chunkEnd == 0){
         _chunkEnd = ceil((double)_element.getSize() / CHUNK_SIZE);  //Set end to the end of the file
     }
@@ -95,7 +95,6 @@ bool FileTransfer::recvFile(const Message* msg){
     
     Message *recvMsg = new Message(*msg);
     recvMsg->setPayload(msg->getPayload(), msg->getPayloadLength());
-    
     _recvList.push_back(recvMsg);
     
     uint16_t lastChunknum = _chunkCurrent + msg->getWindow() - 1;
@@ -115,9 +114,10 @@ bool FileTransfer::recvFile(const Message* msg){
             
         cout << "[TRANSFER] Window completed" << endl;
         
-        // Write data to a temp file
+        // Write data to a temp file and free message
         for(Message* ptr: _recvList) {
-            fwrite(ptr->getPayload(), 1, ptr->getPayloadLength(), _file);
+            fwrite(ptr->getPayload(), 1, ptr->getPayloadLength(), _file);   //Write message to the file
+            delete(ptr);    //Free message
         }
         
         //Whole file is received

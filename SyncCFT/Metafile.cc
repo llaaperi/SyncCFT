@@ -30,13 +30,13 @@
 MetaFile::MetaFile(string fName) : _fileName(fName) {
     
     // Read metadata file
-    read();
+    //read();
     
     // Update metadata
     updateAll();
     
     // Save changes to metafile
-    write();
+    //write();
 }
 
 /*

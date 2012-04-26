@@ -70,28 +70,27 @@ int main (int argc, const char * argv[])
                 return 0;
         }
     }
-	for (int index = optind; index < argc; index++) {
+	for(int index = optind; index < argc; index++) {
         hosts.push_back(argv[index]);
         cout << "Host: " << argv[index] << endl;
     }
     
-    // Check that all necessary input parameters are given
-    if (hosts.empty()) {
-        cout << "Missing host address" << endl;
-        cout << HELP << endl;
-        return 0;
+    //Start in server mode if no hosts are given
+    if(hosts.empty()) {
+        cout << "No remote hosts defined." << endl;
+        cout << "Starting in server mode." << endl;
     }
     
     //Print folder info
     MetaFile mFile(METAFILE);
     mFile.print();
     
-    bool startClient = true;
+    //bool startClient = false;
     bool startServer = true;
     
     // Start client first
     Client* clientHandler = NULL;
-    if(startClient){
+    if(!hosts.empty()){
         try {
             clientHandler = new Client(hosts, cport, sport);
             clientHandler->start();
