@@ -61,6 +61,12 @@ public:
         
     bool recvFile(const Message* msg);
     bool recvFinish();
+    
+    /*
+     * @param msg Last received message
+     */
+    void recvTimeout(const Message* msg);
+    
     bool sendFile(const Message* msg);
     
 private:
@@ -68,6 +74,8 @@ private:
     bool sendWindow(uint16_t size);
     bool sendChunk(const char* chunk, uint16_t len, uint16_t window,
                    uint32_t chunknum, uint32_t seqnum);
+    
+    void writeRecvListToFile();
     
     // Rule of three
     FileTransfer(FileTransfer const& other);

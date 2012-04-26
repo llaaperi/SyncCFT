@@ -83,42 +83,54 @@ FileTransfer::~FileTransfer(){
 }
 
 
+/*
+ * Write reception list to the file
+ */
+void FileTransfer::writeRecvListToFile(){
+    
+    // Write data to a temp file and free message
+    for(Message* ptr: _recvList) {
+        fwrite(ptr->getPayload(), 1, ptr->getPayloadLength(), _file);   //Write message to the file
+        delete(ptr);    //Free message
+    }
+}
+
 
 /*
  *
  */
 bool FileTransfer::recvFile(const Message* msg){
     
+    //Accept only FILE messages
     if(msg->getType() != TYPE_FILE){
         return false;
     }
     
+    //Copy received message and put it in reception queue
     Message *recvMsg = new Message(*msg);
     recvMsg->setPayload(msg->getPayload(), msg->getPayloadLength());
     _recvList.push_back(recvMsg);
     
-    uint16_t lastChunknum = _chunkCurrent + msg->getWindow() - 1;
+    //Calculate last expected chunk number within reception window
+    uint16_t lastChunknum = _chunkCurrent + msg->getWindow();
     if (lastChunknum > _chunkEnd) {
         lastChunknum = _chunkEnd;
     }
     static bool lastChunkReceived = false;
     
-    cout << "lastChunkReceived: " << lastChunkReceived << " chunkCurrent: " << _chunkCurrent << ", lastChunk: " << lastChunknum << ", isLast: " << recvMsg->isLast() << ", Chunk: " << recvMsg->getChunk() << endl;
-    
+    //Last chunk of current window is received
     if((recvMsg->getChunk() >= lastChunknum) && recvMsg->isLast()){
-        
         lastChunkReceived = true;
     }
     
+    cout << "lastChunkReceived: " << lastChunkReceived << " chunkCurrent: " << _chunkCurrent << ", lastChunk: " << lastChunknum << ", isLast: " << recvMsg->isLast() << ", Chunk: " << recvMsg->getChunk() << endl;
+    
+    //Check if last message of the window is received and the window is received correctly
     if(lastChunkReceived && recvFinish()){
             
         cout << "[TRANSFER] Window completed" << endl;
         
-        // Write data to a temp file and free message
-        for(Message* ptr: _recvList) {
-            fwrite(ptr->getPayload(), 1, ptr->getPayloadLength(), _file);   //Write message to the file
-            delete(ptr);    //Free message
-        }
+        writeRecvListToFile();  //Write completed window to file
         
         //Whole file is received
         if(_chunkCurrent == _chunkEnd){
@@ -128,10 +140,8 @@ bool FileTransfer::recvFile(const Message* msg){
         }
         
         //Continue reception of subsequent windows
-        ++_chunkCurrent;
-        ++_seqCurrent;
-        lastChunkReceived = false;
         _recvList.clear();  //Remove all messages from the reception queue
+        lastChunkReceived = false;
     }
 
     return false;
@@ -150,7 +160,7 @@ bool FileTransfer::recvFinish(){
     
     //Check that rest of the messages are received 
     cout << "[TRANSFER] Recv List: (size " << _recvList.size() << ")" << endl;
-    uint32_t currentSeq = _seqCurrent;
+    uint32_t currentSeq = _seqCurrent + 1;
     for(Message *msg : _recvList){
         
         cout << "seqnum=" << msg->getSeqnum() << "(" << currentSeq << "), chunk=" << msg->getChunk() << endl;
@@ -168,10 +178,25 @@ bool FileTransfer::recvFinish(){
     reply.setChunk(_recvList.back()->getChunk());
     _trns->send(&reply, CLIENT_TIMEOUT_SEND);
     
-    _chunkCurrent = _recvList.back()->getChunk();
-    _seqCurrent = _recvList.back()->getSeqnum();
+    _chunkCurrent = _recvList.back()->getChunk();   //Set _chunkCurrent to last received chunk
+    _seqCurrent = _recvList.back()->getSeqnum();    //Set _seqCurrent to last received seqnum
     
     return true;
+}
+
+
+/*
+ *
+ */
+void FileTransfer::recvTimeout(const Message *msg){
+
+    Message reply(*msg);
+    reply.setType(TYPE_ACK);
+    reply.setFirst(false);
+    reply.setLast(false);
+    reply.setSeqnum(_seqCurrent);
+    reply.setChunk(_chunkCurrent);
+    _trns->send(&reply, CLIENT_TIMEOUT_SEND);
 }
 
 
