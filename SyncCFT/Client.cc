@@ -173,12 +173,35 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
         sprintf(buf, "%s;%d-%d", e.getName().c_str(), 0, 0);
         msg.setPayload(buf, (int)strlen(buf));
         
-        if(!Transceiver::sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_SEND)){
+        if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
+            cout << "[CLIENT] Unable to send GET" << endl;
             return;
         }
         
-        //cout << "[CLIENT] Get payload: " << endl << msg.getPayload() << endl;
+        int tries = 0;
+        // Send GET message
+        while(!_trns->recv(&msg, CLIENT_TIMEOUT_ACK)) {
+            // Send new GET    
+            _trns->send(&msg, CLIENT_TIMEOUT_SEND);
+            if (tries++ > CLIENT_RETRIES) {
+                cout << "[CLIENT] Unable to receive reply to GET" << endl;
+                return;
+            }
+        }
         
+        // Handle reply to GET message
+        bool firstFile = false;
+        cout << "[CLIENT] received first message after GET" << endl;
+        if (msg.getType() == TYPE_NACK) {
+            cout << "[CLIENT] Received NACK message after GET" << endl;
+            continue;
+        } else if (msg.getType() == TYPE_ACK) {
+            cout << "[CLIENT] Received ACK message after GET" << endl;
+        } else if (msg.getType() == TYPE_FILE) {
+            cout << "[CLIENT] Received FILE message after GET" << endl;
+            firstFile = true;
+        }
+
         try {
             _fFlow = new FileTransfer(_trns, e, 0, 0, 0, FILE_TRANSFER_TYPE_CLIENT);
         } catch (...) {
@@ -186,20 +209,23 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
             continue;
         }
         
-        Message msg;
-        
-        // TODO: Handle ACK/NACK
-        _trns->recv(&msg, CLIENT_TIMEOUT_ACK);
-        cout << "[CLIENT] received first message after GET" << endl;
         
         bool ready = false;
+        tries = 0;
         while(!ready){
-            if(!_trns->recv(&msg, CLIENT_TIMEOUT_ACK)) {
+            if(!firstFile && !_trns->recv(&msg, CLIENT_TIMEOUT_ACK)) {
                 cout << "[CLIENT] Wait FILE timeout" << endl;
-                continue; // TODO: Timeout handler
+                if (tries++ > CLIENT_RETRIES) {
+                    cout << "[CLIENT] Too many retries" << endl;
+                    break;
+                }
+                _fFlow->recvTimeout(&msg);
+                continue;
             }
+            tries = 0;
             cout << "[CLIENT] Received file message from Chunk: " << msg.getChunk() << ", Seqnum: " << msg.getSeqnum() << ", Size: " << msg.getPayloadLength() << ", Window size: " << msg.getWindow() << endl;
             ready = _fFlow->recvFile(&msg);
+            firstFile = false;
         }
         delete(_fFlow);
     }
