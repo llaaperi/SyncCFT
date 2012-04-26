@@ -15,8 +15,9 @@
 /*
  * Constructor
  */
-Message::Message() : _version(0), _type(0), _clientID(0), _checksum(0), _payloadLen(0),
-                    _window(0), _seqnum(0), _chunk(0), _hello(false), _quit(false), _begin(false), _end(false), 
+Message::Message() : _version(0), _type(0), _clientID(0), _checksum(0),
+                    _payloadLen(0), _window(0), _seqnum(0), _chunk(0),
+                    _hello(false), _quit(false), _begin(false), _end(false), 
                     _payload(0){
 }
 
@@ -140,6 +141,11 @@ void Message::setPayload(const char *payload, int length){
     
     //Clear existing payload
     clearPayload();
+    
+    if ((payload == NULL) || (length == 0)) {
+        return;
+    }
+    
     //Allocate memory and copy new palyload
     _payload = (char*)malloc(length + 1);
     memcpy(_payload, payload, length);

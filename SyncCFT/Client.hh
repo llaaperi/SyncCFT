@@ -23,6 +23,7 @@
 #define CLIENT_TIMEOUT_QUIT 5000
 #define CLIENT_TIMEOUT_BACKOFF 5000
 #define CLIENT_TIMEOUT_FILE 500
+#define CLIENT_RETRIES 5
 
 using namespace std;
 
