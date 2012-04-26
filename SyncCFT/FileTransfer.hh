@@ -48,7 +48,7 @@ class FileTransfer{
     uint32_t _chunkBegin;
     uint32_t _chunkEnd;
     uint32_t _chunkCurrent;
-    uint32_t _chunkAcked;
+    //uint32_t _chunkAcked;
     
 public:
     

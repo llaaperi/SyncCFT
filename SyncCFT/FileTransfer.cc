@@ -28,7 +28,6 @@ FileTransfer::FileTransfer(Transceiver* trns, Element file, uint32_t chunkBegin,
                             _chunkBegin(chunkBegin),
                             _chunkEnd(chunkEnd),
                             _chunkCurrent(chunkBegin),
-                            _chunkAcked(chunkBegin),
                             _sendBuffer(NULL),
                             _sendBufferLen(0),
                             _recvBuffer(NULL),
@@ -41,7 +40,7 @@ FileTransfer::FileTransfer(Transceiver* trns, Element file, uint32_t chunkBegin,
     if(_chunkBegin == 0){   //If begin is 0 change it to 1 (first chunk)
         _chunkBegin = 1;
     }
-    _chunkCurrent = _chunkBegin;    //Reset current to the beging
+    _chunkCurrent = _chunkBegin - 1;    //Reset current to the one before next receive or send chunk
                                 
     if(_chunkEnd == 0){
         _chunkEnd = ceil((double)_element.getSize() / CHUNK_SIZE);  //Set end to the end of the file
@@ -93,6 +92,7 @@ void FileTransfer::writeRecvListToFile(){
         fwrite(ptr->getPayload(), 1, ptr->getPayloadLength(), _file);   //Write message to the file
         delete(ptr);    //Free message
     }
+    _recvList.clear();  //Remove all messages from the reception queue
 }
 
 
@@ -140,7 +140,6 @@ bool FileTransfer::recvFile(const Message* msg){
         }
         
         //Continue reception of subsequent windows
-        _recvList.clear();  //Remove all messages from the reception queue
         lastChunkReceived = false;
     }
 
@@ -256,8 +255,9 @@ bool FileTransfer::sendFile(const Message* msg){
     if(msg->getType() == TYPE_GET){
         
         cout << "[TRANSFER] Send first window after GET" << endl;
-        loadWindow(msg->getWindow());
+        loadWindow(msg->getWindow());   //Send first window after GET
         sendWindow(msg->getWindow());
+        return false;
     }
     
     //Handle FILE ACK's
@@ -270,23 +270,22 @@ bool FileTransfer::sendFile(const Message* msg){
             cout << "[TRASFER] All chunks ACKed: ACK=" << msg->getChunk() << " Current=" << _chunkCurrent << " End=" << _chunkEnd << endl;
             return true;
         }
-        
-        _chunkAcked = msg->getChunk();
-        
+                
         //Packet is lost
-        if(msg->getChunk() < (_chunkCurrent - 1)){
+        if(msg->getChunk() < _chunkCurrent){
             cout << "[TRANSFER] Packet lost: ACK=" << msg->getChunk() << " Current=" << _chunkCurrent << " End=" << _chunkEnd << endl;
             //long int offset = ((_chunkCurrent - 1) - msg->getChunk()) * CHUNK_SIZE; //((curr - 1) - ack) * CSIZE 
-            //fseek(_file, offset, SEEK_CUR); //Rewind file pointer to the acked position + 1
-            //_chunkCurrent = msg->getChunk() + 1;    //
-            //return false;   //MUST BE REMOVED
+            long int offset = _chunkCurrent * CHUNK_SIZE;
+            
+            cout << "[TRANSFER] File pointer rewinded by " << offset << endl;
+            if(fseek(_file, offset, SEEK_SET)){     //Rewind file pointer to the acked position
+                cout << "[TRANSFER] fseek failed" << endl;
+            }
+            _chunkCurrent = msg->getChunk();    //Reset _chunkCurrent
+            _seqCurrent = msg->getSeqnum();     //Reset _seqCurrent
         }
         
-        //No packets lost
-        if(msg->getChunk() == (_chunkCurrent - 1)){
-            cout << "[TRANSFER] Send next window: ACK=" << msg->getChunk() << " Current=" << _chunkCurrent << " End=" << _chunkEnd << endl;
-        }
-        
+        //Send window
         loadWindow(msg->getWindow());
         sendWindow(msg->getWindow());
     }
@@ -326,8 +325,8 @@ bool FileTransfer::sendWindow(uint16_t size){
         }
         
         //Send chunk
-        if(sendChunk(ptr, len, _window, _chunkCurrent, _seqCurrent)){
-            ++_chunkCurrent;
+        if(sendChunk(ptr, len, _window, ++_chunkCurrent, ++_seqCurrent)){
+            //++_chunkCurrent;
         }
     }
     return true;
@@ -378,6 +377,6 @@ bool FileTransfer::sendChunk(const char* chunk, uint16_t len, uint16_t window, u
         ++_seqCurrent;
     }
     
-    cout << "[TRANSFER] last payload length " << msg.getPayloadLength() << endl;
+    //cout << "[TRANSFER] last payload length " << msg.getPayloadLength() << endl;
     return true;
 }
