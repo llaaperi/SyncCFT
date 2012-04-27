@@ -15,6 +15,8 @@
 #define STATE_LOST 0
 #define STATE_NOT_LOST 1
 
+#define DEFAULT_KEYFILE ".sync.cft.key"
+
 
 using namespace std;
 
@@ -36,17 +38,27 @@ namespace Utilities {
     
     
     /* Calculates a 32-byte SHA256 hash from the given data
-     * @param A buffer where to store the hash
-     * @param message Data
+     * @ptr A buffer where to store the hash
+     * @msg Pointer to message data
+     * @len Length of message data
      * @return A pointer to the 32-byte hash
      */
-    void SHA256Hash(unsigned char* buffer, unsigned char const* message, long length);
+    void SHA256Hash(unsigned char* ptr, unsigned char const* msg, long len);
     
     /*
      * Create N bytes of random data
-     * @param buf Buffer where to store the random data
-     * @param lenth The length of the buffer
+     * @ptr Buffer for storing the random data
+     * @len Length of the buffer
      */
-    void randomBytes(unsigned char* buf, int length);
+    void randomBytes(unsigned char* ptr, int len);
+    
+    /*
+     * Get N bit secret key 
+     * @ptr An address where to store the the secret 
+     * @len Length of the secret
+     * @fName Name of file storing the secret, if NULL create a new secret
+     *  to a default file
+     */
+    void getSecretKey(unsigned char* ptr, int len, const char* fName);
 }
 #endif

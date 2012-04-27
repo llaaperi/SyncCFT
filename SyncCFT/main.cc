@@ -13,8 +13,9 @@
 #include "Message.hh"
 #include "Client.hh"
 #include "Server.hh"
+#include "utilities.hh"
 
-#define HELP "Usage: synccft [-c <client port>] [-s <server port>] [-p <p>] [-q <q>] <hosts>"
+#define HELP "Usage: synccft [-c <client port>] [-s <server port>] [-p <p>] [-q <q>] [-k] <hosts>"
 
 int main (int argc, const char * argv[])
 {
@@ -26,6 +27,7 @@ int main (int argc, const char * argv[])
     string p = "0";
     string q = "0";
     list<string> hosts;
+    bool newSecret = false;
     
 	// Long versions of command line parameters
     static struct option long_options[] = {
@@ -33,6 +35,7 @@ int main (int argc, const char * argv[])
         {"sport", 	required_argument, 	0, 's'},
         {"success", required_argument, 	0, 'p'},
         {"fail", 	required_argument, 	0, 'q'},
+        {"secret", 	no_argument, 		0, 'k'},
         {"help", 	no_argument, 		0, 'h'},
         {0, 0, 0, 0}
     };
@@ -43,26 +46,30 @@ int main (int argc, const char * argv[])
 	while ((c = getopt_long (argc, (char **)argv, "hc:s:p:q:", long_options, NULL)) != -1){
         switch (c)
         {
-            case 'c':
+            case 'c': // Client port
                 cport = optarg;
                 cout << "Client port: " << cport << endl;
                 break;
-            case 's':
+            case 's': // Server port
                 sport = optarg;
                 cout << "Server port: " << sport << endl;
                 break;
-            case 'p':
+            case 'p': // Markov probability
                 p = optarg;
                 cout << "p: " << p << endl;
                 break;
-            case 'q':
+            case 'q': // Markov probability
                 q = optarg;
                 cout << "q: " << q << endl;
                 break;
-            case 'h':
+            case 'k': // Generate new secret key
+                newSecret = true;
+                cout << "Generating new secret key" << endl;
+                break;
+            case 'h': // Help
                 cout << HELP << endl;
                 break;
-            case '?':
+            case '?': // Help
                 cout << HELP << endl;
                 return 0;
             default:
@@ -80,6 +87,15 @@ int main (int argc, const char * argv[])
         cout << "No remote hosts defined." << endl;
         cout << "Starting in server mode." << endl;
     }
+    
+    // Load a secret key
+    unsigned char secretKey[512];
+    const char* fName = NULL;
+    if (!newSecret) {
+        fName = DEFAULT_KEYFILE;
+    }
+    Utilities::getSecretKey(secretKey, 512, fName);
+    
     
     //Print folder info
     MetaFile mFile(METAFILE);

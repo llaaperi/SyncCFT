@@ -64,30 +64,31 @@ bool Utilities::packetLost(int state, double p, double q) {
 }
 
 /* Calculates a 32-byte SHA256 hash from the given data
- * @param A buffer where to store the hash
- * @param message Data
- * @param message length
+ * @ptr A buffer where to store the hash
+ * @msg Pointer to message data
+ * @len Length of message data
+ * @return A pointer to the 32-byte hash
  */
-void Utilities::SHA256Hash(unsigned char* buffer, unsigned char const* message, long length)
+void Utilities::SHA256Hash(unsigned char* ptr, unsigned char const* msg, long len)
 {
     SHA256_CTX context;
     
     SHA256_Init(&context);
-    SHA256_Update(&context, message, length);
-    SHA256_Final(buffer, &context);
+    SHA256_Update(&context, msg, len);
+    SHA256_Final(ptr, &context);
 }
 
 
 /*
  * Create N bytes of random data
- * @param buf Buffer where to store the random data
- * @param lenth The length of the buffer
+ * @ptr Buffer for storing the random data
+ * @len Length of the buffer
  */
-void Utilities::randomBytes(unsigned char* buf, int length)
+void Utilities::randomBytes(unsigned char* ptr, int len)
 {
-    if (!RAND_bytes(buf, length)) {
+    if (!RAND_bytes(ptr, len)) {
         cout << "Rand bytes failed" << endl;
-        buf = NULL;
+        ptr = NULL;
         return;
     }
     /*
@@ -98,3 +99,43 @@ void Utilities::randomBytes(unsigned char* buf, int length)
     */
 }
 
+
+/*
+ * Get N bit secret key 
+ * @ptr An address where to store the the secret 
+ * @len Length of the secret
+ * @fName Name of file storing the secret, if NULL create a new secret
+ *  to a default file
+ */
+void Utilities::getSecretKey(unsigned char* ptr, int len, const char* fName) {
+    
+    // Try to load an old secret key
+    FILE* keyFile = NULL;
+    int readBytes = 0;
+    
+    if (fName != NULL) {
+        keyFile = fopen(fName, "r");
+    }
+    if (keyFile != NULL) {
+        readBytes = fread(ptr, 1, len, keyFile);
+        if (readBytes != len) {
+            cout << "[MAIN] Failed to load old keyfile" << endl;
+        } else {
+            //cout << "[MAIN] Loaded old keyfile" << endl;
+            fclose(keyFile);
+            return;
+        }
+    }
+    
+    // Create new secret key
+    keyFile = NULL;
+    Utilities::randomBytes(ptr, len); // Create new random secret key
+    //cout << "[MAIN] Created new secret key" << endl;
+    keyFile = fopen(DEFAULT_KEYFILE, "w");
+    if (keyFile == NULL) {
+        cout << "[MAIN] Failed to open keyfile for writing" << endl;
+    } else {
+        fwrite(ptr, 1, len, keyFile);
+        fclose(keyFile);
+    }
+}
