@@ -324,7 +324,7 @@ bool FileTransfer::sendWindow(uint16_t size){
             len = CHUNK_SIZE;
         }
         
-        //Send chunk
+        //Send chunk    //TODO SEQURNCE NUMBERS NOT CORRECT 7->9
         if(sendChunk(ptr, len, _window, ++_chunkCurrent, ++_seqCurrent)){
             //++_chunkCurrent;
         }
