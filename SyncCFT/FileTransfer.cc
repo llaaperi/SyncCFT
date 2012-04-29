@@ -324,7 +324,7 @@ bool FileTransfer::sendWindow(uint16_t size){
             len = CHUNK_SIZE;
         }
         
-        //Send chunk    //TODO SEQURNCE NUMBERS NOT CORRECT 7->9
+        //Send chunk
         if(sendChunk(ptr, len, _window, ++_chunkCurrent, ++_seqCurrent)){
             //++_chunkCurrent;
         }
@@ -369,7 +369,6 @@ bool FileTransfer::sendChunk(const char* chunk, uint16_t len, uint16_t window, u
             msg.setLast(true);
             msg.setPayload(chunk, len);
             _trns->send(&msg, SERVER_TIMEOUT_SEND);
-            ++_seqCurrent;
             break;
         }
         
