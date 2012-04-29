@@ -17,7 +17,6 @@
 
 #define DEFAULT_KEYFILE ".sync.cft.key"
 
-
 using namespace std;
 
 namespace Utilities {
@@ -32,14 +31,18 @@ namespace Utilities {
     int split(string str, string separator, vector<string>& results);
     
     
+    /*
+     *
+     */
+    void initMarkov(const string& p, const string& q);
+    
+    
     /**
      * Markov process
-     * @state Current state of the process
-     * @p Change to move to LOST state
-     * @q Change to stay in LOST state
+     * Extern variables (_markov_p and _markov_q) must be initialized before
      * @return True if packet is lost
      **/
-    bool packetLost(int state, double p, double q);
+    bool isPacketLost();
     
     
     /**
