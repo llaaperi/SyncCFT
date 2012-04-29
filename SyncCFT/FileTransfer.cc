@@ -279,7 +279,7 @@ bool FileTransfer::sendFile(const Message* msg){
         if(msg->getChunk() < _chunkCurrent){
             cout << "[TRANSFER] Packet lost: ACK=" << msg->getChunk() << " Current=" << _chunkCurrent << " End=" << _chunkEnd << endl;
             //long int offset = ((_chunkCurrent - 1) - msg->getChunk()) * CHUNK_SIZE; //((curr - 1) - ack) * CSIZE 
-            long int offset = _chunkCurrent * CHUNK_SIZE;
+            long int offset = msg->getChunk() * CHUNK_SIZE;
             
             cout << "[TRANSFER] File pointer rewinded by " << offset << endl;
             if(fseek(_file, offset, SEEK_SET)){     //Rewind file pointer to the acked position
