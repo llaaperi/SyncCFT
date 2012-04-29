@@ -13,8 +13,8 @@
 class NetworkingTest : public testing::Test {
 protected:
     virtual void SetUp() {
-        serverSocket = Networking::createUnconnectedSocket("55500");
-        clientSocket = Networking::createConnectedSocket("127.0.0.1", "55500");
+        serverSocket = Networking::createUnconnectedSocket("5062");
+        clientSocket = Networking::createUnconnectedSocket("5063");
     }
     
     virtual void TearDown() {
@@ -44,8 +44,21 @@ TEST_F(NetworkingTest, ClientToServerMsg) {
     char buffer[1500];
     int status;
     
+    struct addrinfo hints, *serverInfo;
+    
+    bzero(&hints, sizeof(struct addrinfo)); // Zero struct values
+    hints.ai_family = AF_UNSPEC; // IPv4 or IPv6
+    hints.ai_socktype = SOCK_DGRAM; // UDP socket
+    
+    //Get address information in struct addrinfo format. Works for IPv4 and IPv6.
+    if(getaddrinfo("127.0.0.1", "5062", &hints, &serverInfo)) { //getaddrinfo returns 0 on success
+        perror("[CLIENT] Running getaddrinfo failed.");
+    }
+    
     // Send message to server
-    status = (int)write(clientSocket, data, sizeof(data));
+    sockaddr servAddr = *serverInfo->ai_addr;
+    struct sockaddr addr = servAddr;
+    status = Networking::sendPacket(serverSocket, data, sizeof(data),  &addr, 5000);
     EXPECT_EQ(status, 12);
     
     // Receive message
@@ -74,9 +87,9 @@ TEST_F(NetworkingTest, ServerResponse) {
     EXPECT_EQ(status, 12);
     EXPECT_TRUE(!strcmp(buffer, data));
     
-    status = Networking::sendPacket(serverSocket, data2, sizeof(data2), &cliAddr, 5);
+    status = Networking::sendPacket(serverSocket, data2, sizeof(data2), &cliAddr, 5000);
     EXPECT_EQ(status, 13);
-    Networking::receivePacket(clientSocket, buffer2, &cliAddr, 5);
+    Networking::receivePacket(clientSocket, buffer2, &cliAddr, 5000);
     EXPECT_EQ(status, 13);
     EXPECT_TRUE(!strcmp(buffer2, data2));
 

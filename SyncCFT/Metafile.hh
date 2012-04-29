@@ -33,68 +33,80 @@ public:
     MetaFile(const char* buffer, int len);
     ~MetaFile(){}
     
-    /*
+    /**
      * Find element
-     * @param name Name of the element
-     * @param found Success status of search
+     * @name Name of the element
+     * @found Success status of search
      * @return Reference to the found element
-     */
+     **/
     Element& find(string const& name, bool& found);
     
-    /*
+    /**
      * Convert string to Element
-     */
+     * @line Element info stored in a string
+     * @file Reference to a Element where to save the info
+     * @return Success status of the operation
+     **/
     bool strToElement(string const& line, Element& file);
     
-    /*
+    /**
      * Convert Element to string
-     */
+     * @file Reference to the Element from which to read the info
+     * @return String containing the element info
+     **/
     string elementToStr(Element const& file) const;
     
-    /* Calculates 16-byte MD5 hash from the given file
-     * @param filename Name of the file
-     * @param length Size of the file
-     * @param hash Store the hash here
+    /** 
+     * Calculates 16-byte MD5 hash from the given file
+     * @filename Name of the file
+     * @length Size of the file
+     * @hash Store the hash here
      * @return 16-byte has hash as string
-     */
+     **/
     static bool MD5Hash(string const& filename, long const length, string& hash);
     
-    /*
+    /**
      * Read the contents of the metatile
-     */
+     **/
     void read(void);
     
-    /*
+    /**
      * Overwrite to the metatile
-     */
+     * @return Success status of the operation
+     **/
     bool write(void);
     
-    /*
+    /**
      * Updates the contents of metafile and metadata
-     */
+     * @return Success status of the operation
+     **/
     bool updateAll(void);
     
-    /*
+    /**
      * Print metadata
-     */
+     **/
     void print(void) const;
     
     
-    /*
-     * Diff
-     */
+    /**
+     * Compare two MetaFiles
+     * @other MetaFile to compare
+     * @return Difference of the MetaFiles as string
+     **/
     string getDiff(MetaFile& other);
     
     
-    /*
-     *
-     */
+    /**
+     * Get contents of Metafile
+     * @return Contents of the Metafile as a string
+     **/
     string getDescr();
     
     
-    /*
-     * Return the metadata
-     */
+    /**
+     * Get the Metadata
+     * @return List of all stored Elements
+     **/
     list<Element> getMetadata() const {return _metadata;}
 
     
@@ -105,9 +117,9 @@ private:
 
 };
 
-/*
+/**
  * Print metadata to stream
- */
+ **/
 ostream& operator<<(ostream& os, const MetaFile& m);
 
 inline bool operator==(const Element& lhs, const Element& rhs) { 

@@ -26,8 +26,40 @@ Client::Client(list<string>& hosts, string cport, string sport) throw(invalid_ar
         throw runtime_error("[CLIENT] Socket creation failed");
     }
     
+    // Find out server address
+    // TODO: Currently supports only one server
+    struct addrinfo hints;
+    
+    bzero(&hints, sizeof(struct addrinfo)); // Zero struct values
+    hints.ai_family = AF_UNSPEC; // IPv4 or IPv6
+    hints.ai_socktype = SOCK_DGRAM; // UDP socket
+    
+    //Get address information in struct addrinfo format. Works for IPv4 and IPv6.
+    if(getaddrinfo(_hosts.front().c_str(), _sport.c_str(), &hints, &_serverInfo)) { //getaddrinfo returns 0 on success
+        throw runtime_error("[CLIENT] Running getaddrinfo failed.");
+    }
+    
+    // Create new tranceiver
+    _trns = new Transceiver(_socket, *getSockAddr());
+
 }
 
+
+/**
+ *
+ * Destructor for Client class
+ *
+ **/
+Client::~Client() {
+    
+    // Close open socket
+    if (_socket < 0) {
+        close(_socket);  
+
+    }
+    // TODO: Free rest of the resources
+    
+}
 
 
 /*
@@ -62,39 +94,29 @@ void* Client::handle(void* arg)
     
     cout << "[CLIENT] Client handler" << endl;
     
-    struct addrinfo hints, *serverInfo;
-    
-    bzero(&hints, sizeof(struct addrinfo)); // Zero struct values
-    hints.ai_family = AF_UNSPEC; // IPv4 or IPv6
-    hints.ai_socktype = SOCK_DGRAM; // UDP socket
-    
-    //Get address information in struct addrinfo format. Works for IPv4 and IPv6.
-    if(getaddrinfo(handler->_hosts.front().c_str(), handler->_sport.c_str(), &hints, &serverInfo)) { //getaddrinfo returns 0 on success
-        perror("[CLIENT] Running getaddrinfo failed.");
-        return 0;
-    }
     
     //TEMP SLEEP
     sleep(2);
     
     while(handler->_running){
+        sockaddr* sockAddr = handler->getSockAddr();
         
         //Try HELLO handshake
-        handler->startSession(*serverInfo->ai_addr);
+        handler->startSession(*sockAddr);
         
         //Metafile handler
         MetaFile* diff;
-        handler->metafileHandler(*serverInfo->ai_addr, &diff);
+        handler->metafileHandler(*sockAddr, &diff);
         
         //File transfers
         if(diff != NULL){
-            handler->fileTransfer(*serverInfo->ai_addr, diff);
+            handler->fileTransfer(*sockAddr, diff);
         }
         
         sleep(1);
         
         //Terminate session
-        handler->endSession(*serverInfo->ai_addr);
+        handler->endSession(*sockAddr);
         
         sleep(CLIENT_TIMEOUT_BACKOFF); //TEMPORARILY HERE
     }
@@ -123,12 +145,12 @@ void Client::metafileHandler(sockaddr servAddr, MetaFile** diff){
     //cout << "[CLIENT] Own descriptio:" << endl;
     //cout << payload << endl;
     msg.setPayload(payload.c_str(), (int)payload.length());
-    if(!Transceiver::sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_SEND)){
+    if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
         return;
     }
     
     //Receive DIFF from the server
-    if(!Transceiver::recvMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_HELLO)){
+    if(!_trns->recv(&msg, CLIENT_TIMEOUT_HELLO)){
         return;
     }
     
@@ -152,13 +174,12 @@ void Client::metafileHandler(sockaddr servAddr, MetaFile** diff){
 
 
 /*
- *
+ * //TODO: servAddr parameter not used anywhere
  */
 void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
     
     cout << "[CLIENT] File transfer started" << endl;
     
-    _trns = new Transceiver(_socket, servAddr);
     Message msg;
     
     list<Element> elements = diff->getData();
@@ -183,7 +204,7 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
         while(!_trns->recv(&msg, CLIENT_TIMEOUT_ACK)) {
             // Send new GET    
             _trns->send(&msg, CLIENT_TIMEOUT_SEND);
-            if (tries++ > CLIENT_RETRIES) {
+            if (++tries > CLIENT_RETRIES) {
                 cout << "[CLIENT] Unable to receive reply to GET" << endl;
                 return;
             }
@@ -209,32 +230,48 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
             continue;
         }
         
-        
-        bool ready = false;
-        tries = 0;
-        while(!ready){
-            if(!firstFile && !_trns->recv(&msg, CLIENT_TIMEOUT_ACK)) {
-                cout << "[CLIENT] Wait FILE timeout" << endl;
-                if (tries++ > CLIENT_RETRIES) {
-                    cout << "[CLIENT] Too many retries" << endl;
-                    break;
-                }
-                _fFlow->recvTimeout(&msg);
-                continue;
-            }
-            tries = 0;
-            cout << "[CLIENT] Received file message from Chunk: " << msg.getChunk() << ", Seqnum: " << msg.getSeqnum() << ", Size: " << msg.getPayloadLength() << ", Window size: " << msg.getWindow() << endl;
-            ready = _fFlow->recvFile(&msg);
-            firstFile = false;
+        if (compliteFileTransfer(&msg, firstFile)) {
+            cout << "[CLIENT] Completed file" << endl;
+        } else {
+            cout << "[CLIENT] Failed to complete file" << endl;
         }
+        
         delete(_fFlow);
     }
 }
 
+/**
+ * Complite single file transfer
+ * @msg Message to begin the transfer session from
+ * @first Is the first message type FILE
+ * @return Success status of the file transfer
+ **/
+bool Client::compliteFileTransfer(Message* msg, bool first) {
+    
+    bool ready = false;
+    int tries = 0;
+    while(!ready){
+        if(!first && !_trns->recv(msg, CLIENT_TIMEOUT_ACK)) {
+            cout << "[CLIENT] Wait FILE timeout" << endl;
+            if (tries++ > CLIENT_RETRIES) {
+                cout << "[CLIENT] Too many retries" << endl;
+                return false;
+            }
+            _fFlow->recvTimeout(msg);
+            continue;
+        }
+        tries = 0;
+        cout << "[CLIENT] Received file message from Chunk: " << msg->getChunk() << ", Seqnum: " << msg->getSeqnum() << ", Size: " << msg->getPayloadLength() << ", Window size: " << msg->getWindow() << endl;
+        ready = _fFlow->recvFile(msg);
+        first = false;
+    }
+    return true;
+}
 
-/*
+
+/**
  * Function tries to start session with a server.
- */
+ **/
 void Client::startSession(sockaddr servAddr){
     
     bool started = false;
@@ -282,12 +319,15 @@ bool Client::handshakeHandler(sockaddr servAddr){
     
     //Send HELLO message
     msg.initHeader(TYPE_HELLO);
-    if(!Transceiver::sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_SEND)){
+    /*if(!Transceiver::sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_SEND)){
+        return false;
+    }*/
+    if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
         return false;
     }
     
     //Receive reply from the server
-    if(!Transceiver::recvMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_HELLO)){
+    if(!_trns->recv(&msg, CLIENT_TIMEOUT_HELLO)){
         return false;
     }
     
@@ -303,7 +343,7 @@ bool Client::handshakeHandler(sockaddr servAddr){
     msg.incrSeqnum();
     msg.setPayload(NULL, 0);
     msg.setHello(true);
-    Transceiver::sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_HELLO);
+    _trns->send(&msg, CLIENT_TIMEOUT_HELLO);
     
     return true;
 }
@@ -319,12 +359,12 @@ bool Client::terminateHandler(sockaddr servAddr){
     
     //Send QUIT message
     msg.initHeader(TYPE_QUIT);
-    if(!Transceiver::sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_SEND)){
+    if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
         return false;
     }
     
     //Receive reply from the server
-    if(!Transceiver::recvMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_QUIT)){
+    if(!_trns->recv(&msg, CLIENT_TIMEOUT_QUIT)){
         return false;
     }
     
@@ -340,7 +380,7 @@ bool Client::terminateHandler(sockaddr servAddr){
     msg.incrSeqnum();
     msg.clearPayload();
     msg.setQuit(true);
-    Transceiver::sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_HELLO);
+    _trns->send(&msg, CLIENT_TIMEOUT_HELLO);
     
     return true;
 }

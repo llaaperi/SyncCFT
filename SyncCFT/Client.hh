@@ -39,10 +39,13 @@ class Client {
     Transceiver* _trns;
     FileTransfer* _fFlow;
     
+    struct addrinfo* _serverInfo;
+
+    
 public:
     
     Client(list<string>& hosts, string cport, string sport) throw(invalid_argument, runtime_error);
-    ~Client() {}
+    ~Client();
     
     /*
      * Start thread for handling clients
@@ -61,6 +64,8 @@ public:
     
     void synchronize(MetaFile file);
     
+    sockaddr* getSockAddr(){return _serverInfo->ai_addr;}
+    
     
 private:
     //Rule of three
@@ -74,6 +79,8 @@ private:
     bool terminateHandler(sockaddr servAddr);
     void metafileHandler(sockaddr servAddr, MetaFile** diff);
     void fileTransfer(sockaddr servAddr, MetaFile* diff);
+    bool compliteFileTransfer(Message* msg, bool first);
+
 };
 
 #endif

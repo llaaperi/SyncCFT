@@ -21,18 +21,11 @@
 FileTransfer::FileTransfer(Transceiver* trns, Element file, uint32_t chunkBegin,
                            uint32_t chunkEnd , int seqnum, int type)
                             throw(std::runtime_error) : 
-                            _trns(trns),
-                            _element(file),
-                            _seqCurrent(seqnum),
-                            _seqBegin(seqnum),
-                            _chunkBegin(chunkBegin),
-                            _chunkEnd(chunkEnd),
-                            _chunkCurrent(chunkBegin),
-                            _sendBuffer(NULL),
-                            _sendBufferLen(0),
-                            _recvBuffer(NULL),
-                            _recvBufferLen(0),
-                            _file(NULL) {
+                            _trns(trns), _element(file), _seqCurrent(seqnum),
+                            _seqBegin(seqnum), _chunkBegin(chunkBegin),
+                            _chunkEnd(chunkEnd), _chunkCurrent(chunkBegin),
+                            _sendBuffer(NULL), _sendBufferLen(0),
+                            _recvBuffer(NULL), _recvBufferLen(0), _file(NULL) {
                                 
     cout << "[FILE] Transfer created" << endl;
     
