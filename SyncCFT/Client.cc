@@ -377,10 +377,10 @@ bool Client::terminateHandler(sockaddr servAddr){
     _id = 0;
     
     //Reply with final QUITACK
-    msg.incrSeqnum();
-    msg.clearPayload();
-    msg.setQuit(true);
-    _trns->send(&msg, CLIENT_TIMEOUT_HELLO);
+    //msg.incrSeqnum();
+    //msg.clearPayload();
+    //msg.setQuit(true);
+    //_trns->send(&msg, CLIENT_TIMEOUT_HELLO);
     
     return true;
 }

@@ -95,14 +95,17 @@ void* Server::handle(void* arg){
             handler->handshakeHandler(&msg, cliAddr);
             continue;
         }
-        if(msg.isQuit()){   //Handle termination requests
-            handler->terminateHandler(&msg, cliAddr);
-            continue;
-        }
         
         //Forward existing connections to corresponding handler
         if((msg.getClientID() < SERVER_SESSION_HANDLERS) && (handler->_sessionHandlers[msg.getClientID()] != NULL)){
-            handler->_sessionHandlers[msg.getClientID()]->newMessage(&msg);
+            bool stop = !handler->_sessionHandlers[msg.getClientID()]->newMessage(&msg);
+            
+            //Release resources if client quits
+            if(stop){
+                delete(handler->_sessionHandlers[msg.getClientID()]);
+                handler->_sessionHandlers[msg.getClientID()] = NULL;
+            }
+            
         }else{
             cout << "[SERVER] Packet discarded" << endl;
             msg.printInfo();
@@ -206,6 +209,15 @@ void Server::terminateHandler(Message* msg, sockaddr cliAddr){
         
         //Check source from session handler
         //TODO
+        
+        //Release resources when client ACKs the handshake
+        if(msg->getClientID() == clientID){
+            
+            if(!_sessionHandlers[clientID]){
+                delete(_sessionHandlers[clientID]);
+                _sessionHandlers[clientID] = NULL;
+            }
+        }
         
         //Reply with final QUITACK
         msg->setType(TYPE_ACK);

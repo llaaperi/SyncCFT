@@ -36,43 +36,6 @@ SessionHandler::~SessionHandler(){
 }
 
 
-void SessionHandler::newMessage(const Message* msg){
-
-    switch (msg->getType()) {
-        case TYPE_ACK:
-            cout << "[SESSION] Received ACK message" << endl;
-            fileHandler(msg);
-            break;
-        case TYPE_HELLO:
-            cout << "[SESSION] Received HELLO message" << endl;
-            break;
-        case TYPE_DESCR:
-            cout << "[SESSION] Received DESCR message" << endl;
-            descrHandler(msg);
-            break;
-        case TYPE_DIFF:
-            cout << "[SESSION] Received DIFF message" << endl;
-            break;
-        case TYPE_GET:
-            cout << "[SESSION] Received GET message" << endl;
-            getHandler(msg);
-            break;
-        case TYPE_FILE:
-            cout << "[SESSION] Received FILE message" << endl;
-            break;
-        case TYPE_QUIT:
-            cout << "[SESSION] Received QUIT message" << endl;
-            break;
-        case TYPE_NACK:
-            cout << "[SESSION] Received NACK message" << endl;
-            break;
-        default:
-            cout << "[SESSION] Unknown message type" << endl;
-            break;
-    }
-}
-
-
 /*
  * Function for checking if source is valid for this session
  */
@@ -103,6 +66,53 @@ bool SessionHandler::isValidMessage(const Message *msg){
         return false;
     }
     
+    return true;
+}
+
+
+/*
+ *
+ */
+bool SessionHandler::newMessage(const Message* msg){
+
+    //Check message validity
+    if(!isValidMessage(msg)){
+        cout << "[SESSION] Invalid message" << endl;
+        return true;
+    }
+    
+    switch (msg->getType()) {
+        case TYPE_ACK:
+            cout << "[SESSION] Received ACK message" << endl;
+            fileHandler(msg);
+            break;
+        case TYPE_HELLO:
+            cout << "[SESSION] Received HELLO message" << endl;
+            break;
+        case TYPE_DESCR:
+            cout << "[SESSION] Received DESCR message" << endl;
+            descrHandler(msg);
+            break;
+        case TYPE_DIFF:
+            cout << "[SESSION] Received DIFF message" << endl;
+            break;
+        case TYPE_GET:
+            cout << "[SESSION] Received GET message" << endl;
+            getHandler(msg);
+            break;
+        case TYPE_FILE:
+            cout << "[SESSION] Received FILE message" << endl;
+            break;
+        case TYPE_QUIT:
+            cout << "[SESSION] Received QUIT message" << endl;
+            return !quitHandler(msg);
+        case TYPE_NACK:
+            cout << "[SESSION] Received NACK message" << endl;
+            break;
+        default:
+            cout << "[SESSION] Unknown message type" << endl;
+            break;
+    }
     return true;
 }
 
@@ -194,12 +204,6 @@ void SessionHandler::sendAck(const Message* msg){
  *
  */
 bool SessionHandler::parseGet(const Message* msg, Element* file, uint32_t* chunkBegin, uint32_t* chunkEnd){
-    
-    //Check message validity
-    if(!isValidMessage(msg)){
-        cout << "[SESSION] Invalid message" << endl;
-        return false;
-    }
     
     //Parse GET message
     string line(msg->getPayload());
@@ -328,4 +332,25 @@ void SessionHandler::createSessionKey(unsigned char* nonce1, unsigned char* nonc
     memcpy(dataPointer, secretKey, 16);
 
     Utilities::SHA256Hash(_sessionKey, data, 96);
+}
+
+
+/*
+ * Handler for session termination
+ */
+bool SessionHandler::quitHandler(const Message* msg){
+    
+    cout << "[SESSION] Terminate handler started" << endl;
+    
+    //Termination is initiated
+    if(msg->getType() == TYPE_QUIT){
+        
+        //Reply with final QUITACK
+        Message reply(*msg);
+        reply.setType(TYPE_ACK);
+        reply.setQuit(true);
+        _trns->send(&reply, SERVER_TIMEOUT_SEND);
+        return true;
+    }
+    return false;
 }

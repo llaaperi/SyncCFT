@@ -49,7 +49,7 @@ public:
     void createSessionKey(unsigned char* nonce1, unsigned char* nonce2, unsigned char* secretKey);
     const unsigned char* getSessionKey() {return _sessionKey;}
 
-    void newMessage(const Message* msg);
+    bool newMessage(const Message* msg);
     
 private:
     // Rule of three
@@ -63,6 +63,7 @@ private:
     void descrHandler(const Message* msg);
     void getHandler(const Message* msg);
     void fileHandler(const Message* msg);
+    bool quitHandler(const Message* msg);
     
     void sendNack(const Message* msg);
     void sendAck(const Message* msg);
