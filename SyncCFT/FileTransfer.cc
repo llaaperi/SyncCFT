@@ -95,22 +95,20 @@ void FileTransfer::writeRecvListToFile(){
 bool FileTransfer::recvFile(const Message* msg){
     
     //Accept only FILE messages
-    if(msg->getType() != TYPE_FILE){
+    // TODO: Check that value is within the window (also over)
+    if((msg->getType() != TYPE_FILE) || (msg->getChunk() <= _chunkCurrent)){
         return false;
     }
     
     //Copy received message and put it in reception queue
     Message *recvMsg = new Message(*msg);
+
+    
     recvMsg->setPayload(msg->getPayload(), msg->getPayloadLength());
     _recvList.push_back(recvMsg);
     
-    //Calculate last expected chunk number within reception window
-    uint16_t lastChunknum = _chunkCurrent + msg->getWindow();
-    if (lastChunknum > _chunkEnd) {
-        lastChunknum = _chunkEnd;
-    }
     
-    cout << " chunkCurrent: " << _chunkCurrent << ", lastChunk: " << lastChunknum << ", isLast: " << recvMsg->isLast() << ", Chunk: " << recvMsg->getChunk() << endl;
+    cout << " chunkCurrent: " << _chunkCurrent << ", isFirst: " << recvMsg->isFirst() << ", isLast: " << recvMsg->isLast() << ", Chunk: " << recvMsg->getChunk() << endl;
     
     //Check if last message of the window is received and the window is received correctly
     if(recvFinish()){
@@ -143,6 +141,7 @@ bool FileTransfer::recvFinish(){
     //Check that rest of the messages are received 
     cout << "[TRANSFER] Recv List: (size " << _recvList.size() << ")" << endl;
     uint32_t currentSeq = _seqCurrent + 1;
+    uint16_t receivedWindows = 0;
     for(Message *msg : _recvList){
         
         cout << "seqnum=" << msg->getSeqnum() << "(" << currentSeq << "), chunk=" << msg->getChunk() << endl;
@@ -150,7 +149,21 @@ bool FileTransfer::recvFinish(){
             cout << "[TRANSFER] Packet missing from window" << endl;
             return false;
         }
+        if (msg->isLast()) {
+            ++receivedWindows;
+        }
     }
+    // Check that first and last packets of chunk has been received
+    if (!_recvList.front()->isFirst() || !_recvList.back()->isLast()) {
+        return false; 
+    }
+    
+    // Check that all chunks have been received
+    if (receivedWindows < _recvList.front()->getWindow() &&
+        _recvList.back()->getChunk() != _chunkEnd) {
+        return false;
+    }
+    
     cout << "[TRANSFER] All packets found" << endl;
 
     Message reply(*_recvList.back());
