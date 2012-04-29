@@ -15,7 +15,7 @@
 #define STATE_LOST 0
 #define STATE_NOT_LOST 1
 
-#define DEFAULT_KEYFILE ".sync.cft.key"
+#define DEFAULT_KEYFILE "sync.cft.key"
 
 
 using namespace std;

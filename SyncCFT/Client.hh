@@ -39,10 +39,13 @@ class Client {
     Transceiver* _trns;
     FileTransfer* _fFlow;
     
+    struct addrinfo* _serverInfo;
+
+    
 public:
     
     Client(list<string>& hosts, string cport, string sport) throw(invalid_argument, runtime_error);
-    ~Client() {}
+    ~Client();
     
     /*
      * Start thread for handling clients
@@ -60,6 +63,8 @@ public:
     static void* handle(void* arg);
     
     void synchronize(MetaFile file);
+    
+    sockaddr* getSockAddr(){return _serverInfo->ai_addr;}
     
     
 private:
