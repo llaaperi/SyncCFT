@@ -81,7 +81,7 @@ private:
     bool terminateHandler(sockaddr servAddr);
     void metafileHandler(sockaddr servAddr, MetaFile** diff);
     void fileTransfer(sockaddr servAddr, MetaFile* diff);
-    bool compliteFileTransfer(Message* msg, bool first);
+    bool completeFileTransfer(Message* msg, bool first);
 
 };
 

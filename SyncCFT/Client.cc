@@ -117,7 +117,7 @@ void* Client::handle(void* arg)
         //Terminate session
         handler->endSession(*sockAddr);
         
-        sleep(CLIENT_BACKOFF); //TEMPORARILY HERE
+        sleep(CLIENT_REFRESH); //TEMPORARILY HERE
     }
     return 0;
 }
@@ -229,7 +229,7 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
             continue;
         }
         
-        if (compliteFileTransfer(&msg, firstFile)) {
+        if (completeFileTransfer(&msg, firstFile)) {
             cout << "[CLIENT] Completed file" << endl;
         } else {
             cout << "[CLIENT] Failed to complete file" << endl;
@@ -240,12 +240,12 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
 }
 
 /**
- * Complite single file transfer
+ * Complete single file transfer
  * @msg Message to begin the transfer session from
  * @first Is the first message type FILE
  * @return Success status of the file transfer
  **/
-bool Client::compliteFileTransfer(Message* msg, bool first) {
+bool Client::completeFileTransfer(Message* msg, bool first) {
     
     bool ready = false;
     int tries = 0;
