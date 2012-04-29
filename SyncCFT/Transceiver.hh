@@ -15,6 +15,16 @@
 
 using namespace std;
 
+/**
+ * TODO: - Class has to support multiple parallel sessions
+ *       - Class has to perform message authentication
+ *
+ * IDEAS: - Create an individual receive buffer for each session (client ID,
+ *          struct sockaddr) -> if received packet doesn't belong to own
+ *          session, save it to the correct receive buffer
+ *
+ **/
+
 class Transceiver {
     int _socket;
     struct sockaddr _cliAddr;

@@ -204,7 +204,7 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
         while(!_trns->recv(&msg, CLIENT_TIMEOUT_ACK)) {
             // Send new GET    
             _trns->send(&msg, CLIENT_TIMEOUT_SEND);
-            if (tries++ > CLIENT_RETRIES) {
+            if (++tries > CLIENT_RETRIES) {
                 cout << "[CLIENT] Unable to receive reply to GET" << endl;
                 return;
             }

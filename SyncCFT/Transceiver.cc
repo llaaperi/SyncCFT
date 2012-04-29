@@ -35,7 +35,8 @@ bool Transceiver::recv(Message* msg, int timeout){
     if(!recvMsg(_socket, msg, &srcAddr, timeout)){
         return false;
     }
-    
+    // TODO: Doesn't work with multiple parallel communications with multiple
+    //       different hosts
     //Check source
     if(!Networking::cmpAddr(&srcAddr, &_cliAddr)){
         return false;
