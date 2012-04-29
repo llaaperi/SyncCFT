@@ -21,9 +21,9 @@
 #define CLIENT_TIMEOUT_HELLO 5000
 #define CLIENT_TIMEOUT_HELLOACK 5000
 #define CLIENT_TIMEOUT_QUIT 5000
-#define CLIENT_TIMEOUT_BACKOFF 5000
 #define CLIENT_TIMEOUT_FILE 500
 #define CLIENT_RETRIES 5
+#define CLIENT_BACKOFF 2 // Timeout in seconds
 
 using namespace std;
 

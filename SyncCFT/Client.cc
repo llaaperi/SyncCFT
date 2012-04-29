@@ -118,7 +118,7 @@ void* Client::handle(void* arg)
         //Terminate session
         handler->endSession(*sockAddr);
         
-        sleep(CLIENT_TIMEOUT_BACKOFF); //TEMPORARILY HERE
+        sleep(CLIENT_BACKOFF); //TEMPORARILY HERE
     }
     return 0;
 }
@@ -281,8 +281,8 @@ void Client::startSession(sockaddr servAddr){
         if(started){
             cout << "[CLIENT] Session started succesfully" << endl;
         }else{
-            cout << "[CLIENT] Session start failed, retrying in " << CLIENT_TIMEOUT_BACKOFF << " seconds" << endl;
-            sleep(CLIENT_TIMEOUT_BACKOFF);
+            cout << "[CLIENT] Session start failed, retrying in " << CLIENT_BACKOFF << " seconds" << endl;
+            sleep(CLIENT_BACKOFF);
         }
     }while(!started);
 }
@@ -301,8 +301,8 @@ void Client::endSession(sockaddr servAddr){
         if(terminated){
             cout << "[CLIENT] Session terminated succesfully" << endl;
         }else{
-            cout << "[CLIENT] Session termination failed, retrying in " << CLIENT_TIMEOUT_BACKOFF << " seconds" << endl;
-            sleep(CLIENT_TIMEOUT_BACKOFF);
+            cout << "[CLIENT] Session termination failed, retrying in " << CLIENT_BACKOFF << " seconds" << endl;
+            sleep(CLIENT_BACKOFF);
         }
     }while(!terminated);
 }

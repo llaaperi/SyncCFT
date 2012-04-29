@@ -48,7 +48,7 @@ bool Utilities::packetLost(int state, double p, double q) {
     }
     
     double randomValue = (double)rand()/(double)RAND_MAX;
-    cout << "Random value: " << randomValue << endl;
+    //cout << "Random value: " << randomValue << endl;
     
     if (state == STATE_LOST) {
         if (randomValue < q)
