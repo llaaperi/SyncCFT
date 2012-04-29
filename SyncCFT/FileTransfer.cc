@@ -157,11 +157,11 @@ bool FileTransfer::recvFinish(){
         
         cout << "seqnum=" << msg->getSeqnum() << "(" << currentSeq << "), chunk=" << msg->getChunk() << endl;
         if(msg->getSeqnum() != currentSeq++){
-            cout << "Packet missing" << endl;
+            cout << "[TRANSFER] Packet missing from window" << endl;
             return false;
         }
     }
-    cout << "All packets found" << endl;
+    cout << "[TRANSFER] All packets found" << endl;
 
     Message reply(*_recvList.back());
     reply.setType(TYPE_ACK);

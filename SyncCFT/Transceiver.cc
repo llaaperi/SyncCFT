@@ -79,13 +79,22 @@ bool Transceiver::recvMsg(int socket, Message* msg, struct sockaddr* srcAddr, in
         return false;
     }
     
-    int recvLen = Networking::receivePacket(socket, recvBuffer, srcAddr, timeout);
+    bool first = true;
+    int recvLen = 0;
+    do{
+        
+        if(!first){
+            cout << "Markov process packet loss" << endl;
+        }
+        first = false;
+        
+        recvLen = Networking::receivePacket(socket, recvBuffer, srcAddr, timeout);
+        
+        if(recvLen <= 0){
+            return false;
+        }
     
-    //Markov packet loss
-    if(Utilities::isPacketLost()){
-        cout << "Markov process packet loss" << endl;
-        return false;
-    }
+    }while(Utilities::isPacketLost());
     
     msg->setAddr(*srcAddr);
     

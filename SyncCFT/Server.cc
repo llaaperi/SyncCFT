@@ -110,6 +110,9 @@ void* Server::handle(void* arg){
             cout << "[SERVER] Packet discarded" << endl;
             msg.printInfo();
         }
+        
+        
+        
     }
     return 0;
 }
