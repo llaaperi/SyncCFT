@@ -16,6 +16,9 @@
 #include <openssl/sha.h>
 #include <openssl/rand.h>
 
+double _markov_p = 0, _markov_q = 0;
+
+
 int Utilities::split(string str, string separator, vector<string>& results) {
     results.clear();
     unsigned long found = str.find_first_of(separator);
@@ -37,31 +40,72 @@ int Utilities::split(string str, string separator, vector<string>& results) {
 
 
 /*
+ *
+ */
+void Utilities::initMarkov(const string& p, const string& q){
+    
+    double p_val = atof(p.c_str());
+    double q_val = atof(q.c_str());
+    
+    //Only q is defined -> set p to same value
+    if(p_val < 0 && q_val > 0){
+        p_val = q_val;
+    }
+    
+    //Only p is defined -> set q to same value
+    if(q_val < 0 && p_val > 0){
+        q_val = p_val;
+    }
+    
+    //If p < 0, so is q and both will be initialized to 0
+    if(p_val < 0){
+        p_val = 0; q_val = 0;
+    }
+    
+    //Check that values do not exceed 1.0
+    if(p_val > 1.0){
+        p_val = 1.0;
+    }
+    
+    if(q_val > 1.0){
+        q_val = 1.0;
+    }
+    
+    _markov_p = p_val;
+    _markov_q = q_val;
+    
+    cout << "Markov process initialized with values p=" << _markov_p << " q=" << _markov_q << endl;
+}
+
+
+/*
  * Markov process
  */
-bool Utilities::packetLost(int state, double p, double q) {
+bool Utilities::isPacketLost() {
     
-    static bool init = true;
+    //cout << "Calculate packet loss p=" << _markov_p << " q=" << _markov_q << endl;  
+    
+    static bool init = true, state = STATE_NOT_LOST;
     if (init) { 
         srand((unsigned int)time(0));
         init = false;
     }
     
     double randomValue = (double)rand()/(double)RAND_MAX;
-    cout << "Random value: " << randomValue << endl;
     
     if (state == STATE_LOST) {
-        if (randomValue < q)
+        if (randomValue < _markov_q)
             return true;
         else 
             return false;
     } else {
-        if (randomValue < p)
+        if (randomValue < _markov_p)
             return true;
         else
             return false;
     }
 }
+
 
 /* Calculates a 32-byte SHA256 hash from the given data
  * @ptr A buffer where to store the hash
@@ -117,7 +161,7 @@ void Utilities::getSecretKey(unsigned char* ptr, int len, const char* fName) {
         keyFile = fopen(fName, "r");
     }
     if (keyFile != NULL) {
-        readBytes = fread(ptr, 1, len, keyFile);
+        readBytes = (int)fread(ptr, 1, len, keyFile);
         if (readBytes != len) {
             cout << "[MAIN] Failed to load old keyfile" << endl;
         } else {

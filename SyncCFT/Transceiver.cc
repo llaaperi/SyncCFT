@@ -81,6 +81,12 @@ bool Transceiver::recvMsg(int socket, Message* msg, struct sockaddr* srcAddr, in
     
     int recvLen = Networking::receivePacket(socket, recvBuffer, srcAddr, timeout);
     
+    //Markov packet loss
+    if(Utilities::isPacketLost()){
+        cout << "Markov process packet loss" << endl;
+        return false;
+    }
+    
     msg->setAddr(*srcAddr);
     
     // Parse message and discard invalid packets

@@ -24,8 +24,8 @@ int main (int argc, const char * argv[])
     //Default values
     string cport = "5063";
     string sport = "5062";
-    string p = "0";
-    string q = "0";
+    string p = ".5";  //Init as not set
+    string q = "-1.0";  //Init as not set
     list<string> hosts;
     bool newSecret = false;
     
@@ -96,6 +96,8 @@ int main (int argc, const char * argv[])
     }
     Utilities::getSecretKey(secretKey, 512, fName);
     
+    //Init markov process
+    Utilities::initMarkov(p, q);
     
     //Print folder info
     MetaFile mFile(METAFILE);
@@ -116,6 +118,7 @@ int main (int argc, const char * argv[])
         }
     }
     
+    Utilities::isPacketLost();
     
     // Pass reference to client object to the server
     // Start client first
