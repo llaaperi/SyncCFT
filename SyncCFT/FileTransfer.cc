@@ -178,16 +178,24 @@ bool FileTransfer::recvFinish(){
 
 
 /*
- *
+ * Called when packet(s) are lost
  */
 void FileTransfer::recvTimeout(const Message *msg){
-
+    
     Message reply(*msg);
     reply.setType(TYPE_ACK);
     reply.setFirst(false);
     reply.setLast(false);
     reply.setSeqnum(_seqCurrent);
     reply.setChunk(_chunkCurrent);
+    
+    //Reduce window size if packet(s) are lost
+    uint16_t window = msg->getWindow();
+    if(window > 1){
+        --window;
+    }
+    reply.setWindow(window);
+    
     _trns->send(&reply, CLIENT_TIMEOUT_SEND);
 }
 
