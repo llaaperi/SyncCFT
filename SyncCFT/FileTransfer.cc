@@ -109,17 +109,11 @@ bool FileTransfer::recvFile(const Message* msg){
     if (lastChunknum > _chunkEnd) {
         lastChunknum = _chunkEnd;
     }
-    static bool lastChunkReceived = false;
     
-    //Last chunk of current window is received
-    if((recvMsg->getChunk() >= lastChunknum) && recvMsg->isLast()){
-        lastChunkReceived = true;
-    }
-    
-    cout << "lastChunkReceived: " << lastChunkReceived << " chunkCurrent: " << _chunkCurrent << ", lastChunk: " << lastChunknum << ", isLast: " << recvMsg->isLast() << ", Chunk: " << recvMsg->getChunk() << endl;
+    cout << " chunkCurrent: " << _chunkCurrent << ", lastChunk: " << lastChunknum << ", isLast: " << recvMsg->isLast() << ", Chunk: " << recvMsg->getChunk() << endl;
     
     //Check if last message of the window is received and the window is received correctly
-    if(lastChunkReceived && recvFinish()){
+    if(recvFinish()){
             
         cout << "[TRANSFER] Window completed" << endl;
         
@@ -128,12 +122,8 @@ bool FileTransfer::recvFile(const Message* msg){
         //Whole file is received
         if(_chunkCurrent == _chunkEnd){
             cout << "[TRANSFER] Complete file received" << endl;
-            lastChunkReceived = false;
             return true;
         }
-        
-        //Continue reception of subsequent windows
-        lastChunkReceived = false;
     }
 
     return false;
