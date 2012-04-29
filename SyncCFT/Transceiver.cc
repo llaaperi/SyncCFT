@@ -25,7 +25,7 @@ bool Transceiver::send(Message* msg, int timeout){
 /*
  * Function receives message from the client.
  * @return  true if valid message was received from the client, 
- *          false if ivalid message or wrong source.
+ *          false if invalid message or wrong source.
  */
 bool Transceiver::recv(Message* msg, int timeout){
     

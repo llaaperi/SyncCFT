@@ -230,32 +230,48 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
             continue;
         }
         
-        
-        bool ready = false;
-        tries = 0;
-        while(!ready){
-            if(!firstFile && !_trns->recv(&msg, CLIENT_TIMEOUT_ACK)) {
-                cout << "[CLIENT] Wait FILE timeout" << endl;
-                if (tries++ > CLIENT_RETRIES) {
-                    cout << "[CLIENT] Too many retries" << endl;
-                    break;
-                }
-                _fFlow->recvTimeout(&msg);
-                continue;
-            }
-            tries = 0;
-            cout << "[CLIENT] Received file message from Chunk: " << msg.getChunk() << ", Seqnum: " << msg.getSeqnum() << ", Size: " << msg.getPayloadLength() << ", Window size: " << msg.getWindow() << endl;
-            ready = _fFlow->recvFile(&msg);
-            firstFile = false;
+        if (compliteFileTransfer(&msg, firstFile)) {
+            cout << "[CLIENT] Completed file" << endl;
+        } else {
+            cout << "[CLIENT] Failed to complete file" << endl;
         }
+        
         delete(_fFlow);
     }
 }
 
+/**
+ * Complite single file transfer
+ * @msg Message to begin the transfer session from
+ * @first Is the first message type FILE
+ * @return Success status of the file transfer
+ **/
+bool Client::compliteFileTransfer(Message* msg, bool first) {
+    
+    bool ready = false;
+    int tries = 0;
+    while(!ready){
+        if(!first && !_trns->recv(msg, CLIENT_TIMEOUT_ACK)) {
+            cout << "[CLIENT] Wait FILE timeout" << endl;
+            if (tries++ > CLIENT_RETRIES) {
+                cout << "[CLIENT] Too many retries" << endl;
+                return false;
+            }
+            _fFlow->recvTimeout(msg);
+            continue;
+        }
+        tries = 0;
+        cout << "[CLIENT] Received file message from Chunk: " << msg->getChunk() << ", Seqnum: " << msg->getSeqnum() << ", Size: " << msg->getPayloadLength() << ", Window size: " << msg->getWindow() << endl;
+        ready = _fFlow->recvFile(msg);
+        first = false;
+    }
+    return true;
+}
 
-/*
+
+/**
  * Function tries to start session with a server.
- */
+ **/
 void Client::startSession(sockaddr servAddr){
     
     bool started = false;
