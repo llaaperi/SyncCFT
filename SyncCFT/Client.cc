@@ -113,7 +113,6 @@ void* Client::handle(void* arg)
             handler->fileTransfer(*sockAddr, diff);
         }
         
-        sleep(1);
         
         //Terminate session
         handler->endSession(*sockAddr);

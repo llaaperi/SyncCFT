@@ -24,6 +24,7 @@
 #define CLIENT_TIMEOUT_FILE 500
 #define CLIENT_RETRIES 5
 #define CLIENT_BACKOFF 2 // In seconds
+#define CLIENT_REFRESH 60
 
 
 using namespace std;
