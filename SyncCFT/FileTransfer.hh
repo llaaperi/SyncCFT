@@ -50,6 +50,8 @@ class FileTransfer{
     uint32_t _chunkCurrent;
     //uint32_t _chunkAcked;
     
+    uint32_t _sendRate;  //Bytes / s
+    
 public:
     
     FileTransfer(Transceiver* trns, Element file, uint32_t chunkBegin,

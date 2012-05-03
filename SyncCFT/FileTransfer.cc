@@ -25,7 +25,7 @@ FileTransfer::FileTransfer(Transceiver* trns, Element file, uint32_t chunkBegin,
                             _seqBegin(seqnum), _chunkBegin(chunkBegin),
                             _chunkEnd(chunkEnd), _chunkCurrent(chunkBegin),
                             _sendBuffer(NULL), _sendBufferLen(0),
-                            _recvBuffer(NULL), _recvBufferLen(0), _file(NULL) {
+                            _recvBuffer(NULL), _recvBufferLen(0), _file(NULL), _sendRate(1000000) {
                                 
     cout << "[FILE] Transfer created" << endl;
     
@@ -202,9 +202,9 @@ void FileTransfer::recvTimeout(const Message *msg){
     reply.setChunk(_chunkCurrent);
     
     //Reduce window size if packet(s) are lost
-    uint16_t window = msg->getWindow();
-    if(window > 1){
-        --window;
+    uint16_t window = msg->getWindow() / 2;
+    if(window == 0){
+        window = 1;
     }
     reply.setWindow(window);
     
@@ -390,6 +390,9 @@ bool FileTransfer::sendChunk(const char* chunk, uint16_t len, uint16_t window, u
         msg.incrSeqnum();   //Increment seqnum for the next packet
         ++_seqCurrent;
     }
+    
+    double t = (double)CHUNK_SIZE / _sendRate;   //Time needed to send chunk
+    usleep(t * 1000000);
     
     //cout << "[TRANSFER] last payload length " << msg.getPayloadLength() << endl;
     return true;
