@@ -76,6 +76,17 @@ FileTransfer::~FileTransfer(){
 
 
 /*
+ * Clear reception list content
+ */
+void FileTransfer::clearRecvList(){
+    for(Message* ptr: _recvList) {
+        delete(ptr);    //Free message
+    }
+    _recvList.clear();  //Remove all messages from the reception queue
+}
+
+
+/*
  * Write reception list to the file
  */
 void FileTransfer::writeRecvListToFile(){
@@ -83,9 +94,8 @@ void FileTransfer::writeRecvListToFile(){
     // Write data to a temp file and free message
     for(Message* ptr: _recvList) {
         fwrite(ptr->getPayload(), 1, ptr->getPayloadLength(), _file);   //Write message to the file
-        delete(ptr);    //Free message
     }
-    _recvList.clear();  //Remove all messages from the reception queue
+    clearRecvList();    //Clear list
 }
 
 
@@ -132,8 +142,6 @@ bool FileTransfer::recvFile(const Message* msg){
  *
  */
 bool FileTransfer::recvFinish(){
-    
-    cout << "[TRANSFER] Window finished " << endl;
     
     //Sort reveice list according to sequence number
     _recvList.sort(Message::compare_seqnum);
@@ -201,6 +209,8 @@ void FileTransfer::recvTimeout(const Message *msg){
     reply.setWindow(window);
     
     _trns->send(&reply, CLIENT_TIMEOUT_SEND);
+    
+    clearRecvList();    //Clear reception list
 }
 
 

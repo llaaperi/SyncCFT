@@ -75,6 +75,7 @@ private:
     bool sendChunk(const char* chunk, uint16_t len, uint16_t window,
                    uint32_t chunknum, uint32_t seqnum);
     
+    void clearRecvList();
     void writeRecvListToFile();
     
     // Rule of three
