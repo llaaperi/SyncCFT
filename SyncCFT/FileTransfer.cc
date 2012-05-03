@@ -169,6 +169,7 @@ bool FileTransfer::recvFinish(){
     Message reply(*_recvList.back());
     reply.setType(TYPE_ACK);
     reply.setLast(false);
+    reply.setWindow(*_recvList.back()->getWindow() + 1);    //Increment window size after successfull window reception
     reply.setSeqnum(_recvList.back()->getSeqnum());
     reply.setChunk(_recvList.back()->getChunk());
     _trns->send(&reply, CLIENT_TIMEOUT_SEND);
