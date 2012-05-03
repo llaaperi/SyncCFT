@@ -266,7 +266,7 @@ void FileTransfer::recvTimeout(const Message *msg){
     
     _trns->send(&reply, CLIENT_TIMEOUT_SEND);
     
-    recvListClear();    //Clear reception list
+    //recvListClear();    //Clear reception list
 }
 
 
