@@ -186,8 +186,8 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
     for(Element e : elements){
         cout << "[CLIENT] Request file: " << e.getName() << endl;
         
-        msg.initHeader(TYPE_GET);
-		msg.setWindow(2);
+        msg.initHeader(TYPE_GET);   //Create GET message
+		msg.setWindow(1);   //Init window size to 1
         
         char buf[NETWORKING_MTU];
         sprintf(buf, "%s;%d-%d", e.getName().c_str(), 0, 0);

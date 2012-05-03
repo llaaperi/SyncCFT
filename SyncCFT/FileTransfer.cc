@@ -334,7 +334,7 @@ bool FileTransfer::sendWindow(uint16_t size){
     for(int i = 0; i < chunks; i++){
         
         char* ptr = _sendBuffer + (i * CHUNK_SIZE); //Chunk begin
-        uint16_t len = _sendBufferLen - (i * CHUNK_SIZE);   //Calculate chunk size
+        uint32_t len = _sendBufferLen - (i * CHUNK_SIZE);   //Calculate chunk size
         if(len > CHUNK_SIZE){
             len = CHUNK_SIZE;
         }
@@ -392,7 +392,9 @@ bool FileTransfer::sendChunk(const char* chunk, uint16_t len, uint16_t window, u
     }
     
     double t = (double)CHUNK_SIZE / _sendRate;   //Time needed to send chunk
-    usleep(t * 1000000);
+    uint32_t delay = t * 1000000;
+    //cout << "[TRANSFER] Send delay (us): " << delay << endl;
+    usleep(delay);
     
     //cout << "[TRANSFER] last payload length " << msg.getPayloadLength() << endl;
     return true;

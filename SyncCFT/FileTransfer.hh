@@ -34,9 +34,9 @@ class FileTransfer{
     
     FILE* _file;
     char* _sendBuffer;
-    unsigned long _sendBufferLen;
+    uint32_t _sendBufferLen;
     char* _recvBuffer;
-    unsigned long _recvBufferLen;
+    uint32_t _recvBufferLen;
     
     list<Message*> _recvList;
     
