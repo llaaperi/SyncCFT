@@ -255,7 +255,7 @@ bool Client::completeFileTransfer(Message* msg, bool first) {
     int tries = 0;
     while(!ready){
         
-        if(!first && !_trns->recv(msg, (int)timeout)) {
+        if(!first && !_trns->recv(msg, 100)) {
             cout << "[CLIENT] Wait FILE timeout" << endl;
             if (tries++ > CLIENT_RETRIES) {
                 cout << "[CLIENT] Too many retries" << endl;
