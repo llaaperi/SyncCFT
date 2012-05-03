@@ -227,6 +227,8 @@ bool FileTransfer::recvFinish(){
     reply.setSeqnum(_recvList.back()->getSeqnum());
     reply.setChunk(_recvList.back()->getChunk());
     _trns->send(&reply, CLIENT_TIMEOUT_SEND);
+    cout << "[CLIENT] Client ACK: Chunk: " << reply.getChunk() << ", Seqnum: " << reply.getSeqnum() << endl; 
+
     
     _chunkCurrent = _recvList.back()->getChunk();   //Set _chunkCurrent to last received chunk
     _seqCurrent = _recvList.back()->getSeqnum();    //Set _seqCurrent to last received seqnum
@@ -265,6 +267,7 @@ void FileTransfer::recvTimeout(const Message *msg){
     reply.setWindow(window);
     
     _trns->send(&reply, CLIENT_TIMEOUT_SEND);
+    cout << "[CLIENT] Client ACK: Chunk: " << reply.getChunk() << ", Seqnum: " << reply.getSeqnum() << endl; 
     
     //recvListClear();    //Clear reception list
 }
