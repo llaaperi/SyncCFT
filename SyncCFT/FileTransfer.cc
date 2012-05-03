@@ -208,8 +208,13 @@ bool FileTransfer::recvFinish(){
     int receivedChunks = getReceivedChunks(&last);
     cout << "[TRANSFER] Received chunks: " << receivedChunks << ", Window: " << _window << endl;
     
+    //Check that some chunks are received
+    if(receivedChunks == 0){
+        return false;
+    }
+    
     // Check that all chunks have been received
-    if (receivedChunks < _window && _recvList.back()->getChunk() != _chunkEnd) {
+    if(receivedChunks < _window && _recvList.back()->getChunk() != _chunkEnd) {
         return false;
     }
     
