@@ -334,17 +334,17 @@ bool FileTransfer::sendFile(const Message* msg){
     //Handle FILE ACK's
     if(msg->getType() == TYPE_ACK){
         
-        cout << "[TRANSFER] Client ACKed chunk " << msg->getChunk() << endl;
+        cout << "[TRANSFER] Client ACKed chunk " << msg->getChunk() << " Seqnum=" << msg->getSeqnum() << endl;
         
         //Check if whole file has been trasmitted
         if(msg->getChunk() >= _chunkEnd){
-            cout << "[TRASFER] All chunks ACKed: ACK=" << msg->getChunk() << " Current=" << _chunkCurrent << " End=" << _chunkEnd << endl;
+            cout << "[TRASFER] All chunks ACKed: ACK=" << msg->getChunk() << " Current=" << _chunkCurrent << " End=" << _chunkEnd << " Seqnum=" << msg->getSeqnum() << endl;
             return true;
         }
                 
         //Packet is lost
         if(msg->getChunk() < _chunkCurrent){
-            cout << "[TRANSFER] Packet lost: ACK=" << msg->getChunk() << " Current=" << _chunkCurrent << " End=" << _chunkEnd << endl;
+            cout << "[TRANSFER] Packet lost: ACK=" << msg->getChunk() << " Current=" << _chunkCurrent << " End=" << _chunkEnd << " Seqnum=" << msg->getSeqnum() << endl;
             //long int offset = ((_chunkCurrent - 1) - msg->getChunk()) * CHUNK_SIZE; //((curr - 1) - ack) * CSIZE 
             long int offset = msg->getChunk() * CHUNK_SIZE;
             
@@ -423,14 +423,14 @@ bool FileTransfer::sendChunk(const char* chunk, uint16_t len, uint16_t window, u
     msg.setFirst(true);
     while(len > 0){
     
-        cout << "[TRANSFER] message " << _seqCurrent << " sent from chunk " << chunknum << endl;
+        cout << "[TRANSFER] message " << msg.getSeqnum() << " sent from chunk " << msg.getChunk() << endl;
         
         //Send full packet
         if(len > MESSAGE_MTU){
             
             msg.setPayload(chunk, MESSAGE_MTU);
             _trns->send(&msg, SERVER_TIMEOUT_SEND);
-            
+            msg.incrSeqnum();   //Increment seqnum for the next packet
             msg.setFirst(false);
             
             len -= MESSAGE_MTU; //Decrement remaining length
@@ -442,10 +442,8 @@ bool FileTransfer::sendChunk(const char* chunk, uint16_t len, uint16_t window, u
             _trns->send(&msg, SERVER_TIMEOUT_SEND);
             break;
         }
-        
-        msg.incrSeqnum();   //Increment seqnum for the next packet
-        ++_seqCurrent;
     }
+    _seqCurrent = msg.getSeqnum();
     
     double t = (double)CHUNK_SIZE / _sendRate;   //Time needed to send chunk
     uint32_t delay = t * 1000000;
