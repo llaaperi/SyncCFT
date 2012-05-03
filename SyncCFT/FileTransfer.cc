@@ -89,11 +89,16 @@ void FileTransfer::recvListClear(){
 /*
  * Write reception list to the file
  */
-void FileTransfer::writeRecvListToFile(){
+void FileTransfer::writeRecvListToFile(const Message* last){
     
     // Write data to a temp file and free message
     for(Message* ptr: _recvList) {
         fwrite(ptr->getPayload(), 1, ptr->getPayloadLength(), _file);   //Write message to the file
+        
+        if((last != NULL) && (last == ptr)){
+            break;
+        }
+        
     }
     recvListClear();    //Clear list
 }
@@ -151,7 +156,7 @@ bool FileTransfer::recvFile(const Message* msg){
             
         cout << "[TRANSFER] Window completed" << endl;
         
-        writeRecvListToFile();  //Write completed window to file
+        writeRecvListToFile(NULL);  //Write completed window to file
         
         //Whole file is received
         if(_chunkCurrent == _chunkEnd){
@@ -237,6 +242,7 @@ void FileTransfer::recvTimeout(const Message *msg){
     if(receivedChunks > 0){
         _seqCurrent = last->getSeqnum();
         _chunkCurrent = last->getChunk();
+        writeRecvListToFile(last);  //Write completed chunks to file
     }
     
     Message reply(*msg);

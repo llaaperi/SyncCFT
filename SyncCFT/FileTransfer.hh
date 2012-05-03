@@ -80,7 +80,7 @@ private:
     
     int getReceivedChunks(Message** last);
     
-    void writeRecvListToFile();
+    void writeRecvListToFile(const Message* last);
     void recvListAdd(Message* msg);
     void recvListClear();
     
