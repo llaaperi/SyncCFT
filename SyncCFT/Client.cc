@@ -247,10 +247,15 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
  **/
 bool Client::completeFileTransfer(Message* msg, bool first) {
     
+    Timer tmr;
+    tmr.start();
+    long timeout = CLIENT_TIMEOUT_FILE;
+    
     bool ready = false;
     int tries = 0;
     while(!ready){
-        if(!first && !_trns->recv(msg, CLIENT_TIMEOUT_FILE)) {
+        
+        if(!first && !_trns->recv(msg, (int)timeout)) {
             cout << "[CLIENT] Wait FILE timeout" << endl;
             if (tries++ > CLIENT_RETRIES) {
                 cout << "[CLIENT] Too many retries" << endl;
@@ -260,6 +265,13 @@ bool Client::completeFileTransfer(Message* msg, bool first) {
             continue;
         }
         tries = 0;
+        
+        long ms = tmr.elapsed_ms();
+        timeout = ms * 3;   //TODO moving average
+        cout << "[CLIENT] Inter-arrival time (ms): " << ms << endl;
+        
+        tmr.start();
+        
         cout << "[CLIENT] Received file message from Chunk: " << msg->getChunk() << ", Seqnum: " << msg->getSeqnum() << ", Size: " << msg->getPayloadLength() << ", Window size: " << msg->getWindow() << endl;
         ready = _fFlow->recvFile(msg);
         first = false;

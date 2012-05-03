@@ -13,6 +13,7 @@
 #include "FileTransfer.hh"
 #include "Metafile.hh"
 #include "Message.hh"
+#include "Timer.hh"
 #include <stdexcept>
 
 //Timeouts in milliseconds
