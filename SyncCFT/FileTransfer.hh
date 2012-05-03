@@ -41,6 +41,7 @@ class FileTransfer{
     list<Message*> _recvList;
     
     uint16_t _window;
+    
     uint32_t _seqBegin;
     uint32_t _seqEnd;
     uint32_t _seqCurrent;
@@ -77,8 +78,11 @@ private:
     bool sendChunk(const char* chunk, uint16_t len, uint16_t window,
                    uint32_t chunknum, uint32_t seqnum);
     
-    void clearRecvList();
+    int getReceivedChunks(Message** last);
+    
     void writeRecvListToFile();
+    void recvListAdd(Message* msg);
+    void recvListClear();
     
     // Rule of three
     FileTransfer(FileTransfer const& other);

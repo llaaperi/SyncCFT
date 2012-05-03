@@ -21,7 +21,7 @@
 FileTransfer::FileTransfer(Transceiver* trns, Element file, uint32_t chunkBegin,
                            uint32_t chunkEnd , int seqnum, int type)
                             throw(std::runtime_error) : 
-                            _trns(trns), _element(file), _seqCurrent(seqnum),
+                            _trns(trns), _element(file), _window(1), _seqCurrent(seqnum),
                             _seqBegin(seqnum), _chunkBegin(chunkBegin),
                             _chunkEnd(chunkEnd), _chunkCurrent(chunkBegin),
                             _sendBuffer(NULL), _sendBufferLen(0),
@@ -78,7 +78,7 @@ FileTransfer::~FileTransfer(){
 /*
  * Clear reception list content
  */
-void FileTransfer::clearRecvList(){
+void FileTransfer::recvListClear(){
     for(Message* ptr: _recvList) {
         delete(ptr);    //Free message
     }
@@ -95,7 +95,33 @@ void FileTransfer::writeRecvListToFile(){
     for(Message* ptr: _recvList) {
         fwrite(ptr->getPayload(), 1, ptr->getPayloadLength(), _file);   //Write message to the file
     }
-    clearRecvList();    //Clear list
+    recvListClear();    //Clear list
+}
+
+
+/*
+ *
+ */
+void FileTransfer::recvListAdd(Message* msg){
+    
+    //Sort reveice list according to sequence number
+    _recvList.sort(Message::compare_seqnum);
+    
+    for(Message* ptr : _recvList){
+    
+        if(msg->getSeqnum() == ptr->getSeqnum()){   //Discard duplicates
+            delete(msg);
+            return;
+        }
+        
+        if(msg->getSeqnum() < ptr->getSeqnum()){    //Skip rest of the list bcause message should be before ptr
+            break;
+        }
+    
+    }
+    
+    _recvList.push_back(msg);
+    _recvList.sort(Message::compare_seqnum);
 }
 
 
@@ -110,13 +136,13 @@ bool FileTransfer::recvFile(const Message* msg){
         return false;
     }
     
+    //Set current window
+    _window = msg->getWindow();
+    
     //Copy received message and put it in reception queue
     Message *recvMsg = new Message(*msg);
-
-    
     recvMsg->setPayload(msg->getPayload(), msg->getPayloadLength());
-    _recvList.push_back(recvMsg);
-    
+    recvListAdd(recvMsg);
     
     cout << " chunkCurrent: " << _chunkCurrent << ", isFirst: " << recvMsg->isFirst() << ", isLast: " << recvMsg->isLast() << ", Chunk: " << recvMsg->getChunk() << endl;
     
@@ -141,33 +167,43 @@ bool FileTransfer::recvFile(const Message* msg){
 /*
  *
  */
-bool FileTransfer::recvFinish(){
-    
+int FileTransfer::getReceivedChunks(Message** last){
+
     //Sort reveice list according to sequence number
     _recvList.sort(Message::compare_seqnum);
+
+    cout << "[TRANSFER] Recv List: (size " << _recvList.size() << ")" << endl;
     
     //Check that rest of the messages are received 
-    cout << "[TRANSFER] Recv List: (size " << _recvList.size() << ")" << endl;
     uint32_t currentSeq = _seqCurrent + 1;
-    uint16_t receivedWindows = 0;
+    uint16_t receivedChunks = 0;
     for(Message *msg : _recvList){
         
         cout << "seqnum=" << msg->getSeqnum() << "(" << currentSeq << "), chunk=" << msg->getChunk() << endl;
+        
         if(msg->getSeqnum() != currentSeq++){
             cout << "[TRANSFER] Packet missing from window" << endl;
-            return false;
+            return receivedChunks;
         }
-        if (msg->isLast()) {
-            ++receivedWindows;
+        if(msg->isLast()) {
+            ++receivedChunks;
+            *last = msg;
         }
     }
-    // Check that first and last packets of chunk has been received
-    if (!_recvList.front()->isFirst() || !_recvList.back()->isLast()) {
-        return false; 
-    }
+    return receivedChunks;
+}
+
+
+/*
+ *
+ */
+bool FileTransfer::recvFinish(){
+    
+    Message* last;
+    int receivedChunks = getReceivedChunks(&last);
     
     // Check that all chunks have been received
-    if (receivedWindows < _recvList.front()->getWindow() &&
+    if (receivedChunks < _recvList.front()->getWindow() &&
         _recvList.back()->getChunk() != _chunkEnd) {
         return false;
     }
@@ -177,7 +213,7 @@ bool FileTransfer::recvFinish(){
     Message reply(*_recvList.back());
     reply.setType(TYPE_ACK);
     reply.setLast(false);
-    reply.setWindow(_recvList.back()->getWindow() + 1);    //Increment window size after successfull window reception
+    reply.setWindow(_window + 1);    //Increment window size after successfull window reception
     reply.setSeqnum(_recvList.back()->getSeqnum());
     reply.setChunk(_recvList.back()->getChunk());
     _trns->send(&reply, CLIENT_TIMEOUT_SEND);
@@ -193,6 +229,15 @@ bool FileTransfer::recvFinish(){
  * Called when packet(s) are lost
  */
 void FileTransfer::recvTimeout(const Message *msg){
+    
+    Message* last;
+    int receivedChunks = getReceivedChunks(&last);
+    
+    // Check that all chunks have been received
+    if(receivedChunks > 0){
+        _seqCurrent = last->getSeqnum();
+        _chunkCurrent = last->getChunk();
+    }
     
     Message reply(*msg);
     reply.setType(TYPE_ACK);
@@ -210,7 +255,7 @@ void FileTransfer::recvTimeout(const Message *msg){
     
     _trns->send(&reply, CLIENT_TIMEOUT_SEND);
     
-    clearRecvList();    //Clear reception list
+    recvListClear();    //Clear reception list
 }
 
 
