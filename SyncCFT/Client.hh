@@ -23,7 +23,8 @@
 #define CLIENT_TIMEOUT_HELLOACK 5000
 #define CLIENT_TIMEOUT_QUIT 5000
 #define CLIENT_TIMEOUT_FILE 5000
-#define CLIENT_RETRIES 5
+#define CLIENT_CHUNK_RETRIES 5 // Max chunk retries
+#define CLIENT_QUIT_RETRIES 3 // Max quit retries
 #define CLIENT_BACKOFF 2 // In seconds
 #define CLIENT_REFRESH 60
 
