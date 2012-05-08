@@ -233,6 +233,8 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
             cout << "[CLIENT] Completed file" << endl;
         } else {
             cout << "[CLIENT] Failed to complete file" << endl;
+            delete(_fFlow);
+            return; // Terminate session
         }
         
         delete(_fFlow);
