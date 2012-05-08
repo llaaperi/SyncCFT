@@ -270,9 +270,7 @@ void FileTransfer::recvTimeout(const Message *msg){
     reply.setWindow(window);
     
     _trns->send(&reply, CLIENT_TIMEOUT_SEND);
-    cout << "[TRANSFER] Client ACK: Chunk: " << reply.getChunk() << ", Seqnum: " << reply.getSeqnum() << endl; 
-    
-    //recvListClear();    //Clear reception list
+    cout << "[CLIENT] Client ACK: Chunk: " << reply.getChunk() << ", Seqnum: " << reply.getSeqnum() << endl; 
 }
 
 
