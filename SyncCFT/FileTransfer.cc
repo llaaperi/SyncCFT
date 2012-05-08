@@ -182,7 +182,7 @@ bool FileTransfer::recvFile(const Message* msg){
  *
  */
 bool FileTransfer::fileFinish(){
-    
+    fclose(_file); // Close output file
     string fileHash;
     string tmpName = _element.getName() + ".tmp"; 
     if(!Utilities::MD5Hash(tmpName, fileHash)){
@@ -195,7 +195,7 @@ bool FileTransfer::fileFinish(){
         return false;
     }
     
-    if(!rename(tmpName.c_str(), _element.getName().c_str())){
+    if(rename(tmpName.c_str(), _element.getName().c_str())){
         cout << "[TRANSFER] Renaming file " << tmpName << " failed" << endl;
         return false;
     }

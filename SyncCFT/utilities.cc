@@ -130,7 +130,7 @@ bool Utilities::MD5Hash(string const& filename, string& hash) {
     struct stat stats;
     stat(filename.c_str(), &stats);
     
-    //cout << "Length = " << length << ", statsLen = " << stats.st_size << endl;
+    //cout << "[UTILITIES] StatsLen = " << stats.st_size << endl;
     
     // Map file to memory
     fileBuf = (char*)mmap(0, stats.st_size, PROT_READ, MAP_SHARED, fd, 0);
