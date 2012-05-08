@@ -33,12 +33,12 @@ class FileTransfer{
     Transceiver* _trns;
     
     FILE* _file;
+    
     char* _sendBuffer;
     uint32_t _sendBufferLen;
-    char* _recvBuffer;
-    uint32_t _recvBufferLen;
-    
     list<Message*> _recvList;
+    
+    FILE* _outFile;
     
     uint16_t _window;
     

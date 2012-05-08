@@ -25,7 +25,7 @@ FileTransfer::FileTransfer(Transceiver* trns, Element file, uint32_t chunkBegin,
                             _seqBegin(seqnum), _chunkBegin(chunkBegin),
                             _chunkEnd(chunkEnd), _chunkCurrent(chunkBegin),
                             _sendBuffer(NULL), _sendBufferLen(0),
-                            _recvBuffer(NULL), _recvBufferLen(0), _file(NULL), _sendRate(1000000) {
+                            _file(NULL), _sendRate(1000000) {
                                 
     cout << "[FILE] Transfer created" << endl;
     
@@ -49,6 +49,8 @@ FileTransfer::FileTransfer(Transceiver* trns, Element file, uint32_t chunkBegin,
     } else {
         // Open file for reading
         _file = fopen(_element.getName().c_str(), "r");
+        //string fName = _element.getName() + ".tmp";
+        //_outFile = fopen(fName.c_str(), "w");
     }
     
     if(_file == NULL){
@@ -69,9 +71,6 @@ FileTransfer::~FileTransfer(){
     if(_sendBuffer != NULL){
         free(_sendBuffer);
     }
-    if(_recvBuffer != NULL){
-        free(_recvBuffer);
-    }
 }
 
 
@@ -91,11 +90,16 @@ void FileTransfer::recvListClear(){
  */
 void FileTransfer::writeRecvListToFile(const Message* last){
     
+    //cout << "[TRANSFER] Writing received chunks to a file" << endl;
+    
     // Write data to a temp file and free message
-    for(Message* ptr: _recvList) {
+    for(Message* ptr : _recvList) {
+        
+        cout << "[TRANSFER] Writing chunk " << ptr->getChunk() << " with seqnum of " << ptr->getSeqnum() << " to a file." << endl;
+        
         fwrite(ptr->getPayload(), 1, ptr->getPayloadLength(), _file);   //Write message to the file
         
-        if((last != NULL) && (last == ptr)){
+        if(last == ptr){
             break;
         }
         
@@ -156,7 +160,7 @@ bool FileTransfer::recvFile(const Message* msg){
             
         cout << "[TRANSFER] Window completed" << endl;
         
-        writeRecvListToFile(NULL);  //Write completed window to file
+        writeRecvListToFile(_recvList.back());  //Write completed window to file
         
         //Whole file is received
         if(_chunkCurrent == _chunkEnd){
@@ -351,7 +355,7 @@ bool FileTransfer::sendFile(const Message* msg){
             //long int offset = ((_chunkCurrent - 1) - msg->getChunk()) * CHUNK_SIZE; //((curr - 1) - ack) * CSIZE 
             long int offset = msg->getChunk() * CHUNK_SIZE;
             
-            cout << "[TRANSFER] File pointer rewinded by " << offset << endl;
+            cout << "[TRANSFER] File pointer set to " << offset << endl;
             if(fseek(_file, offset, SEEK_SET)){     //Rewind file pointer to the acked position
                 cout << "[TRANSFER] fseek failed" << endl;
             }
@@ -431,6 +435,7 @@ bool FileTransfer::sendChunk(const char* chunk, uint16_t len, uint16_t window, u
             
             msg.setPayload(chunk, MESSAGE_MTU);
             _trns->send(&msg, SERVER_TIMEOUT_SEND);
+            cout << "[TRANSFER] message " << msg.getSeqnum() << " sent from chunk " << msg.getChunk() << " First = " << msg.isFirst() << ", Last = " << msg.isLast() << endl;
             msg.incrSeqnum();   //Increment seqnum for the next packet
             msg.setFirst(false);
             
@@ -444,7 +449,6 @@ bool FileTransfer::sendChunk(const char* chunk, uint16_t len, uint16_t window, u
             cout << "[TRANSFER] message " << msg.getSeqnum() << " sent from chunk " << msg.getChunk() << " First = " << msg.isFirst() << ", Last = " << msg.isLast() << endl;
             break;
         }
-            cout << "[TRANSFER] message " << msg.getSeqnum() << " sent from chunk " << msg.getChunk() << " First = " << msg.isFirst() << ", Last = " << msg.isLast() << endl;
     }
     _seqCurrent = msg.getSeqnum();
     
