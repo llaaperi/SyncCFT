@@ -175,9 +175,9 @@
 				0DDFD181151CBFED00B77760 /* SessionHandler.cc */,
 				90CB6D631525E33C001B7F0C /* Element.hh */,
 				90CB6D601525E32B001B7F0C /* Element.cc */,
-				966F0F9714E5AADB007FB278 /* SyncCFT.1 */,
 				96E8C2511525CCD500688FFE /* FileTransfer.hh */,
 				96E8C2531525CCE600688FFE /* FileTransfer.cc */,
+				966F0F9714E5AADB007FB278 /* SyncCFT.1 */,
 			);
 			path = SyncCFT;
 			sourceTree = "<group>";
