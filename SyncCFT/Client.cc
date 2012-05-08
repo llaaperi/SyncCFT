@@ -203,7 +203,7 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
         while(!_trns->recv(&msg, CLIENT_TIMEOUT_ACK)) {
             // Send new GET    
             _trns->send(&msg, CLIENT_TIMEOUT_SEND);
-            if (++tries > CLIENT_RETRIES) {
+            if (++tries > CLIENT_CHUNK_RETRIES) {
                 cout << "[CLIENT] Unable to receive reply to GET" << endl;
                 return;
             }
@@ -259,7 +259,7 @@ bool Client::completeFileTransfer(Message* msg, bool first) {
         
         if(!first && !_trns->recv(msg, 100)) {
             cout << "[CLIENT] Wait FILE timeout" << endl;
-            if (tries++ > CLIENT_RETRIES) {
+            if (tries++ > CLIENT_CHUNK_RETRIES) {
                 cout << "[CLIENT] Too many retries" << endl;
                 return false;
             }
@@ -306,7 +306,7 @@ void Client::startSession(sockaddr servAddr){
  * Function terminates current session
  */
 void Client::endSession(sockaddr servAddr){
-    
+    int retries = CLIENT_QUIT_RETRIES;
     bool terminated = false;
     do{
         cout << "[CLIENT] Trying to terminate session ..." << endl;
@@ -316,6 +316,9 @@ void Client::endSession(sockaddr servAddr){
         }else{
             cout << "[CLIENT] Session termination failed, retrying in " << CLIENT_BACKOFF << " seconds" << endl;
             sleep(CLIENT_BACKOFF);
+        }
+        if ((retries--) <= 0) { // Retry quit CLIENT_QUIT_RETRIES times
+            return;
         }
     }while(!terminated);
 }
@@ -388,12 +391,6 @@ bool Client::terminateHandler(sockaddr servAddr){
     
     //Remove id
     _id = 0;
-    
-    //Reply with final QUITACK
-    //msg.incrSeqnum();
-    //msg.clearPayload();
-    //msg.setQuit(true);
-    //_trns->send(&msg, CLIENT_TIMEOUT_HELLO);
     
     return true;
 }
