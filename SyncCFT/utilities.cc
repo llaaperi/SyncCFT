@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/mman.h>
 #include <time.h>
@@ -126,6 +127,11 @@ bool Utilities::MD5Hash(string const& filename, long const length, string& hash)
     fd = open(filename.c_str(), O_RDONLY);
     if(fd < 0)
         return false;
+    
+    struct stat stats;
+    stat(filename.c_str(), &stats);
+    
+    cout << "Length = " << length << ", statsLen = " << stats.st_size << endl;
     
     // Map file to memory
     fileBuf = (char*)mmap(0, length, PROT_READ, MAP_SHARED, fd, 0);
