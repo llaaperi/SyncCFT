@@ -56,15 +56,6 @@ public:
      **/
     string elementToStr(Element const& file) const;
     
-    /** 
-     * Calculates 16-byte MD5 hash from the given file
-     * @filename Name of the file
-     * @length Size of the file
-     * @hash Store the hash here
-     * @return 16-byte has hash as string
-     **/
-    static bool MD5Hash(string const& filename, long const length, string& hash);
-    
     /**
      * Read the contents of the metatile
      **/

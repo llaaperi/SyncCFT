@@ -44,6 +44,14 @@ namespace Utilities {
      **/
     bool isPacketLost();
     
+    /** 
+     * Calculates 16-byte MD5 hash from the given file
+     * @filename Name of the file
+     * @length Size of the file
+     * @hash Store the hash here
+     * @return 16-byte has hash as string
+     **/
+    bool MD5Hash(string const& filename, long const length, string& hash);
     
     /**
      * Calculates a 32-byte SHA256 hash from the given data

@@ -60,10 +60,8 @@ public:
     ~FileTransfer();
     
     const Element& getElement(){return _element;}
-    void recvChunck();
         
     bool recvFile(const Message* msg);
-    bool recvFinish();
     
     /*
      * @param msg Last received message
@@ -83,6 +81,10 @@ private:
     void writeRecvListToFile(const Message* last);
     void recvListAdd(Message* msg);
     void recvListClear();
+    
+    void recvChunck();
+    bool recvFinish();
+    bool fileFinish();
     
     // Rule of three
     FileTransfer(FileTransfer const& other);

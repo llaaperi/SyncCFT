@@ -163,12 +163,41 @@ bool FileTransfer::recvFile(const Message* msg){
         //Whole file is received
         if(_chunkCurrent == _chunkEnd){
             cout << "[TRANSFER] Complete file received" << endl;
-            return true;
+            return fileFinish();
         }
     }
 
     return false;
 }
+
+
+
+/*
+ *
+ */
+bool FileTransfer::fileFinish(){
+    
+    string fileHash;
+    string tmpName = _element.getName() + ".tmp"; 
+    if(!Utilities::MD5Hash(tmpName, _element.getSize(), fileHash)){
+        cout << "[TRANSFER] File " << tmpName << " not found" << endl;
+        return false;
+    }
+    
+    if(_element.getHash() != fileHash){
+        cout << "[TRANSFER] File " << tmpName << " has invalid MD5 hash" << endl;
+        return false;
+    }
+    
+    if(!rename(tmpName.c_str(), _element.getName().c_str())){
+        cout << "[TRANSFER] Renaming file " << tmpName << " failed" << endl;
+        return false;
+    }
+    
+    cout << "[TRANSFER] File " << _element.getName() << " received successfully" << endl;
+    return true;
+}
+
 
 
 /*

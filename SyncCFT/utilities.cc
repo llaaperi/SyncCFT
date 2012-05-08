@@ -10,9 +10,13 @@
 #include "utilities.hh"
 
 #include <iostream>
+#include <sstream>
 #include <sys/time.h>
+#include <sys/mman.h>
 #include <time.h>
+#include <fcntl.h>
 
+#include <openssl/md5.h>
 #include <openssl/sha.h>
 #include <openssl/rand.h>
 
@@ -104,6 +108,40 @@ bool Utilities::isPacketLost() {
         else
             return false;
     }
+}
+
+
+/* Calculates 16-byte MD5 hash from the given file
+ * @param filename Name of the file
+ * @param length Size of the file
+ * @param hash Store the hash here
+ * @return 16-byte has hash as string
+ */
+bool Utilities::MD5Hash(string const& filename, long const length, string& hash) {
+    
+    int fd;
+    char* fileBuf;
+    unsigned char result[MD5_DIGEST_LENGTH];
+    
+    fd = open(filename.c_str(), O_RDONLY);
+    if(fd < 0)
+        return false;
+    
+    // Map file to memory
+    fileBuf = (char*)mmap(0, length, PROT_READ, MAP_SHARED, fd, 0);
+    MD5((unsigned char*)fileBuf, length, result);
+    munmap(fileBuf, length);
+    close(fd);
+    
+    // Convert hash to string
+    char values[2];
+    ostringstream hashStream;
+    for(int i = 0; i < MD5_DIGEST_LENGTH; i++) {
+        sprintf(values,"%02x", result[i]);
+        hashStream << values;
+    }
+    hash = hashStream.str();
+    return true;
 }
 
 
