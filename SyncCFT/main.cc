@@ -24,7 +24,7 @@ int main (int argc, const char * argv[])
     //Default values
     string cport = "5063";
     string sport = "5062";
-    string p = "0.2";  //Init as not set
+    string p = "-1.0";  //Init as not set
     string q = "-1.0";  //Init as not set
     list<string> hosts;
     bool newSecret = false;

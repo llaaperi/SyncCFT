@@ -162,8 +162,14 @@ bool FileTransfer::recvFile(const Message* msg){
                 
         //Whole file is received
         if(_chunkCurrent == _chunkEnd){
-            cout << "[TRANSFER] Complete file received" << endl;
-            return fileFinish();
+            
+            //Finish file ransfer by checking file validity and renaming it correctly (without .tmp suffix)
+            if(!fileFinish()){
+                cout << "[TRANSFER] Invalid file " << _element.getName() << " received " << endl;
+            }else{
+                cout << "[TRANSFER] File " << _element.getName() << " received successfully" << endl;
+            }
+            return true;    //Return true whether or not the file was received successfully
         }
     }
 
@@ -193,8 +199,6 @@ bool FileTransfer::fileFinish(){
         cout << "[TRANSFER] Renaming file " << tmpName << " failed" << endl;
         return false;
     }
-    
-    cout << "[TRANSFER] File " << _element.getName() << " received successfully" << endl;
     return true;
 }
 
@@ -250,7 +254,7 @@ bool FileTransfer::recvFinish(){
     }
     
     cout << "[TRANSFER] All packets found" << endl;
-    writeRecvListToFile(last);  //Write completed window to file
+    writeRecvListToFile(last);  //Write completed chunks to file
 
     Message reply(*last);
     reply.setType(TYPE_ACK);
@@ -259,7 +263,7 @@ bool FileTransfer::recvFinish(){
     reply.setSeqnum(last->getSeqnum());
     reply.setChunk(last->getChunk());
     _trns->send(&reply, CLIENT_TIMEOUT_SEND);
-    cout << "[CLIENT] Client ACK: Chunk: " << reply.getChunk() << ", Seqnum: " << reply.getSeqnum() << endl; 
+    cout << "[TRANSFER] Client ACK: Chunk: " << reply.getChunk() << ", Seqnum: " << reply.getSeqnum() << endl; 
 
     
     _chunkCurrent = last->getChunk();   //Set _chunkCurrent to last received chunk
@@ -299,7 +303,7 @@ void FileTransfer::recvTimeout(const Message *msg){
     reply.setWindow(window);
     
     _trns->send(&reply, CLIENT_TIMEOUT_SEND);
-    cout << "[CLIENT] Client ACK: Chunk: " << reply.getChunk() << ", Seqnum: " << reply.getSeqnum() << endl; 
+    cout << "[TRANSFER] Client ACK: Chunk: " << reply.getChunk() << ", Seqnum: " << reply.getSeqnum() << endl; 
 }
 
 
