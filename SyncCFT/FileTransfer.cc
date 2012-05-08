@@ -272,8 +272,6 @@ void FileTransfer::recvTimeout(const Message *msg){
     
     _trns->send(&reply, CLIENT_TIMEOUT_SEND);
     cout << "[CLIENT] Client ACK: Chunk: " << reply.getChunk() << ", Seqnum: " << reply.getSeqnum() << endl; 
-    
-    //recvListClear();    //Clear reception list
 }
 
 
