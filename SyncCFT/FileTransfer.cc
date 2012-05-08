@@ -159,9 +159,7 @@ bool FileTransfer::recvFile(const Message* msg){
     if(recvFinish()){
             
         cout << "[TRANSFER] Window completed" << endl;
-        
-        writeRecvListToFile(_recvList.back());  //Write completed window to file
-        
+                
         //Whole file is received
         if(_chunkCurrent == _chunkEnd){
             cout << "[TRANSFER] Complete file received" << endl;
@@ -223,6 +221,7 @@ bool FileTransfer::recvFinish(){
     }
     
     cout << "[TRANSFER] All packets found" << endl;
+    writeRecvListToFile(last);  //Write completed window to file
 
     Message reply(*last);
     reply.setType(TYPE_ACK);
@@ -248,9 +247,9 @@ void FileTransfer::recvTimeout(const Message *msg){
     
     Message* last;
     int receivedChunks = getReceivedChunks(&last);
-    
     // Check that all chunks have been received
     if(receivedChunks > 0){
+        cout << "[TRANSFER] Last correct packet seq: " << last->getSeqnum() << ", chunk: " << last->getChunk() << endl;
         _seqCurrent = last->getSeqnum();
         _chunkCurrent = last->getChunk();
         writeRecvListToFile(last);  //Write completed chunks to file
