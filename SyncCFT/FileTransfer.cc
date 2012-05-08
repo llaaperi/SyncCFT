@@ -214,24 +214,24 @@ bool FileTransfer::recvFinish(){
     }
     
     // Check that all chunks have been received
-    if(receivedChunks < _window && _recvList.back()->getChunk() != _chunkEnd) {
+    if((receivedChunks < _window) && ((_chunkCurrent + receivedChunks) != _chunkEnd)) {
         return false;
     }
     
     cout << "[TRANSFER] All packets found" << endl;
 
-    Message reply(*_recvList.back());
+    Message reply(*last);
     reply.setType(TYPE_ACK);
     reply.setLast(false);
     reply.setWindow(_window + 1);    //Increment window size after successfull window reception
-    reply.setSeqnum(_recvList.back()->getSeqnum());
-    reply.setChunk(_recvList.back()->getChunk());
+    reply.setSeqnum(last->getSeqnum());
+    reply.setChunk(last->getChunk());
     _trns->send(&reply, CLIENT_TIMEOUT_SEND);
     cout << "[CLIENT] Client ACK: Chunk: " << reply.getChunk() << ", Seqnum: " << reply.getSeqnum() << endl; 
 
     
-    _chunkCurrent = _recvList.back()->getChunk();   //Set _chunkCurrent to last received chunk
-    _seqCurrent = _recvList.back()->getSeqnum();    //Set _seqCurrent to last received seqnum
+    _chunkCurrent = last->getChunk();   //Set _chunkCurrent to last received chunk
+    _seqCurrent = last->getSeqnum();    //Set _seqCurrent to last received seqnum
     
     return true;
 }
@@ -425,8 +425,6 @@ bool FileTransfer::sendChunk(const char* chunk, uint16_t len, uint16_t window, u
     
     msg.setFirst(true);
     while(len > 0){
-    
-        cout << "[TRANSFER] message " << msg.getSeqnum() << " sent from chunk " << msg.getChunk() << endl;
         
         //Send full packet
         if(len > MESSAGE_MTU){
@@ -443,8 +441,10 @@ bool FileTransfer::sendChunk(const char* chunk, uint16_t len, uint16_t window, u
             msg.setLast(true);
             msg.setPayload(chunk, len);
             _trns->send(&msg, SERVER_TIMEOUT_SEND);
+            cout << "[TRANSFER] message " << msg.getSeqnum() << " sent from chunk " << msg.getChunk() << " First = " << msg.isFirst() << ", Last = " << msg.isLast() << endl;
             break;
         }
+            cout << "[TRANSFER] message " << msg.getSeqnum() << " sent from chunk " << msg.getChunk() << " First = " << msg.isFirst() << ", Last = " << msg.isLast() << endl;
     }
     _seqCurrent = msg.getSeqnum();
     
