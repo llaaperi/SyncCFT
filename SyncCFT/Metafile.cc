@@ -159,7 +159,7 @@ bool MetaFile::updateAll(void) {
                 newFile.setSize(stats.st_size);
                 // MD5 hash
                 string fileHash;
-                if(!Utilities::MD5Hash(entry->d_name, stats.st_size,fileHash))
+                if(!Utilities::MD5Hash(entry->d_name,fileHash))
                     continue;
                 newFile.setHash(fileHash);
                 // Timestamp

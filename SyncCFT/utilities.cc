@@ -114,11 +114,10 @@ bool Utilities::isPacketLost() {
 
 /* Calculates 16-byte MD5 hash from the given file
  * @param filename Name of the file
- * @param length Size of the file
  * @param hash Store the hash here
  * @return 16-byte has hash as string
  */
-bool Utilities::MD5Hash(string const& filename, long const length, string& hash) {
+bool Utilities::MD5Hash(string const& filename, string& hash) {
     
     int fd;
     char* fileBuf;
@@ -131,12 +130,12 @@ bool Utilities::MD5Hash(string const& filename, long const length, string& hash)
     struct stat stats;
     stat(filename.c_str(), &stats);
     
-    cout << "Length = " << length << ", statsLen = " << stats.st_size << endl;
+    //cout << "Length = " << length << ", statsLen = " << stats.st_size << endl;
     
     // Map file to memory
-    fileBuf = (char*)mmap(0, length, PROT_READ, MAP_SHARED, fd, 0);
-    MD5((unsigned char*)fileBuf, length, result);
-    munmap(fileBuf, length);
+    fileBuf = (char*)mmap(0, stats.st_size, PROT_READ, MAP_SHARED, fd, 0);
+    MD5((unsigned char*)fileBuf, stats.st_size, result);
+    munmap(fileBuf, stats.st_size);
     close(fd);
     
     // Convert hash to string

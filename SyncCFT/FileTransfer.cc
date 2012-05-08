@@ -179,7 +179,7 @@ bool FileTransfer::fileFinish(){
     
     string fileHash;
     string tmpName = _element.getName() + ".tmp"; 
-    if(!Utilities::MD5Hash(tmpName, _element.getSize(), fileHash)){
+    if(!Utilities::MD5Hash(tmpName, fileHash)){
         cout << "[TRANSFER] File " << tmpName << " not found" << endl;
         return false;
     }
