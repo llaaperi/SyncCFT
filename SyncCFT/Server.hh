@@ -17,11 +17,13 @@
 #include "stdexcept"
 
 //Timeouts in milliseconds
-#define SERVER_TIMEOUT_RECV 1000000
+#define SERVER_TIMEOUT_RECV 1000
 #define SERVER_TIMEOUT_SEND 5000
 #define SERVER_TIMEOUT_HELLOACK 5000
 
 #define SERVER_SESSION_HANDLERS 3 //Number of handlers can be defined. Maximum value is 256.
+
+extern list<Client*> _clients;
 
 using namespace std;
 
@@ -54,6 +56,8 @@ public:
      * Main function for server thread
      */
     static void* handle(void* arg);
+    
+    void addSource(string addr, string port);
 
 private:
     //Rule of three
@@ -61,6 +65,7 @@ private:
     Server operator=(Server const& other);
     
     int getFreeID();
+    void sourceHandler();
     void handshakeHandler(Message* msg, sockaddr cliAddr);
     void terminateHandler(Message* msg, sockaddr cliAddr);
 };

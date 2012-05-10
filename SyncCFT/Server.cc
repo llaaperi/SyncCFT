@@ -13,6 +13,9 @@
 #include "networking.hh"
 
 
+list<Client*> _clients;
+
+
 /*
  * Constructor
  */
@@ -68,6 +71,10 @@ void Server::stop(void){
 }
 
 
+void Server::addSource(string addr, string port){
+
+}
+
 
 /*
  * Main function for server
@@ -84,37 +91,55 @@ void* Server::handle(void* arg){
     while(handler->_running){
         
         //Wait incoming packets
-        cout << "[SERVER] Waiting packets..." << endl;
-        while(!Transceiver::recvMsg(handler->_socket, &msg, &cliAddr, SERVER_TIMEOUT_RECV));        
+        //cout << "[SERVER] Waiting packets..." << endl;
+        //while(!Transceiver::recvMsg(handler->_socket, &msg, &cliAddr, SERVER_TIMEOUT_RECV));        
         
-        //msg.printBytes();
-        //msg.printInfo();
+        if(Transceiver::recvMsg(handler->_socket, &msg, &cliAddr, SERVER_TIMEOUT_RECV)){
         
-        //Server handles HELLO and QUIT messages
-        if(msg.isHello()){  //Handle new handshake requests
-            handler->handshakeHandler(&msg, cliAddr);
-            continue;
-        }
-        
-        //Forward existing connections to corresponding handler
-        if((msg.getClientID() < SERVER_SESSION_HANDLERS) && (handler->_sessionHandlers[msg.getClientID()] != NULL)){
-            bool stop = !handler->_sessionHandlers[msg.getClientID()]->newMessage(&msg);
+            //msg.printBytes();
+            //msg.printInfo();
             
-            //Release resources if client quits
-            if(stop){
-                delete(handler->_sessionHandlers[msg.getClientID()]);
-                handler->_sessionHandlers[msg.getClientID()] = NULL;
+            //Server handles HELLO and QUIT messages
+            if(msg.isHello()){  //Handle new handshake requests
+                handler->handshakeHandler(&msg, cliAddr);
+                continue;
             }
             
-        }else{
-            cout << "[SERVER] Packet discarded" << endl;
-            //msg.printInfo();
+            //Forward existing connections to corresponding handler
+            if((msg.getClientID() < SERVER_SESSION_HANDLERS) && (handler->_sessionHandlers[msg.getClientID()] != NULL)){
+                bool stop = !handler->_sessionHandlers[msg.getClientID()]->newMessage(&msg);
+                
+                //Release resources if client quits
+                if(stop){
+                    delete(handler->_sessionHandlers[msg.getClientID()]);
+                    handler->_sessionHandlers[msg.getClientID()] = NULL;
+                }
+                
+            }else{
+                cout << "[SERVER] Packet discarded" << endl;
+                //msg.printInfo();
+            }
         }
         
+        if(!_clients.empty()){
+            //cout << "[SERVER] Handle source clients" << endl;
+            handler->sourceHandler();
+        }
         
         
     }
     return 0;
+}
+
+
+
+void Server::sourceHandler(){
+    
+    Client* cli = _clients.front();
+    if(!cli->isRunning()){
+        cout << "[SERVER] Starting client " << cli->getHost() << endl;
+        cli->start();
+    }
 }
 
 

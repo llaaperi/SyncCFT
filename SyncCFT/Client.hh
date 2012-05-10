@@ -34,7 +34,7 @@ using namespace std;
 class Client {
     //Transceiver _transceiver;
     pthread_t _thread;
-    list<string> _hosts;
+    list<string> _hosts;    //Only first is used
     string _cport;
     string _sport;
     bool _running;
@@ -48,7 +48,7 @@ class Client {
     
 public:
     
-    Client(list<string>& hosts, string cport, string sport) throw(invalid_argument, runtime_error);
+    Client(list<string> hosts, string cport, string sport) throw(invalid_argument, runtime_error);
     ~Client();
     
     /*
@@ -61,15 +61,24 @@ public:
      */
     void stop();
     
+    
+    /*
+     *
+     */
+    bool isRunning(){return _running;}
+    
+    
     /*
      * Main function for client thread
      */
     static void* handle(void* arg);
     
+    
     void synchronize(MetaFile file);
     
     sockaddr* getSockAddr(){return _serverInfo->ai_addr;}
     
+    string getHost(){return _hosts.front();}
     
 private:
     //Rule of three

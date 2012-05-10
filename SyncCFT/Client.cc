@@ -12,7 +12,7 @@
 #include "networking.hh"
 #include "FileTransfer.hh"
 
-Client::Client(list<string>& hosts, string cport, string sport) throw(invalid_argument, runtime_error) : _hosts(hosts), _cport(cport), _sport(sport){
+Client::Client(list<string> hosts, string cport, string sport) throw(invalid_argument, runtime_error) : _hosts(hosts), _cport(cport), _sport(sport), _running(false){
     
     if(true){
         
@@ -57,8 +57,14 @@ Client::~Client() {
         close(_socket);  
 
     }
-    // TODO: Free rest of the resources
     
+    if(_trns != NULL){
+        delete(_trns);
+    }
+    
+    if(_fFlow != NULL){
+        delete(_fFlow);
+    }
 }
 
 
@@ -118,6 +124,7 @@ void* Client::handle(void* arg)
         
         sleep(CLIENT_REFRESH); //TEMPORARILY HERE
     }
+    handler->_running = false;
     return 0;
 }
 

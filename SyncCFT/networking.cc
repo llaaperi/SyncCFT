@@ -283,6 +283,57 @@ int Networking::sendPacket(int socketFd, char* data,int length, struct sockaddr*
 
 
 /*
+ *
+ */
+string Networking::getAddrStr(const struct sockaddr* addr){
+
+    //Check for NULL pointer
+    if(addr == NULL){
+        return "";
+    }
+    //Print IPv4 addresses
+    if(addr->sa_family == AF_INET){
+        
+        long ip = ((sockaddr_in*)addr)->sin_addr.s_addr;
+        stringstream addrStrm;
+        addrStrm << (ip & 0xFF) << "." << ((ip >> 8) & 0xFF) << "." << ((ip >> 16) & 0xFF) << "." << ((ip >> 24) & 0xFF);
+        return addrStrm.str();
+        
+    }//Print IPv6 addresses
+    else{
+        cout << "Not implemented IPv6 getStr." << endl;
+    }
+    return "";
+}
+
+
+/*
+ *
+ */
+string Networking::getPortStr(const struct sockaddr* addr){
+    
+    //Check for NULL pointer
+    if(addr == NULL){
+        return "";
+    }
+    //Print IPv4 addresses
+    if(addr->sa_family == AF_INET){
+        
+        sockaddr_in* addr_in = (sockaddr_in*)addr;
+        unsigned int port = ((addr_in->sin_port & 0xFF) << 8) | ((addr_in->sin_port) >> 8);
+        stringstream portStrm;
+        portStrm << port;
+        return portStrm.str();
+        
+    }//Print IPv6 addresses
+    else{
+        cout << "Not implemented IPv6 getStr." << endl;
+    }
+    return "";
+}
+
+
+/*
  * Print address IP:Port (127.0.0.1:5062)
  * @param adress to be printed
  */

@@ -105,6 +105,18 @@ namespace Networking {
     int sendPacket(int socketFd, char* data,int length, struct sockaddr* cliAddr, unsigned int timeout);
     
     
+    /*
+     *
+     */
+    string getAddrStr(const struct sockaddr* addr);
+    
+    
+    /*
+     *
+     */
+    string getPortStr(const struct sockaddr* addr);
+    
+    
     /**
      * Print address IP:Port (127.0.0.1:5062)
      * @addr Address to be printed

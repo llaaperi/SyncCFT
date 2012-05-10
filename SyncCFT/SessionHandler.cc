@@ -142,10 +142,32 @@ void SessionHandler::descrHandler(const Message* msg){
     reply.setLast(true);
     
     MetaFile clientFile(msg->getPayload(), msg->getPayloadLength());
-    string diff = mFile.getDiff(clientFile);
+    string clientDiff = mFile.getDiff(clientFile);
+    string serverDiff = clientFile.getDiff(mFile);
+    
+    //cout << "[SESSION] Client diff: " << endl << clientDiff << endl;
+    //cout << "[SESSION] Server diff: " << endl << serverDiff << endl;
+    
+    //Add new file source for the server if client has files that server does not
+    if(!serverDiff.empty()){
+        
+        const struct sockaddr* cliAddr = msg->getAddr();
+        
+        string ip = Networking::getAddrStr(cliAddr);
+        string port = Networking::getPortStr(cliAddr);
+        
+        cout << "[SESSION] Add new source, ip: " << ip << ", port: " << port << endl;
+        
+        list<string> hosts;
+        hosts.push_back(ip);
+        
+        //TODO check duplicates
+        Client* newClient = new Client(hosts, port, "5062");
+        _clients.push_back(newClient);
+    }
     
     //cout << "[SESSION] Diff file:" << endl << diff << endl;
-    reply.setPayload(diff.c_str(), (int)diff.length());
+    reply.setPayload(clientDiff.c_str(), (int)clientDiff.length());
     
     //msg->printInfo();
     
