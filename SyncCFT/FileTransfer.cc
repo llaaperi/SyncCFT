@@ -45,10 +45,10 @@ FileTransfer::FileTransfer(Transceiver* trns, Element file, uint32_t chunkBegin,
     if (type == FILE_TRANSFER_TYPE_CLIENT) {
         //Open temp file for writing
         string fName = _element.getName() + ".tmp";
-        _file = fopen(fName.c_str(), "w");  //w or a
+        _file = fopen((_syncDir + fName).c_str(), "w");  //w or a
     } else {
         // Open file for reading
-        _file = fopen(_element.getName().c_str(), "r");
+        _file = fopen((_syncDir + _element.getName()).c_str(), "r");
         //string fName = _element.getName() + ".tmp";
         //_outFile = fopen(fName.c_str(), "w");
     }
