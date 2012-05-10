@@ -185,7 +185,7 @@ bool FileTransfer::fileFinish(){
     fclose(_file); // Close output file
     string fileHash;
     string tmpName = _element.getName() + ".tmp"; 
-    if(!Utilities::MD5Hash(tmpName, fileHash)){
+    if(!Utilities::MD5Hash(_syncDir + tmpName, fileHash)){
         cout << "[TRANSFER] File " << tmpName << " not found" << endl;
         return false;
     }
@@ -195,7 +195,7 @@ bool FileTransfer::fileFinish(){
         return false;
     }
     
-    if(rename(tmpName.c_str(), _element.getName().c_str())){
+    if(rename((_syncDir + tmpName).c_str(), _element.getName().c_str())){
         cout << "[TRANSFER] Renaming file " << tmpName << " failed" << endl;
         return false;
     }
