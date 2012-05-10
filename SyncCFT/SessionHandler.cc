@@ -32,7 +32,13 @@ SessionHandler::SessionHandler(int socket, struct sockaddr* cliAddr, uint8_t id,
 SessionHandler::~SessionHandler(){
     // Commented to enable unit testing
     cout << "[SESSION] Session " << (unsigned int)_id << " terminated"<< endl;
-    delete(_trns);
+    delete(_trns);  //Free transceiver
+    
+    for(int i = 0; i < SESSIONHANDLER_MAX_TRANSFERS; i++){  //Free file transfer objects
+        if(_fFlows[i] != NULL){
+            delete(_fFlows[i]);
+        }
+    }
 }
 
 

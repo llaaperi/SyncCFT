@@ -128,6 +128,10 @@ int Server::getFreeID(){
     for(int i = 0; i < SERVER_SESSION_HANDLERS; i++){
         if(_sessionHandlers[i] == NULL){
             return i;
+        }else
+        if(_sessionHandlers[i]->isExpired()){
+            delete(_sessionHandlers[i]);    //Free existing session handler if it has timed out
+            return i;
         }
     }
     return -1;
