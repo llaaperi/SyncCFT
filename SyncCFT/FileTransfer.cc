@@ -195,7 +195,7 @@ bool FileTransfer::fileFinish(){
         return false;
     }
     
-    if(rename((_syncDir + tmpName).c_str(), _element.getName().c_str())){
+    if(rename((_syncDir + tmpName).c_str(), (_syncDir + _element.getName()).c_str())){
         cout << "[TRANSFER] Renaming file " << tmpName << " failed" << endl;
         return false;
     }
