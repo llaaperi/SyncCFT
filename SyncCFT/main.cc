@@ -151,7 +151,8 @@ int main (int argc, const char * argv[])
             return 0;
         }
     }
-        
+
+    // TODO: Terminate with sigint handler
     while(true){
         sleep(1);
         //break;
