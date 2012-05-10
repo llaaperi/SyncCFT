@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <getopt.h>
+#include <sys/stat.h>
 
 #include "Metafile.hh"
 #include "Message.hh"
@@ -15,7 +16,7 @@
 #include "Server.hh"
 #include "utilities.hh"
 
-#define HELP "Usage: synccft [-c <client port>] [-s <server port>] [-p <p>] [-q <q>] [-k] <hosts>"
+#define HELP "Usage: synccft [-c <client port>] [-s <server port>] [-p <p>] [-q <q>] [-k] [-d <dir>] <hosts>"
 
 int main (int argc, const char * argv[])
 {
@@ -26,6 +27,7 @@ int main (int argc, const char * argv[])
     string sport = "5062";
     string p = "-1.0";  //Init as not set
     string q = "-1.0";  //Init as not set
+    string dir = "./Sync/";
     list<string> hosts;
     bool newSecret = false;
     
@@ -35,6 +37,7 @@ int main (int argc, const char * argv[])
         {"sport", 	required_argument, 	0, 's'},
         {"success", required_argument, 	0, 'p'},
         {"fail", 	required_argument, 	0, 'q'},
+        {"dir",     required_argument, 	0, 'd'},
         {"secret", 	no_argument, 		0, 'k'},
         {"help", 	no_argument, 		0, 'h'},
         {0, 0, 0, 0}
@@ -43,7 +46,7 @@ int main (int argc, const char * argv[])
     int c;
     opterr = 0;
     // Use get_opt to parse command line parameters
-	while ((c = getopt_long (argc, (char **)argv, "hc:s:p:q:", long_options, NULL)) != -1){
+	while ((c = getopt_long (argc, (char **)argv, "hd:c:s:p:q:", long_options, NULL)) != -1){
         switch (c)
         {
             case 'c': // Client port
@@ -61,6 +64,10 @@ int main (int argc, const char * argv[])
             case 'q': // Markov probability
                 q = optarg;
                 cout << "q: " << q << endl;
+                break;
+            case 'd': // Sync directory
+                dir = optarg;
+                cout << "Directory: " << dir << endl;
                 break;
             case 'k': // Generate new secret key
                 newSecret = true;
@@ -98,6 +105,18 @@ int main (int argc, const char * argv[])
     
     //Init markov process
     Utilities::initMarkov(p, q);
+    
+    // Check if sync directory exists 
+    if(dir.at(dir.length()-1) != '/') {
+        dir += "/";
+    }
+    _syncDir = dir;
+    if (mkdir(_syncDir.c_str(), S_IRWXU)) {
+        cout << "[MAIN] Unable to create dir " << _syncDir << " or it already exists" << endl;
+    } else {
+        cout << "[MAIN] Created dir " << _syncDir << endl;
+
+    }
     
     //Print folder info
     MetaFile mFile(METAFILE);

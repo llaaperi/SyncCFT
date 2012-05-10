@@ -24,16 +24,18 @@
 #include "metafile.hh"
 #include "utilities.hh"
 
+string _syncDir = "./Sync/";
+
 MetaFile::MetaFile(string fName) : _fileName(fName) {
     
     // Read metadata file
-    //read();
+    read();
     
     // Update metadata
     updateAll();
     
     // Save changes to metafile
-    //write();
+    write();
 }
 
 /*
@@ -99,9 +101,9 @@ void MetaFile::read(void) {
     string line;
     
     // Try to open directory metafile
-    _metafile.open(_fileName.c_str(), fstream::in);
+    _metafile.open((_syncDir + _fileName).c_str(), fstream::in);
     if (_metafile.is_open()) { // Old metafile found
-        //cout << "Metafile found" << endl;
+        //cout << "[METAFILE] Metafile found" << endl;
         
         // Read configuration file line by line and save data into an array
         while (getline(_metafile, line)) {
@@ -117,14 +119,16 @@ void MetaFile::read(void) {
  * Overwrite to the metatile
  */
 bool MetaFile::write(void) {
-    _metafile.open(_fileName.c_str(), fstream::out | fstream::trunc);
+    _metafile.open((_syncDir + _fileName).c_str(), fstream::out | fstream::trunc);
     if (_metafile.is_open()) {
         for (list<Element>::const_iterator iter = _metadata.begin(); iter != _metadata.end(); iter++)
             _metafile << elementToStr(*iter) << endl;
         _metafile.close();
         return true;
-    } else
-        return false; 
+    } else {
+        cout << "[METAFILE] Unable to write to the metafile" << endl;
+        return false;
+    }
 }
 
 /*
@@ -134,60 +138,66 @@ bool MetaFile::updateAll(void) {
     DIR *directory;
     struct dirent *entry;
     struct stat stats;
+    list<Element> newMetadata;
     
-    
-    directory = opendir ("./");
-    if (directory != NULL) {
-        
-        // Loop through each entry in the given directory
-        while ((entry = readdir(directory))) {
-            Element newFile;            
-            // Skip '.', '..' and hidden files
-            if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0 || entry->d_name[0] == '.')
-                continue;
-            // Obtain file information
-            if (stat(entry->d_name, &stats) < 0)
-                continue;
-            
-            // Check file type
-            int type = (int)entry->d_type;
-
-            if (type == FT_FILE) {
-                // Filename
-                newFile.setName(entry->d_name);
-                // File size
-                newFile.setSize(stats.st_size);
-                // MD5 hash
-                string fileHash;
-                if(!Utilities::MD5Hash(entry->d_name,fileHash))
-                    continue;
-                newFile.setHash(fileHash);
-                // Timestamp
-                newFile.setTimeStamp(time(NULL));
-                
-                // Check if data already exists and update only changed files
-                bool found = false;
-                Element& oldFile = find(newFile.getName(), found);
-                if (found) {
-                    if (newFile.getHash() == oldFile.getHash())
-                        continue;
-                    else if (newFile.getTimeStamp() > oldFile.getTimeStamp())
-                        oldFile = newFile;
-                    continue;
-                }
-                _metadata.push_back(newFile);
-            } else if (FT_FOLDER) {
-                //cout << "Skip folder" << endl;
-            } else
-                cout << "Unknown filetype" << endl;
-        }
-        (void) closedir (directory);
-        return true;     
-    }
-    else {
-        perror ("Couldn't open the directory");
+    directory = opendir (_syncDir.c_str());
+    if (directory == NULL) {
+        cout << "[METAFILE] Couldn't open the directory " << _syncDir << endl;
         return false;
     }
+        
+    // Loop through each entry in the given directory
+    while ((entry = readdir(directory))) {
+        //cout << "[METAFILE] Directory entry: " << entry->d_name << endl;
+        Element newFile;            
+        // Skip '.', '..' and hidden files
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0 || entry->d_name[0] == '.')
+            continue;
+            // Obtain file information
+        if (stat((_syncDir + entry->d_name).c_str(), &stats) < 0) {
+            //cout << "[METAFILE] No file info" << endl;
+            continue;
+        }
+        
+        // Check file type
+        int type = (int)entry->d_type;
+        //cout << "[METAFILE] Type: " << type << endl;
+        if (type == FT_FILE) {
+            //cout << "[METAFILE] File: " << entry->d_name << endl;
+            // Filename
+            newFile.setName(entry->d_name);
+            // File size
+            newFile.setSize(stats.st_size);
+            // MD5 hash
+            string fileHash;
+            if(!Utilities::MD5Hash(_syncDir + entry->d_name,fileHash)) {
+                //cout << "[METAFILE] MD5 failed" << endl;
+                continue;
+            }
+            newFile.setHash(fileHash);
+            // Timestamp
+            newFile.setTimeStamp(time(NULL));
+            
+            // Check if data already exists and update only changed files
+            bool found = false;
+            Element& oldFile = find(newFile.getName(), found);
+            if (found) { // File already exists in metafile
+                //cout << "[METAFILE] Found old entry" << endl;
+                if (newFile.getHash() == oldFile.getHash()) {
+                    newMetadata.push_back(oldFile);
+                    continue;
+                }
+            }
+            newMetadata.push_back(newFile);
+        } else if (FT_FOLDER) {
+            //cout << "Skip folder" << endl;
+        } else
+            cout << "Unknown filetype" << endl;
+    }
+
+    _metadata = newMetadata;
+    closedir (directory);
+    return true;     
 }
 
 /*

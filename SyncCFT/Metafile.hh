@@ -18,6 +18,7 @@
 #define FT_FILE     8
 #define FT_FOLDER   4
 
+extern string _syncDir;
 
 using namespace std;
 
