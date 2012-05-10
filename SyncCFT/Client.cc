@@ -257,7 +257,7 @@ bool Client::completeFileTransfer(Message* msg, bool first) {
     int tries = 0;
     while(!ready){
         
-        if(!first && !_trns->recv(msg, 100)) {
+        if(!first && !_trns->recv(msg, timeout)) {
             cout << "[CLIENT] Wait FILE timeout" << endl;
             if (tries++ > CLIENT_CHUNK_RETRIES) {
                 cout << "[CLIENT] Too many retries" << endl;
@@ -270,6 +270,9 @@ bool Client::completeFileTransfer(Message* msg, bool first) {
         
         long ms = tmr.elapsed_ms();
         timeout = ms * 3;   //TODO moving average
+        if (timeout < 100) { // Set minimum timeout value
+            timeout = 100;
+        }
         cout << "[CLIENT] Inter-arrival time (ms): " << ms << endl;
         
         tmr.start();
