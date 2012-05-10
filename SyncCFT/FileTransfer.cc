@@ -68,9 +68,10 @@ FileTransfer::~FileTransfer(){
     if(_file != NULL){
         fclose(_file);
     }
-    if(_sendBuffer != NULL){
+    if(_sendBuffer != NULL){    //Free send buffer
         free(_sendBuffer);
     }
+    recvListClear();    //Clear receive list
 }
 
 
