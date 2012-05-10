@@ -117,7 +117,7 @@ void* Client::handle(void* arg)
         //Terminate session
         handler->endSession(*sockAddr);
         
-        sleep(CLIENT_REFRESH); //TEMPORARILY HERE
+        sleep(CLIENT_REFRESH);
     }
     return 0;
 }
