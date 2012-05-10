@@ -113,7 +113,6 @@ void* Client::handle(void* arg)
             handler->fileTransfer(*sockAddr, diff);
         }
         
-        
         //Terminate session
         handler->endSession(*sockAddr);
         
@@ -168,7 +167,6 @@ void Client::metafileHandler(sockaddr servAddr, MetaFile** diff){
         *diff = NULL;
         cout << "[CLIENT] Received empty DIFF" << endl;
     }
-    
 }
 
 
@@ -182,6 +180,7 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
     Message msg;
     
     list<Element> elements = diff->getData();
+    delete(diff);   //Free previously allocated MetaFile
     
     for(Element e : elements){
         cout << "[CLIENT] Request file: " << e.getName() << endl;

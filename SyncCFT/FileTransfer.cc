@@ -309,40 +309,6 @@ void FileTransfer::recvTimeout(const Message *msg){
 
 
 /*
- *
- */
-/*
-bool FileTransfer::recvWindow(uint16_t size){
-    
-    uint16_t packets = size * ceil((double)CHUNK_SIZE / MESSAGE_MTU);
-    uint8_t recvChunk[packets];
-    
-    cout << "[TRANSFER] Prepare to receive " << packets << " packets" << endl;
-    
-    for(int i = 0; i < packets; i++){}
-    
-    Message msg;
-    list<Message> recvMsg;
-    
-    bool finished = false;
-    while(finished){
-        
-        _trns->recv(&msg, CLIENT_TIMEOUT_FILE);
-        
-        if
-    
-    }
-    
-    
-}
-*/
-
-//bool FileTransfer::recvChunk(uint32_t chunknum, uint32_t seqnum){}
-
-
-
-
-/*
  * Return true when finished
  */
 bool FileTransfer::sendFile(const Message* msg){
