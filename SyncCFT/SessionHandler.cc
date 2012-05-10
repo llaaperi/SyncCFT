@@ -81,6 +81,9 @@ bool SessionHandler::newMessage(const Message* msg){
         return true;
     }
     
+    // Reset idle timer
+    _timer.start();
+    
     switch (msg->getType()) {
         case TYPE_ACK:
             cout << "[SESSION] Received ACK message" << endl;
@@ -350,6 +353,19 @@ bool SessionHandler::quitHandler(const Message* msg){
         reply.setType(TYPE_ACK);
         reply.setQuit(true);
         _trns->send(&reply, SERVER_TIMEOUT_SEND);
+        return true;
+    }
+    return false;
+}
+
+
+/*
+ * Check if connection has been idle too long
+ * @return True if expired
+ */
+bool SessionHandler::isExpired() {
+    
+    if (_timer.elapsed_s() >= SESSION_TIMEOUT) {
         return true;
     }
     return false;
