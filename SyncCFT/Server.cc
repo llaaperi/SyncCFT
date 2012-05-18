@@ -69,7 +69,7 @@ void Server::addSource(string addr, string port){
     
     //cout << "[SERVER] Add new source, ip: " << addr << ", port: " << port << endl;
     if(_client != NULL){
-        _client->addHost(addr, port); 
+        _client->addHost(addr, port, false); 
     }else{
         cout << "[SERVER] Server does not accept new sources" << endl;
     }

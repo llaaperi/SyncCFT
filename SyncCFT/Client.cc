@@ -24,7 +24,7 @@ Client::Client(list<string> hosts, string cport, string sport, int mode) throw(i
     
     //Add hosts
     for(string host : hosts){
-        addHost(host, sport);
+        addHost(host, sport, true);
     }
 }
 
@@ -57,11 +57,22 @@ Client::~Client() {
 /*
  *
  */
-void Client::addHost(string addr, string port){
+void Client::addHost(string addr, string port, bool permanent){
     
     cout << "[CLIENT] Adding new host, ip: " << addr << ", port: " << port << endl;
     
+    //Check duplicates
+    for(Host h : _hosts){
+        if((h.ip == addr) && (h.port == port)){
+            cout << "[CLIENT] Duplicate host" << endl;
+            return;
+        }
+    }
+    
     Host newHost;
+    newHost.perm = permanent;   //Set host type
+    newHost.ip = addr;
+    newHost.port = port;
     
     // Find out server address
     // TODO: Currently supports only one server
@@ -112,18 +123,21 @@ void* Client::handle(void* arg)
     
     cout << "[CLIENT] Client handler" << endl;
     
-    
-    //TEMP SLEEP
-    sleep(2);
-	
-	//int count = handler->_mode;
-    
     while(handler->_running){
         
-        for(Host h : handler->_hosts){
-            handler->sessionHandler(h);
+        list<Host>::iterator iter;
+        for(iter = handler->_hosts.begin(); iter != handler->_hosts.end(); iter++){
+            handler->sessionHandler(*iter);
+            
+            //Remove temporary hosts
+            if(!(*iter).perm){
+                cout << "[CLIENT] Removing temporary host " << (*iter).ip << endl;
+                handler->_hosts.erase(iter);
+            }
         }
 		
+        
+        
         sleep(CLIENT_REFRESH);
     }
     handler->_running = false;

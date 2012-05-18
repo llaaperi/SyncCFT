@@ -35,6 +35,7 @@ struct Host {
     string ip;
     string port;
     struct addrinfo* serverInfo;
+    bool perm;  //Permanent host (from command line)
 };
 
 class Client {
@@ -93,7 +94,7 @@ public:
     //sockaddr* getSockAddr(){return _serverInfo->ai_addr;}
     
     //string getHost(){return _hosts.front();}
-    void addHost(string addr, string port);
+    void addHost(string addr, string port, bool permanent);
     
 private:
     //Rule of three
