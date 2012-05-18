@@ -12,8 +12,11 @@
 #include "networking.hh"
 #include "FileTransfer.hh"
 
-Client::Client(list<string> hosts, string cport, string sport) throw(invalid_argument, runtime_error) : _hosts(hosts), _cport(cport), _sport(sport), _running(false){
+
+Client::Client(list<string> hosts, string cport, string sport, int mode) throw(invalid_argument, runtime_error) : _mode(mode), _hosts(hosts), _cport(cport), _sport(sport), _running(false){
     
+	cout << "[CLIENT] Client constructor with mode: " << mode << endl;
+	
     if(true){
         
     }
@@ -103,6 +106,8 @@ void* Client::handle(void* arg)
     
     //TEMP SLEEP
     sleep(2);
+	
+	int count = handler->_mode;
     
     while(handler->_running){
         sockaddr* sockAddr = handler->getSockAddr();
@@ -122,9 +127,16 @@ void* Client::handle(void* arg)
         //Terminate session
         handler->endSession(*sockAddr);
         
+		// Close client depending on mode
+		if ((handler->_mode) && (--count <= 0)) {
+			cout << "[CLIENT] Client finished" << endl;
+			break;
+		}
+		
         sleep(CLIENT_REFRESH);
     }
     handler->_running = false;
+		
     return 0;
 }
 

@@ -26,7 +26,7 @@
 #define CLIENT_CHUNK_RETRIES 5 // Max chunk retries
 #define CLIENT_QUIT_RETRIES 3 // Max quit retries
 #define CLIENT_BACKOFF 2 // In seconds
-#define CLIENT_REFRESH 60
+#define CLIENT_REFRESH 10
 
 
 using namespace std;
@@ -38,6 +38,7 @@ class Client {
     string _cport;
     string _sport;
     bool _running;
+	int _mode;
     int _socket;
     uint8_t _id;
     Transceiver* _trns;
@@ -47,8 +48,10 @@ class Client {
 
     
 public:
-    
-    Client(list<string> hosts, string cport, string sport) throw(invalid_argument, runtime_error);
+    /*
+	 * Mode defines how many times the synchronization operation is repeated, 0 = infinite
+	 */
+    Client(list<string> hosts, string cport, string sport, int mode=0) throw(invalid_argument, runtime_error);
     ~Client();
     
     /*
