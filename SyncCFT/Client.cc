@@ -140,7 +140,10 @@ void Client::sessionHandler(Host h){
     
     cout << "[CLIENT] New session with host " << h.ip << endl;
     
-    sockaddr* sockAddr = h.serverInfo->ai_addr;;
+    sockaddr* sockAddr = h.serverInfo->ai_addr;
+    
+    Transceiver trans(_socket, *sockAddr);
+    _trns = &trans;
     
     //Try HELLO handshake
     startSession(*sockAddr);
