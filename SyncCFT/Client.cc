@@ -13,7 +13,7 @@
 #include "FileTransfer.hh"
 
 
-Client::Client(list<string> hosts, string cport, string sport, int mode) throw(invalid_argument, runtime_error) : _mode(mode), _hosts(hosts), _cport(cport), _sport(sport), _running(false){
+Client::Client(list<string> hosts, string cport, string sport, int mode) throw(invalid_argument, runtime_error) : _mode(mode), _hosts(hosts), _cport(cport), _sport(sport), _running(false), _finished(false){
     
 	cout << "[CLIENT] Client constructor with mode: " << mode << endl;
 	
@@ -136,6 +136,7 @@ void* Client::handle(void* arg)
         sleep(CLIENT_REFRESH);
     }
     handler->_running = false;
+    handler->_finished = true;
 		
     return 0;
 }

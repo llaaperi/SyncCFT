@@ -38,6 +38,7 @@ class Client {
     string _cport;
     string _sport;
     bool _running;
+    bool _finished;
 	int _mode;
     int _socket;
     uint8_t _id;
@@ -70,6 +71,11 @@ public:
      */
     bool isRunning(){return _running;}
     
+    
+    /*
+     *
+     */
+    bool isFinished(){return _finished;}
     
     /*
      * Main function for client thread

@@ -154,16 +154,22 @@ void SessionHandler::descrHandler(const Message* msg){
         const struct sockaddr* cliAddr = msg->getAddr();
         
         string ip = Networking::getAddrStr(cliAddr);
-        string port = Networking::getPortStr(cliAddr);
+        string cport = Networking::getPortStr(cliAddr);
+        string sport = "" + (atoi(cport.c_str()) - 1);
         
-        cout << "[SESSION] Add new source, ip: " << ip << ", port: " << port << endl;
+        
+        cout << "[SESSION] Add new source, ip: " << ip << ", cport: " << cport << ", sport: " << sport << endl;
         
         list<string> hosts;
         hosts.push_back(ip);
         
-        //TODO check duplicates
-        Client* newClient = new Client(hosts, port, "5062");
-        _clients.push_back(newClient);
+        //Check duplicates
+        
+        
+        
+        Client* newClient = new Client(hosts, cport, sport, 1); //Create new client for synchronization
+        _serverClients.push_back(newClient);  //Add client to servers source list
+        //NOTE: Client cannot be started here because runtime conflict between two clients due to implementation
     }
     
     //cout << "[SESSION] Diff file:" << endl << diff << endl;

@@ -13,7 +13,7 @@
 #include "networking.hh"
 
 
-list<Client*> _clients;
+list<Client*> _serverClients;
 
 
 /*
@@ -121,7 +121,7 @@ void* Server::handle(void* arg){
             }
         }
         
-        if(!_clients.empty()){
+        if(!_serverClients.empty()){
             //cout << "[SERVER] Handle source clients" << endl;
             handler->sourceHandler();
         }
@@ -135,10 +135,20 @@ void* Server::handle(void* arg){
 
 void Server::sourceHandler(){
     
-    Client* cli = _clients.front();
-    if(!cli->isRunning()){
-        cout << "[SERVER] Starting client " << cli->getHost() << endl;
-        cli->start();
+    Client* cli = _serverClients.front();
+    if(!_serverClients.empty() && !cli->isRunning()){
+        
+        //Remove finished client
+        if(cli->isFinished()){
+            cout << "[SERVER] Removing finished client " << cli->getHost() << endl;
+            _serverClients.pop_front();
+            delete(cli);
+            sourceHandler();    //Start new client if list is not empty
+        }
+        else{
+            cout << "[SERVER] Starting client " << cli->getHost() << endl;
+            cli->start();
+        }
     }
 }
 

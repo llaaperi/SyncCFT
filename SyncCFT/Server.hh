@@ -23,7 +23,7 @@
 
 #define SERVER_SESSION_HANDLERS 3 //Number of handlers can be defined. Maximum value is 256.
 
-extern list<Client*> _clients;
+extern list<Client*> _serverClients;
 
 using namespace std;
 
