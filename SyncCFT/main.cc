@@ -18,13 +18,14 @@
 
 #define HELP "Usage: synccft [-c <client port>] [-s <server port>] [-p <p>] [-q <q>] [-k] [-d <dir>] <hosts>"
 
+
 int main (int argc, const char * argv[])
 {
     std::cout << "*** SyncCTF launched ***" << std::endl;
     
     //Default values
-    string cport = "5063";
-    string sport = "5062";
+    string clientPort = "5063";
+    string serverPort = "5062";
     string p = "-1.0";  //Init as not set
     string q = "-1.0";  //Init as not set
     string dir = "./Sync/";
@@ -50,12 +51,12 @@ int main (int argc, const char * argv[])
         switch (c)
         {
             case 'c': // Client port
-                cport = optarg;
-                cout << "Client port: " << cport << endl;
+                clientPort = optarg;
+                cout << "Client port: " << clientPort << endl;
                 break;
             case 's': // Server port
-                sport = optarg;
-                cout << "Server port: " << sport << endl;
+                serverPort = optarg;
+                cout << "Server port: " << serverPort << endl;
                 break;
             case 'p': // Markov probability
                 p = optarg;
@@ -122,14 +123,14 @@ int main (int argc, const char * argv[])
     MetaFile mFile(METAFILE);
     mFile.print();
     
-    //bool startClient = false;
+    bool startClient = true;
     bool startServer = true;
     
     // Start client first
     Client* clientHandler = NULL;
-    if(!hosts.empty()){
+    if(startClient){
         try {
-            clientHandler = new Client(hosts, cport, sport);
+            clientHandler = new Client(hosts, clientPort, serverPort);
             clientHandler->start();
         } catch (...) {
             cout << "Creating client handler failed." << endl;
@@ -137,14 +138,12 @@ int main (int argc, const char * argv[])
         }
     }
     
-    Utilities::isPacketLost();
-    
     // Pass reference to client object to the server
     // Start client first
     Server* serverHandler = NULL;
     if(startServer){
         try {
-            serverHandler = new Server(clientHandler, sport);
+            serverHandler = new Server(clientHandler, serverPort);
             serverHandler->start();
         } catch (...) {
             cout << "Creating server handler failed." << endl;

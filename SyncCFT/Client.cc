@@ -13,38 +13,19 @@
 #include "FileTransfer.hh"
 
 
-Client::Client(list<string> hosts, string cport, string sport, int mode) throw(invalid_argument, runtime_error) : _mode(mode), _hosts(hosts), _cport(cport), _sport(sport), _running(false), _finished(false){
+Client::Client(list<string> hosts, string cport, string sport, int mode) throw(invalid_argument, runtime_error) : _mode(mode), _cport(cport), _sport(sport), _running(false), _finished(false){
     
-	cout << "[CLIENT] Client constructor with mode: " << mode << endl;
-	
-    if(true){
-        
-    }
-    else{
-        throw invalid_argument("[CLIENT] Invalid arguments");
-    }
+	//cout << "[CLIENT] Client constructor with mode: " << mode << endl;
     
     _socket = Networking::createUnconnectedSocket(_cport);
     if(_socket < 0){
         throw runtime_error("[CLIENT] Socket creation failed");
     }
     
-    // Find out server address
-    // TODO: Currently supports only one server
-    struct addrinfo hints;
-    
-    bzero(&hints, sizeof(struct addrinfo)); // Zero struct values
-    hints.ai_family = AF_UNSPEC; // IPv4 or IPv6
-    hints.ai_socktype = SOCK_DGRAM; // UDP socket
-    
-    //Get address information in struct addrinfo format. Works for IPv4 and IPv6.
-    if(getaddrinfo(_hosts.front().c_str(), _sport.c_str(), &hints, &_serverInfo)) { //getaddrinfo returns 0 on success
-        throw runtime_error("[CLIENT] Running getaddrinfo failed.");
+    //Add hosts
+    for(string host : hosts){
+        addHost(host, sport);
     }
-    
-    // Create new tranceiver
-    _trns = new Transceiver(_socket, *getSockAddr());
-
 }
 
 
@@ -55,10 +36,12 @@ Client::Client(list<string> hosts, string cport, string sport, int mode) throw(i
  **/
 Client::~Client() {
     
+    cout << "[CLIENT] Destructor" << endl;
+    
     // Close open socket
-    if (_socket < 0) {
-        close(_socket);  
-
+    if(_socket >= 0) {
+        cout << "[CLIENT] Closing socket" << endl;
+        close(_socket);
     }
     
     if(_trns != NULL){
@@ -68,6 +51,32 @@ Client::~Client() {
     if(_fFlow != NULL){
         delete(_fFlow);
     }
+}
+
+
+/*
+ *
+ */
+void Client::addHost(string addr, string port){
+    
+    cout << "[CLIENT] Adding new host, ip: " << addr << ", port: " << port << endl;
+    
+    Host newHost;
+    
+    // Find out server address
+    // TODO: Currently supports only one server
+    struct addrinfo hints;
+    
+    bzero(&hints, sizeof(struct addrinfo)); // Zero struct values
+    hints.ai_family = AF_UNSPEC; // IPv4 or IPv6
+    hints.ai_socktype = SOCK_DGRAM; // UDP socket
+    
+    //Get address information in struct addrinfo format. Works for IPv4 and IPv6.
+    if(getaddrinfo(addr.c_str(), port.c_str(), &hints, &newHost.serverInfo)) { //getaddrinfo returns 0 on success
+        throw runtime_error("[CLIENT] Running getaddrinfo failed.");
+    }
+    
+     _hosts.push_back(newHost);
 }
 
 
@@ -107,31 +116,13 @@ void* Client::handle(void* arg)
     //TEMP SLEEP
     sleep(2);
 	
-	int count = handler->_mode;
+	//int count = handler->_mode;
     
     while(handler->_running){
-        sockaddr* sockAddr = handler->getSockAddr();
         
-        //Try HELLO handshake
-        handler->startSession(*sockAddr);
-        
-        //Metafile handler
-        MetaFile* diff;
-        handler->metafileHandler(*sockAddr, &diff);
-        
-        //File transfers
-        if(diff != NULL){
-            handler->fileTransfer(*sockAddr, diff);
+        for(Host h : handler->_hosts){
+            handler->sessionHandler(h);
         }
-        
-        //Terminate session
-        handler->endSession(*sockAddr);
-        
-		// Close client depending on mode
-		if ((handler->_mode) && (--count <= 0)) {
-			cout << "[CLIENT] Client finished" << endl;
-			break;
-		}
 		
         sleep(CLIENT_REFRESH);
     }
@@ -139,6 +130,32 @@ void* Client::handle(void* arg)
     handler->_finished = true;
 		
     return 0;
+}
+
+
+/*
+ *
+ */
+void Client::sessionHandler(Host h){
+    
+    cout << "[CLIENT] New session with host " << h.ip << endl;
+    
+    sockaddr* sockAddr = h.serverInfo->ai_addr;;
+    
+    //Try HELLO handshake
+    startSession(*sockAddr);
+    
+    //Metafile handler
+    MetaFile* diff;
+    metafileHandler(*sockAddr, &diff);
+    
+    //File transfers
+    if(diff != NULL){
+        fileTransfer(*sockAddr, diff);
+    }
+    
+    //Terminate session
+    endSession(*sockAddr);
 }
 
 
@@ -253,10 +270,12 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
         } else {
             cout << "[CLIENT] Failed to complete file" << endl;
             delete(_fFlow);
+            _fFlow = NULL;
             return; // Terminate session
         }
         
         delete(_fFlow);
+        _fFlow = NULL;
     }
 }
 

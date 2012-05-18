@@ -31,10 +31,16 @@
 
 using namespace std;
 
+struct Host {
+    string ip;
+    string port;
+    struct addrinfo* serverInfo;
+};
+
 class Client {
     //Transceiver _transceiver;
     pthread_t _thread;
-    list<string> _hosts;    //Only first is used
+    list<Host> _hosts;
     string _cport;
     string _sport;
     bool _running;
@@ -45,7 +51,6 @@ class Client {
     Transceiver* _trns;
     FileTransfer* _fFlow;
     
-    struct addrinfo* _serverInfo;
 
     
 public:
@@ -85,15 +90,17 @@ public:
     
     void synchronize(MetaFile file);
     
-    sockaddr* getSockAddr(){return _serverInfo->ai_addr;}
+    //sockaddr* getSockAddr(){return _serverInfo->ai_addr;}
     
-    string getHost(){return _hosts.front();}
+    //string getHost(){return _hosts.front();}
+    void addHost(string addr, string port);
     
 private:
     //Rule of three
     Client(Client const& other);
     Client operator=(Client const& other);
     
+    void sessionHandler(Host h);
     void startSession(sockaddr servAddr);
     void endSession(sockaddr servAddr);
     

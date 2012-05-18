@@ -17,19 +17,19 @@
 #include "stdexcept"
 
 //Timeouts in milliseconds
-#define SERVER_TIMEOUT_RECV 1000
+#define SERVER_TIMEOUT_RECV 1000000
 #define SERVER_TIMEOUT_SEND 5000
 #define SERVER_TIMEOUT_HELLOACK 5000
 
 #define SERVER_SESSION_HANDLERS 3 //Number of handlers can be defined. Maximum value is 256.
 
-extern list<Client*> _serverClients;
+extern list<string> _serverClients; //ip:port
 
 using namespace std;
 
 class Server {
     //Transceiver mTransceiver;
-    Client* _clientHandler;
+    Client* _client;
     pthread_t _thread;
     bool _running;
     string _port;

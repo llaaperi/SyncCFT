@@ -13,23 +13,14 @@
 #include "networking.hh"
 
 
-list<Client*> _serverClients;
+list<string> _serverClients;
 
 
 /*
  * Constructor
  */
-Server::Server(Client* clientHandler, string port) throw(invalid_argument,runtime_error) : _port(port), _running(false){
+Server::Server(Client* clientHandler, string port) throw(invalid_argument,runtime_error) : _port(port), _running(false), _client(clientHandler){
     
-    _clientHandler = clientHandler;
-    /*
-    if(clientHandler != NULL){
-        _clientHandler = clientHandler;
-    }
-    else{
-        throw invalid_argument("[SERVER] NULL Client");
-    }
-    */
     _socket = Networking::createUnconnectedSocket(_port);
     if(_socket < 0){
         throw runtime_error("[SERVER] Socket creation failed");
@@ -71,8 +62,17 @@ void Server::stop(void){
 }
 
 
+/*
+ * Add new sync source to the client hosts
+ */
 void Server::addSource(string addr, string port){
-
+    
+    //cout << "[SERVER] Add new source, ip: " << addr << ", port: " << port << endl;
+    if(_client != NULL){
+        _client->addHost(addr, port); 
+    }else{
+        cout << "[SERVER] Server does not accept new sources" << endl;
+    }
 }
 
 
@@ -91,7 +91,7 @@ void* Server::handle(void* arg){
     while(handler->_running){
         
         //Wait incoming packets
-        //cout << "[SERVER] Waiting packets..." << endl;
+        cout << "[SERVER] Waiting packets..." << endl;
         //while(!Transceiver::recvMsg(handler->_socket, &msg, &cliAddr, SERVER_TIMEOUT_RECV));        
         
         if(Transceiver::recvMsg(handler->_socket, &msg, &cliAddr, SERVER_TIMEOUT_RECV)){
@@ -121,18 +121,19 @@ void* Server::handle(void* arg){
             }
         }
         
+        /*
         if(!_serverClients.empty()){
             //cout << "[SERVER] Handle source clients" << endl;
             handler->sourceHandler();
         }
-        
+        */
         
     }
     return 0;
 }
 
 
-
+/*
 void Server::sourceHandler(){
     
     Client* cli = _serverClients.front();
@@ -141,8 +142,8 @@ void Server::sourceHandler(){
         //Remove finished client
         if(cli->isFinished()){
             cout << "[SERVER] Removing finished client " << cli->getHost() << endl;
-            _serverClients.pop_front();
-            delete(cli);
+            delete(cli);    //Free finished client
+            _serverClients.pop_front(); //Remove pointer from the list
             sourceHandler();    //Start new client if list is not empty
         }
         else{
@@ -151,7 +152,7 @@ void Server::sourceHandler(){
         }
     }
 }
-
+*/
 
 
 /*
@@ -223,7 +224,7 @@ void Server::handshakeHandler(Message* msg, sockaddr cliAddr){
         
         //Allocate resources when client ACKs the handshake
         if(msg->getClientID() == clientID){
-            _sessionHandlers[clientID] = new SessionHandler(_socket, &cliAddr, clientID, msg->getSeqnum());
+            _sessionHandlers[clientID] = new SessionHandler(this, _socket, &cliAddr, clientID, msg->getSeqnum());
         }
         return;
     }

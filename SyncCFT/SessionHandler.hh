@@ -19,8 +19,11 @@
 
 using namespace std;
 
+class Server;
+
 class SessionHandler {
     
+    Server* _server;
     uint8_t _id;
     uint32_t _seqnum;
     Transceiver* _trns;
@@ -30,8 +33,8 @@ class SessionHandler {
     unsigned char _sessionKey[32];
     
 public:
-    SessionHandler(){};
-    SessionHandler(int socket, struct sockaddr* cliAddr, uint8_t id, uint32_t seqnum);
+    //SessionHandler(){};
+    SessionHandler(Server* server, int socket, struct sockaddr* cliAddr, uint8_t id, uint32_t seqnum);
     ~SessionHandler();
     
     

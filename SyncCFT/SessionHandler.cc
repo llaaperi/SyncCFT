@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <sstream>
 
 #include "SessionHandler.hh"
 #include "Transceiver.hh"
@@ -18,8 +19,12 @@
 /*
  * Constructor
  */
-SessionHandler::SessionHandler(int socket, struct sockaddr* cliAddr, uint8_t id, uint32_t seqnum) : _id(id), _seqnum(seqnum){
+SessionHandler::SessionHandler(Server* server, int socket, struct sockaddr* cliAddr, uint8_t id, uint32_t seqnum) : _id(id), _seqnum(seqnum){
+    
     cout << "[SESSION] New session with id " << (unsigned int)id << " accepted"<< endl;
+    
+    _server = server;
+    
     //Create new tranceiver for this session
     _trns = new Transceiver(socket, *cliAddr);
     memset(_fFlows, 0, SESSIONHANDLER_MAX_TRANSFERS * sizeof(FileTransfer*));
@@ -145,33 +150,6 @@ void SessionHandler::descrHandler(const Message* msg){
     string clientDiff = mFile.getDiff(clientFile);
     string serverDiff = clientFile.getDiff(mFile);
     
-    //cout << "[SESSION] Client diff: " << endl << clientDiff << endl;
-    //cout << "[SESSION] Server diff: " << endl << serverDiff << endl;
-    
-    //Add new file source for the server if client has files that server does not
-    if(!serverDiff.empty()){
-        
-        const struct sockaddr* cliAddr = msg->getAddr();
-        
-        string ip = Networking::getAddrStr(cliAddr);
-        string cport = Networking::getPortStr(cliAddr);
-        string sport = "" + (atoi(cport.c_str()) - 1);
-        
-        
-        cout << "[SESSION] Add new source, ip: " << ip << ", cport: " << cport << ", sport: " << sport << endl;
-        
-        list<string> hosts;
-        hosts.push_back(ip);
-        
-        //Check duplicates
-        
-        
-        
-        Client* newClient = new Client(hosts, cport, sport, 1); //Create new client for synchronization
-        _serverClients.push_back(newClient);  //Add client to servers source list
-        //NOTE: Client cannot be started here because runtime conflict between two clients due to implementation
-    }
-    
     //cout << "[SESSION] Diff file:" << endl << diff << endl;
     reply.setPayload(clientDiff.c_str(), (int)clientDiff.length());
     
@@ -179,6 +157,20 @@ void SessionHandler::descrHandler(const Message* msg){
     
     //Send diff
     _trns->send(&reply, SERVER_TIMEOUT_SEND);
+    
+    //cout << "[SESSION] Client diff: " << endl << clientDiff << endl;
+    //cout << "[SESSION] Server diff: " << endl << serverDiff << endl;
+    
+    //Add new file source for the server if client has files that server does not
+    if(!serverDiff.empty()){
+        
+        const struct sockaddr* cliAddr = msg->getAddr();
+        stringstream ss;
+        ss << atoi(Networking::getPortStr(cliAddr).c_str()) - 1;    //Server port is source port - 1
+        
+        _server->addSource(Networking::getAddrStr(cliAddr), ss.str());
+    }
+    
     cout << "[SESSION] Description handler finished" << endl;
 }
 
