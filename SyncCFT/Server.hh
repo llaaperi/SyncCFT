@@ -35,12 +35,13 @@ class Server {
     string _port;
     int _socket;
     int _version;
+	const unsigned char* _secretKey;
     
     SessionHandler* _sessionHandlers[SERVER_SESSION_HANDLERS];
 
 public:
     
-    Server(Client* clientHandler, string port, int version) throw(invalid_argument,runtime_error);
+    Server(Client* clientHandler, string port, int version, const unsigned char* secretKey) throw(invalid_argument,runtime_error);
     ~Server();
     
     /*

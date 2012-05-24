@@ -52,14 +52,14 @@ class Client {
     uint8_t _id;
     Transceiver* _trns;
     FileTransfer* _fFlow;
-    
+    const unsigned char* _secretKey;
 
     
 public:
     /*
 	 * Mode defines how many times the synchronization operation is repeated, 0 = infinite
 	 */
-    Client(list<string> hosts, string cport, string sport, int version, int mode=0) throw(invalid_argument, runtime_error);
+    Client(list<string> hosts, string cport, string sport, int version, const unsigned char* secretKey, int mode=0) throw(invalid_argument, runtime_error);
     ~Client();
     
     /*

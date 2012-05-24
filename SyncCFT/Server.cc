@@ -19,7 +19,7 @@ list<string> _serverClients;
 /*
  * Constructor
  */
-Server::Server(Client* clientHandler, string port, int version) throw(invalid_argument,runtime_error) : _client(clientHandler), _port(port), _version(version), _running(false){
+Server::Server(Client* clientHandler, string port, int version, const unsigned char* secretKey) throw(invalid_argument,runtime_error) : _client(clientHandler), _port(port), _version(version), _secretKey(secretKey), _running(false){
     
     _socket = Networking::createUnconnectedSocket(_port);
     if(_socket < 0){
