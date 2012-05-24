@@ -311,6 +311,9 @@ void Message::printInfo() const {
     cout << endl;
     
     if(getPayloadLength() > 0){
-        cout << "Payload:" << endl << "\"" << getPayload() << "\"" << endl;
+        cout << "Payload:" << endl;
+        Utilities::printBytes((unsigned char*)getPayload(), getPayloadLength());
+        cout << endl;
     }
+    
 }
