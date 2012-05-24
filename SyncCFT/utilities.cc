@@ -193,6 +193,7 @@ void Utilities::randomBytes(unsigned char* ptr, int len)
 void Utilities::nonceHash(unsigned char* result, const unsigned char* nonce, const unsigned char* key){
     
     unsigned char hashInput[16 + 512];
+	memset(result, 0, 256);
     memcpy(hashInput, nonce, 16);
     memcpy(hashInput + 16, key, 512);
     Utilities::SHA256Hash(result, hashInput, 512 + 16);
