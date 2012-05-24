@@ -399,9 +399,8 @@ bool Client::handshakeHandlerV1(sockaddr servAddr){
     
     //Send HELLO message
     msg.initHeader(TYPE_HELLO);
-    /*if(!Transceiver::sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_SEND)){
-        return false;
-    }*/
+    msg.setVersion(1);
+    
     if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
         return false;
     }
@@ -441,9 +440,8 @@ bool Client::handshakeHandlerV2(sockaddr servAddr){
     
     //Send HELLO message
     msg.initHeader(TYPE_HELLO);
-    /*if(!Transceiver::sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_SEND)){
-     return false;
-     }*/
+    msg.setVersion(2);
+    
     if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
         return false;
     }
