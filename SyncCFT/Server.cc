@@ -226,6 +226,10 @@ void Server::handshakeHandlerV1(Message* msg, sockaddr cliAddr){
     }
 }
 
+
+/*
+ *
+ */
 void Server::replyNACK(Message* msg, sockaddr cliAddr){
     msg->incrSeqnum();
     msg->setType(TYPE_NACK);
@@ -234,11 +238,23 @@ void Server::replyNACK(Message* msg, sockaddr cliAddr){
 }
 
 
+/*
+ *
+ */
 void Server::createNewSession(int clientID, sockaddr cliAddr, uint32_t seqnum){
-    
     Transceiver* trns = new Transceiver(_socket, cliAddr);
     _sessionHandlers[clientID] = new SessionHandler(this, trns, clientID, seqnum);
 }
+
+
+void Utilities::nonceHash(unsigned char* result, const unsigned char* nonce, const unsigned char* key){
+    
+    unsigned char hashInput[16 + 512];
+    memcpy(hashInput, nonce, 16);
+    memcpy(hashInput + 16, key, 512);
+    Utilities::SHA256Hash(result, hashInput, 512 + 16);
+}
+
 
 /*
  *
@@ -299,12 +315,41 @@ void Server::handshakeHandlerV2(Message* msg, sockaddr cliAddr){
         return;
     }
     
-    //Handshake is completed
+    //Check client hash
     if(msg->getType() == TYPE_ACK){
         
         cout << "[SERVER] HELLOACK received from ";
         Networking::printAddress(&cliAddr);
         cout << endl;
+        
+        if(msg->getPayloadLength() < 256){
+            cout << "[SERVER] Connection refused: Invalid hash" << endl;
+            replyNACK(msg, cliAddr);
+            return;
+        }
+        
+        unsigned char hash[256];
+        Utilities::nonceHash(hash, sNonce, _secretKey);
+        
+        //Check that client hash is correct
+        if(memcmp(hash, msg->getPayload(), 256)){
+            cout << "[SERVER] Connection refused: Invalid hash value" << endl;
+            replyNACK(msg, cliAddr);
+            return;
+        }
+        
+        cout << "Server hash (first 32 bytes): ";
+        Utilities::printBytes(hash, 32);
+        cout << endl;
+        
+        //Reply with ACK containing hash
+        Utilities::nonceHash(hash, cNonce, _secretKey);
+        msg->incrSeqnum();
+        msg->setPayload((char*)hash, 256);
+        msg->setHello(true);
+        if(!Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND)){
+            return;
+        }
         
         //Allocate resources when client ACKs the handshake
         if(msg->getClientID() == clientID){

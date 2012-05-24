@@ -188,6 +188,18 @@ void Utilities::randomBytes(unsigned char* ptr, int len)
 
 
 /*
+ * Calculate hash from nonce and key
+ */
+void Utilities::nonceHash(unsigned char* result, const unsigned char* nonce, const unsigned char* key){
+    
+    unsigned char hashInput[16 + 512];
+    memcpy(hashInput, nonce, 16);
+    memcpy(hashInput + 16, key, 512);
+    Utilities::SHA256Hash(result, hashInput, 512 + 16);
+}
+
+
+/*
  * Get N bit secret key 
  * @ptr An address where to store the the secret 
  * @len Length of the secret

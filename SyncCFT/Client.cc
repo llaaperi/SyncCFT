@@ -440,18 +440,17 @@ bool Client::handshakeHandlerV2(sockaddr servAddr){
     
     cout << "[CLIENT] Version 2 handshake handler" << endl;
     
-    //Send HELLO message
+    //**********************Send HELLO message *************************
     msg.initHeader(TYPE_HELLO);
     msg.setVersion(2);
     
     Utilities::randomBytes(cNonce, 16);
     msg.setPayload((char*)cNonce, 16);
-    
     if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
         return false;
     }
     
-    //Receive reply from the server
+    //******************Receive reply from the server *************************
     if(!_trns->recv(&msg, CLIENT_TIMEOUT_HELLO)){
         return false;
     }
@@ -470,7 +469,27 @@ bool Client::handshakeHandlerV2(sockaddr servAddr){
     Utilities::printBytes(cNonce, 16);
     cout << endl;
     
+    //*********************Send key hash *****************
     
+    unsigned char hash[256];
+    unsigned char hashInput[16 + 512];
+    memcpy(hashInput, sNonce, 16);
+    memcpy(hashInput + 16, _secretKey, 512);
+    Utilities::SHA256Hash(hash, hashInput, 512 + 16);
+    
+    cout << "Client hash (first 32 bytes): ";
+    Utilities::printBytes(hash, 32);
+    cout << endl;
+    
+    //Reply with ACK containing hash
+    msg.incrSeqnum();
+    msg.setPayload((char*)hash, 256);
+    msg.setHello(true);
+    if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
+        return false;
+    }
+    
+    //************** check server responce ****************
     
     //Save id
     _id = msg.getClientID();

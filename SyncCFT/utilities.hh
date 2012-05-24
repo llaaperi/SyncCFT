@@ -68,6 +68,12 @@ namespace Utilities {
      **/
     void randomBytes(unsigned char* ptr, int len);
     
+    
+    /**
+     *
+     */
+    void nonceHash(unsigned char* result, const unsigned char* nonce, const unsigned char* key);
+    
     /**
      * Get N bit secret key 
      * @ptr An address where to store the the secret 
