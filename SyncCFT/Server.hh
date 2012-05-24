@@ -65,6 +65,8 @@ private:
     Server(Server const& other);
     Server operator=(Server const& other);
     
+    void replyNACK(Message* msg, sockaddr cliAddr);
+    
     int getFreeID();
     void sourceHandler();
     void handshakeHandlerV1(Message* msg, sockaddr cliAddr);

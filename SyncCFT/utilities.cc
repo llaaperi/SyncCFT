@@ -226,3 +226,13 @@ void Utilities::getSecretKey(unsigned char* ptr, int len, const char* fName) {
         fclose(keyFile);
     }
 }
+
+
+/*
+ *
+ */
+void Utilities::printBytes(unsigned char* ptr, int len){
+    for(int i = 0; i < len; i++){
+        printf("%02x ", ptr[i]);
+    }    
+}

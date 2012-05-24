@@ -226,6 +226,13 @@ void Server::handshakeHandlerV1(Message* msg, sockaddr cliAddr){
     }
 }
 
+void Server::replyNACK(Message* msg, sockaddr cliAddr){
+    msg->incrSeqnum();
+    msg->setType(TYPE_NACK);
+    msg->clearPayload();
+    Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND);
+}
+
 
 /*
  *
@@ -233,7 +240,72 @@ void Server::handshakeHandlerV1(Message* msg, sockaddr cliAddr){
 void Server::handshakeHandlerV2(Message* msg, sockaddr cliAddr){
     
     cout << "[SERVER] Handshake handler version 2 started" << endl;
+    static int clientID = 0;
+    static unsigned char cNonce[16];
+    static unsigned char sNonce[16];
     
+    
+    //Hanshake is initiated
+    if(msg->getType() == TYPE_HELLO){
+        
+        cout << "[SERVER] HELLO received from ";
+        Networking::printAddress(&cliAddr);
+        cout << endl;
+        
+        //Check that there are free client ID's
+        int id = getFreeID();
+        if(id < 0){
+            //Send NACK if ID's are depleted
+            cout << "[SERVER] Connection refused: ClientID's depleted" << endl;
+            replyNACK(msg, cliAddr);
+            return;
+        }
+        
+        //Check nonce
+        if(msg->getPayloadLength() < 16){
+            cout << "[SERVER] Connection refused: Invalid nonce" << endl;
+            replyNACK(msg, cliAddr);
+            return;
+        }
+        
+        //Get client nonce
+        memcpy(cNonce, msg->getPayload(), 16);
+        
+        //Reply with ACK and clientID
+        msg->incrSeqnum();
+        msg->setClientID(id);
+        msg->setType(TYPE_ACK);
+        
+        Utilities::randomBytes(sNonce, 16);
+        msg->setPayload((char*)sNonce, 16);
+        
+        if(Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND)){
+            clientID = id; //Save id if packet was sent succesfully
+        }
+        
+        cout << "Server nonce: ";
+        Utilities::printBytes(sNonce, 16);
+        cout << endl;
+        cout << "Client nonce: ";
+        Utilities::printBytes(cNonce, 16);
+        cout << endl;
+        
+        return;
+    }
+    
+    //Handshake is completed
+    if(msg->getType() == TYPE_ACK){
+        
+        cout << "[SERVER] HELLOACK received from ";
+        Networking::printAddress(&cliAddr);
+        cout << endl;
+        
+        //Allocate resources when client ACKs the handshake
+        if(msg->getClientID() == clientID){
+            _sessionHandlers[clientID] = new SessionHandler(this, _socket, &cliAddr, clientID, msg->getSeqnum());
+        }
+        return;
+    }
 }
 
 

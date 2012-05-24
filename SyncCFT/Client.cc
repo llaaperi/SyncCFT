@@ -434,6 +434,8 @@ bool Client::handshakeHandlerV1(sockaddr servAddr){
  */
 bool Client::handshakeHandlerV2(sockaddr servAddr){
     
+    unsigned char cNonce[16];
+    unsigned char sNonce[16];
     Message msg;
     
     cout << "[CLIENT] Version 2 handshake handler" << endl;
@@ -441,6 +443,9 @@ bool Client::handshakeHandlerV2(sockaddr servAddr){
     //Send HELLO message
     msg.initHeader(TYPE_HELLO);
     msg.setVersion(2);
+    
+    Utilities::randomBytes(cNonce, 16);
+    msg.setPayload((char*)cNonce, 16);
     
     if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
         return false;
@@ -451,10 +456,19 @@ bool Client::handshakeHandlerV2(sockaddr servAddr){
         return false;
     }
     
-    //Check that received HELLOACK
-    if(msg.getType() != TYPE_ACK){
+    //Check that received HELLOACK with nonce
+    if((msg.getType() != TYPE_ACK) || (msg.getPayloadLength() < 16)){
         return false;
     }
+    
+    //Get servers nonce
+    memcpy(sNonce, msg.getPayload(), 16);
+    cout << "Server nonce: ";
+    Utilities::printBytes(sNonce, 16);
+    cout << endl;
+    cout << "Client nonce: ";
+    Utilities::printBytes(cNonce, 16);
+    cout << endl;
     
     //Save id
     _id = msg.getClientID();

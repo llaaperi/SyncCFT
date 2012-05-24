@@ -76,5 +76,11 @@ namespace Utilities {
      *  to a default file
      **/
     void getSecretKey(unsigned char* ptr, int len, const char* fName);
+    
+    
+    /**
+     *  Printf bytes to stdout
+     */
+    void printBytes(unsigned char* ptr, int len);
 }
 #endif
