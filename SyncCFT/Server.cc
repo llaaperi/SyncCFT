@@ -313,14 +313,26 @@ void Server::handshakeHandlerV2(Message* msg, sockaddr cliAddr){
         Networking::printAddress(&cliAddr);
         cout << endl;
         
+        msg->printInfo();
+        
         if(msg->getPayloadLength() < 256){
             cout << "[SERVER] Connection refused: Invalid hash" << endl;
             replyNACK(msg, cliAddr);
             return;
         }
-        
+        /*
+        cout << "[SERVER] Secret key: " << endl;
+        Utilities::printBytes((unsigned char*)_secretKey, 256);
+        cout << endl;
+        */
         unsigned char hash[256];
         Utilities::nonceHash(hash, sNonce, _secretKey);
+        
+        cout << "Server hash (first 32 bytes): " << endl;
+        Utilities::printBytes(hash, 256);
+        cout << endl;
+        
+        //Utilities::printBytes((unsigned char*)msg->getPayload(), 256);
         
         //Check that client hash is correct
         if(memcmp(hash, msg->getPayload(), 256)){
@@ -328,10 +340,6 @@ void Server::handshakeHandlerV2(Message* msg, sockaddr cliAddr){
             replyNACK(msg, cliAddr);
             return;
         }
-        
-        cout << "Server hash (first 32 bytes): ";
-        Utilities::printBytes(hash, 32);
-        cout << endl;
         
         //Reply with ACK containing hash
         Utilities::nonceHash(hash, cNonce, _secretKey);
