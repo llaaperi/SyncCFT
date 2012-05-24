@@ -48,6 +48,7 @@ class Client {
     bool _finished;
 	int _mode;
     int _socket;
+    int _version;
     uint8_t _id;
     Transceiver* _trns;
     FileTransfer* _fFlow;
@@ -58,7 +59,7 @@ public:
     /*
 	 * Mode defines how many times the synchronization operation is repeated, 0 = infinite
 	 */
-    Client(list<string> hosts, string cport, string sport, int mode=0) throw(invalid_argument, runtime_error);
+    Client(list<string> hosts, string cport, string sport, int version, int mode=0) throw(invalid_argument, runtime_error);
     ~Client();
     
     /*

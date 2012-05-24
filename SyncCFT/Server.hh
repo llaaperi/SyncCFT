@@ -34,12 +34,13 @@ class Server {
     bool _running;
     string _port;
     int _socket;
+    int _version;
     
     SessionHandler* _sessionHandlers[SERVER_SESSION_HANDLERS];
 
 public:
     
-    Server(Client* clientHandler, string port) throw(invalid_argument,runtime_error);
+    Server(Client* clientHandler, string port, int version) throw(invalid_argument,runtime_error);
     ~Server();
     
     /*
@@ -67,7 +68,7 @@ private:
     int getFreeID();
     void sourceHandler();
     void handshakeHandler(Message* msg, sockaddr cliAddr);
-    void terminateHandler(Message* msg, sockaddr cliAddr);
+    //void terminateHandler(Message* msg, sockaddr cliAddr);
 };
 
 #endif

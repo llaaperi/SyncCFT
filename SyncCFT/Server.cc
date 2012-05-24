@@ -19,7 +19,7 @@ list<string> _serverClients;
 /*
  * Constructor
  */
-Server::Server(Client* clientHandler, string port) throw(invalid_argument,runtime_error) : _port(port), _running(false), _client(clientHandler){
+Server::Server(Client* clientHandler, string port, int version) throw(invalid_argument,runtime_error) : _client(clientHandler), _port(port), _version(version), _running(false){
     
     _socket = Networking::createUnconnectedSocket(_port);
     if(_socket < 0){
@@ -134,28 +134,6 @@ void* Server::handle(void* arg){
 
 
 /*
-void Server::sourceHandler(){
-    
-    Client* cli = _serverClients.front();
-    if(!_serverClients.empty() && !cli->isRunning()){
-        
-        //Remove finished client
-        if(cli->isFinished()){
-            cout << "[SERVER] Removing finished client " << cli->getHost() << endl;
-            delete(cli);    //Free finished client
-            _serverClients.pop_front(); //Remove pointer from the list
-            sourceHandler();    //Start new client if list is not empty
-        }
-        else{
-            cout << "[SERVER] Starting client " << cli->getHost() << endl;
-            cli->start();
-        }
-    }
-}
-*/
-
-
-/*
  * Function for requesting next free client id
  * Return: -1 if no free ID's are available or free id
  */
@@ -235,6 +213,7 @@ void Server::handshakeHandler(Message* msg, sockaddr cliAddr){
 /*
  * Handler for session termination
  */
+/*
 void Server::terminateHandler(Message* msg, sockaddr cliAddr){
 
     cout << "[SERVER] Terminate handler started" << endl;
@@ -287,4 +266,4 @@ void Server::terminateHandler(Message* msg, sockaddr cliAddr){
         }
     }
 }
-
+*/
