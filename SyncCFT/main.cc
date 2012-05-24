@@ -105,15 +105,18 @@ int main (int argc, const char * argv[])
     }
     
     // Load a secret key
-    unsigned char secretKey[512];
+    unsigned char secretKey[64];
     const char* fName = NULL;
     if (!newSecret) {
         fName = DEFAULT_KEYFILE;
     }
-    if(!Utilities::getSecretKey(secretKey, 512, fName)){
+    if(!Utilities::getSecretKey(secretKey, 64, fName)){
         cout << "New key generated to file <" << DEFAULT_KEYFILE << ">" << endl;
         return 0;
     }
+    cout << "[MAIN] Secret key:" << endl;
+    Utilities::printBytes(secretKey, 64);
+    cout << endl;
     
     //Init markov process
     Utilities::initMarkov(p, q);

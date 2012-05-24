@@ -296,10 +296,10 @@ void Server::handshakeHandlerV2(Message* msg, sockaddr cliAddr){
             clientID = id; //Save id if packet was sent succesfully
         }
         
-        cout << "Server nonce: ";
+        cout << "[SERVER] Server nonce: ";
         Utilities::printBytes(sNonce, 16);
         cout << endl;
-        cout << "Client nonce: ";
+        cout << "[SERVER] Client nonce: ";
         Utilities::printBytes(cNonce, 16);
         cout << endl;
         
@@ -315,7 +315,7 @@ void Server::handshakeHandlerV2(Message* msg, sockaddr cliAddr){
         
         msg->printInfo();
         
-        if(msg->getPayloadLength() < 256){
+        if(msg->getPayloadLength() < 32){
             cout << "[SERVER] Connection refused: Invalid hash" << endl;
             replyNACK(msg, cliAddr);
             return;
@@ -325,17 +325,17 @@ void Server::handshakeHandlerV2(Message* msg, sockaddr cliAddr){
         Utilities::printBytes((unsigned char*)_secretKey, 256);
         cout << endl;
         */
-        unsigned char hash[256];
+        unsigned char hash[32];
         Utilities::nonceHash(hash, sNonce, _secretKey);
         
-        cout << "Server hash (first 32 bytes): " << endl;
-        Utilities::printBytes(hash, 256);
+        cout << "Server hash: " << endl;
+        Utilities::printBytes(hash, 32);
         cout << endl;
         
         //Utilities::printBytes((unsigned char*)msg->getPayload(), 256);
         
         //Check that client hash is correct
-        if(memcmp(hash, msg->getPayload(), 256)){
+        if(memcmp(hash, msg->getPayload(), 32)){
             cout << "[SERVER] Connection refused: Invalid hash value" << endl;
             replyNACK(msg, cliAddr);
             return;
@@ -344,7 +344,7 @@ void Server::handshakeHandlerV2(Message* msg, sockaddr cliAddr){
         //Reply with ACK containing hash
         Utilities::nonceHash(hash, cNonce, _secretKey);
         msg->incrSeqnum();
-        msg->setPayload((char*)hash, 256);
+        msg->setPayload((char*)hash, 32);
         msg->setHello(true);
         if(!Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND)){
             return;

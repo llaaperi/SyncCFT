@@ -192,11 +192,27 @@ void Utilities::randomBytes(unsigned char* ptr, int len)
  */
 void Utilities::nonceHash(unsigned char* result, const unsigned char* nonce, const unsigned char* key){
     
-    unsigned char hashInput[16 + 512];
-	memset(result, 0, 256);
+    unsigned char hashInput[80];
+	memset(result, 0, 32);
     memcpy(hashInput, nonce, 16);
-    memcpy(hashInput + 16, key, 512);
-    Utilities::SHA256Hash(result, hashInput, 512 + 16);
+    memcpy(hashInput + 16, key, 64);
+    /*
+    cout << "[UTILITIES] Nonce:" << endl;
+    printBytes((unsigned char*)nonce, 16);
+    cout << endl;
+    cout << "[UTILITIES] Key:" << endl;
+    printBytes((unsigned char*)key, 64);
+    cout << endl;
+    cout << "[UTILITIES] Sum:" << endl;
+    printBytes((unsigned char*)hashInput, 80);
+    cout << endl;
+    */
+    Utilities::SHA256Hash(result, hashInput, 80);
+    /*
+    cout << "[UTILITIES] Hash:" << endl;
+    printBytes((unsigned char*)result, 32);
+    cout << endl;
+    */
 }
 
 

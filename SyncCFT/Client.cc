@@ -462,33 +462,33 @@ bool Client::handshakeHandlerV2(sockaddr servAddr){
     
     //Get servers nonce
     memcpy(sNonce, msg.getPayload(), 16);
-    cout << "Server nonce: ";
+    cout << "[CLIENT] Server nonce: ";
     Utilities::printBytes(sNonce, 16);
     cout << endl;
-    cout << "Client nonce: ";
+    cout << "[CLIENT] Client nonce: ";
     Utilities::printBytes(cNonce, 16);
     cout << endl;
     
     //*********************Send key hash *****************
     
-    unsigned char hash[256];
-    unsigned char hashInput[16 + 512];
-    memcpy(hashInput, sNonce, 16);
-    memcpy(hashInput + 16, _secretKey, 512);
-    Utilities::SHA256Hash(hash, hashInput, 512 + 16);
+    unsigned char hash[32];
     
-    cout << "Client hash (first 32 bytes): ";
+	Utilities::nonceHash(hash, sNonce, _secretKey);
+    
+    cout << "[CLIENT] Sent hash: " << endl;
     Utilities::printBytes(hash, 32);
     cout << endl;
     
     //Reply with ACK containing hash
+	msg.setType(TYPE_ACK);
     msg.incrSeqnum();
-    msg.setPayload((char*)hash, 256);
+    msg.setPayload((char*)hash, 32);
     msg.setHello(true);
     if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
         return false;
     }
-    
+	//msg.printInfo();
+	return false;
     //************** check server responce ****************
     
     //Save id
