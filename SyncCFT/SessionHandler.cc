@@ -19,14 +19,9 @@
 /*
  * Constructor
  */
-SessionHandler::SessionHandler(Server* server, int socket, struct sockaddr* cliAddr, uint8_t id, uint32_t seqnum) : _id(id), _seqnum(seqnum){
+SessionHandler::SessionHandler(Server* server, Transceiver* trns, uint8_t id, uint32_t seqnum) : _server(server), _trns(trns), _id(id), _seqnum(seqnum){
     
     cout << "[SESSION] New session with id " << (unsigned int)id << " accepted"<< endl;
-    
-    _server = server;
-    
-    //Create new tranceiver for this session
-    _trns = new Transceiver(socket, *cliAddr);
     memset(_fFlows, 0, SESSIONHANDLER_MAX_TRANSFERS * sizeof(FileTransfer*));
 }
 

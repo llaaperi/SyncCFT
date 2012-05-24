@@ -66,6 +66,7 @@ private:
     Server operator=(Server const& other);
     
     void replyNACK(Message* msg, sockaddr cliAddr);
+    void createNewSession(int clientID, sockaddr cliAddr, uint32_t seqnum);
     
     int getFreeID();
     void sourceHandler();

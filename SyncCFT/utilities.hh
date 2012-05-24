@@ -74,8 +74,9 @@ namespace Utilities {
      * @len Length of the secret
      * @fName Name of file storing the secret, if NULL create a new secret
      *  to a default file
+     * @return true if key file was loaded, false if new key was created
      **/
-    void getSecretKey(unsigned char* ptr, int len, const char* fName);
+    bool getSecretKey(unsigned char* ptr, int len, const char* fName);
     
     
     /**

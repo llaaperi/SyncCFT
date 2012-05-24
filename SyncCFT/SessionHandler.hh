@@ -34,7 +34,7 @@ class SessionHandler {
     
 public:
     //SessionHandler(){};
-    SessionHandler(Server* server, int socket, struct sockaddr* cliAddr, uint8_t id, uint32_t seqnum);
+    SessionHandler(Server* server, Transceiver* trns, uint8_t id, uint32_t seqnum);
     ~SessionHandler();
     
     

@@ -470,6 +470,8 @@ bool Client::handshakeHandlerV2(sockaddr servAddr){
     Utilities::printBytes(cNonce, 16);
     cout << endl;
     
+    
+    
     //Save id
     _id = msg.getClientID();
     

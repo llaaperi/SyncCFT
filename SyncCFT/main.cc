@@ -110,7 +110,10 @@ int main (int argc, const char * argv[])
     if (!newSecret) {
         fName = DEFAULT_KEYFILE;
     }
-    Utilities::getSecretKey(secretKey, 512, fName);
+    if(!Utilities::getSecretKey(secretKey, 512, fName)){
+        cout << "New key generated to file <" << DEFAULT_KEYFILE << ">" << endl;
+        return 0;
+    }
     
     //Init markov process
     Utilities::initMarkov(p, q);
@@ -138,7 +141,7 @@ int main (int argc, const char * argv[])
     Client* clientHandler = NULL;
     if(startClient){
         try {
-            clientHandler = new Client(hosts, clientPort, serverPort, version);
+            clientHandler = new Client(hosts, clientPort, serverPort, version, secretKey);
             clientHandler->start();
         } catch (...) {
             cout << "Creating client handler failed." << endl;
@@ -151,7 +154,7 @@ int main (int argc, const char * argv[])
     Server* serverHandler = NULL;
     if(startServer){
         try {
-            serverHandler = new Server(clientHandler, serverPort, version);
+            serverHandler = new Server(clientHandler, serverPort, version, secretKey);
             serverHandler->start();
         } catch (...) {
             cout << "Creating server handler failed." << endl;

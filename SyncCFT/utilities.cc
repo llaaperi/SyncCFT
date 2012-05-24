@@ -194,7 +194,7 @@ void Utilities::randomBytes(unsigned char* ptr, int len)
  * @fName Name of file storing the secret, if NULL create a new secret
  *  to a default file
  */
-void Utilities::getSecretKey(unsigned char* ptr, int len, const char* fName) {
+bool Utilities::getSecretKey(unsigned char* ptr, int len, const char* fName) {
     
     // Try to load an old secret key
     FILE* keyFile = NULL;
@@ -210,7 +210,7 @@ void Utilities::getSecretKey(unsigned char* ptr, int len, const char* fName) {
         } else {
             //cout << "[MAIN] Loaded old keyfile" << endl;
             fclose(keyFile);
-            return;
+            return true;
         }
     }
     
@@ -225,6 +225,7 @@ void Utilities::getSecretKey(unsigned char* ptr, int len, const char* fName) {
         fwrite(ptr, 1, len, keyFile);
         fclose(keyFile);
     }
+    return false;
 }
 
 

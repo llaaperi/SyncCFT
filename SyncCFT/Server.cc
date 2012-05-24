@@ -220,7 +220,7 @@ void Server::handshakeHandlerV1(Message* msg, sockaddr cliAddr){
         
         //Allocate resources when client ACKs the handshake
         if(msg->getClientID() == clientID){
-            _sessionHandlers[clientID] = new SessionHandler(this, _socket, &cliAddr, clientID, msg->getSeqnum());
+            createNewSession(clientID, cliAddr, msg->getSeqnum());
         }
         return;
     }
@@ -233,6 +233,12 @@ void Server::replyNACK(Message* msg, sockaddr cliAddr){
     Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND);
 }
 
+
+void Server::createNewSession(int clientID, sockaddr cliAddr, uint32_t seqnum){
+    
+    Transceiver* trns = new Transceiver(_socket, cliAddr);
+    _sessionHandlers[clientID] = new SessionHandler(this, trns, clientID, seqnum);
+}
 
 /*
  *
@@ -302,7 +308,7 @@ void Server::handshakeHandlerV2(Message* msg, sockaddr cliAddr){
         
         //Allocate resources when client ACKs the handshake
         if(msg->getClientID() == clientID){
-            _sessionHandlers[clientID] = new SessionHandler(this, _socket, &cliAddr, clientID, msg->getSeqnum());
+            createNewSession(clientID, cliAddr, msg->getSeqnum());
         }
         return;
     }
