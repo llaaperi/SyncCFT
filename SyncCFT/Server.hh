@@ -67,7 +67,8 @@ private:
     
     int getFreeID();
     void sourceHandler();
-    void handshakeHandler(Message* msg, sockaddr cliAddr);
+    void handshakeHandlerV1(Message* msg, sockaddr cliAddr);
+    void handshakeHandlerV2(Message* msg, sockaddr cliAddr);
     //void terminateHandler(Message* msg, sockaddr cliAddr);
 };
 

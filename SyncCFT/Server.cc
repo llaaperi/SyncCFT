@@ -101,8 +101,16 @@ void* Server::handle(void* arg){
             
             //Server handles HELLO and QUIT messages
             if(msg.isHello()){  //Handle new handshake requests
-                handler->handshakeHandler(&msg, cliAddr);
-                continue;
+                
+                //Check request version number
+                if(msg.getVersion() == 1){
+                    handler->handshakeHandlerV1(&msg, cliAddr);
+                    continue;
+                }
+                if(msg.getVersion() == 2){
+                    handler->handshakeHandlerV2(&msg, cliAddr);
+                    continue;
+                }
             }
             
             //Forward existing connections to corresponding handler
@@ -157,10 +165,20 @@ int Server::getFreeID(){
  * Handshake handler funcion handles new connection requests and allocates ne handler when sucessfull
  * NOT ROBUST YET, ALLOCATES RESOURCES WITHOUT CHECKING
  */
-void Server::handshakeHandler(Message* msg, sockaddr cliAddr){
+void Server::handshakeHandlerV1(Message* msg, sockaddr cliAddr){
     
-    cout << "[SERVER] Handshake handler started" << endl;
+    cout << "[SERVER] Handshake handler version 1 started" << endl;
     static int clientID = 0;
+    
+    if(_version > 1){
+        //Send NACK if version 1 is not supported by the server
+        cout << "[SERVER] Connection refused: Version 1 not supported" << endl;
+        msg->incrSeqnum();
+        msg->setType(TYPE_NACK);
+        msg->clearPayload();
+        Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND);
+        return;
+    }
     
     //Hanshake is initiated
     if(msg->getType() == TYPE_HELLO){
@@ -208,6 +226,15 @@ void Server::handshakeHandler(Message* msg, sockaddr cliAddr){
     }
 }
 
+
+/*
+ *
+ */
+void Server::handshakeHandlerV2(Message* msg, sockaddr cliAddr){
+    
+    cout << "[SERVER] Handshake handler version 2 started" << endl;
+    
+}
 
 
 /*

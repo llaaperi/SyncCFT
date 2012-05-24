@@ -106,7 +106,10 @@ private:
     void startSession(sockaddr servAddr);
     void endSession(sockaddr servAddr);
     
-    bool handshakeHandler(sockaddr servAddr);
+    bool handshakeHandlerV1(sockaddr servAddr);
+    bool handshakeHandlerV2(sockaddr servAddr);
+    
+    
     bool terminateHandler(sockaddr servAddr);
     void metafileHandler(sockaddr servAddr, MetaFile** diff);
     void fileTransfer(sockaddr servAddr, MetaFile* diff);

@@ -348,7 +348,11 @@ void Client::startSession(sockaddr servAddr){
     bool started = false;
     do{
         cout << "[CLIENT] Trying to start session ..." << endl;
-        started = handshakeHandler(servAddr);
+        if(_version == 1){
+            started = handshakeHandlerV1(servAddr);
+        }else{
+            started = handshakeHandlerV2(servAddr);
+        }
         if(started){
             cout << "[CLIENT] Session started succesfully" << endl;
         }else{
@@ -387,9 +391,11 @@ void Client::endSession(sockaddr servAddr){
  * HandshakeHandler function handles the HELLO handshake between client and server.
  * Returns true if handshake was successfull and false if it failed.
  */
-bool Client::handshakeHandler(sockaddr servAddr){
+bool Client::handshakeHandlerV1(sockaddr servAddr){
     
     Message msg;
+    
+    cout << "[CLIENT] Version 1 handshake handler" << endl;
     
     //Send HELLO message
     msg.initHeader(TYPE_HELLO);
@@ -422,6 +428,47 @@ bool Client::handshakeHandler(sockaddr servAddr){
     return true;
 }
 
+
+/*
+ * HandshakeHandler function handles the HELLO handshake between client and server.
+ * Returns true if handshake was successfull and false if it failed.
+ */
+bool Client::handshakeHandlerV2(sockaddr servAddr){
+    
+    Message msg;
+    
+    cout << "[CLIENT] Version 2 handshake handler" << endl;
+    
+    //Send HELLO message
+    msg.initHeader(TYPE_HELLO);
+    /*if(!Transceiver::sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_SEND)){
+     return false;
+     }*/
+    if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
+        return false;
+    }
+    
+    //Receive reply from the server
+    if(!_trns->recv(&msg, CLIENT_TIMEOUT_HELLO)){
+        return false;
+    }
+    
+    //Check that received HELLOACK
+    if(msg.getType() != TYPE_ACK){
+        return false;
+    }
+    
+    //Save id
+    _id = msg.getClientID();
+    
+    //Reply with final HELLOACK
+    msg.incrSeqnum();
+    msg.setPayload(NULL, 0);
+    msg.setHello(true);
+    _trns->send(&msg, CLIENT_TIMEOUT_HELLO);
+    
+    return true;
+}
 
 
 /*
