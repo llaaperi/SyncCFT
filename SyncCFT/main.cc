@@ -16,8 +16,7 @@
 #include "Server.hh"
 #include "utilities.hh"
 
-#define HELP "Usage: synccft [-c <client port>] [-s <server port>] [-p <p>] [-q <q>] [-k] [-d <dir>] <hosts>"
-
+#define HELP "Usage: synccft [-c <client port>] [-s <server port>] [-p <p>] [-q <q>] [-k] [-d <dir>] [-v <version>] <hosts>"
 
 int main (int argc, const char * argv[])
 {
@@ -29,6 +28,7 @@ int main (int argc, const char * argv[])
     string p = "-1.0";  //Init as not set
     string q = "-1.0";  //Init as not set
     string dir = "./Sync/";
+	int version = 0; // Support both protocol versions by default
     list<string> hosts;
     bool newSecret = false;
     
@@ -39,6 +39,7 @@ int main (int argc, const char * argv[])
         {"success", required_argument, 	0, 'p'},
         {"fail", 	required_argument, 	0, 'q'},
         {"dir",     required_argument, 	0, 'd'},
+		{"version", required_argument, 	0, 'v'},
         {"secret", 	no_argument, 		0, 'k'},
         {"help", 	no_argument, 		0, 'h'},
         {0, 0, 0, 0}
@@ -47,7 +48,7 @@ int main (int argc, const char * argv[])
     int c;
     opterr = 0;
     // Use get_opt to parse command line parameters
-	while ((c = getopt_long (argc, (char **)argv, "hd:c:s:p:q:", long_options, NULL)) != -1){
+	while ((c = getopt_long (argc, (char **)argv, "hkd:c:s:p:q:v:", long_options, NULL)) != -1){
         switch (c)
         {
             case 'c': // Client port
@@ -73,6 +74,13 @@ int main (int argc, const char * argv[])
             case 'k': // Generate new secret key
                 newSecret = true;
                 cout << "Generating new secret key" << endl;
+                break;
+			case 'v': // Protocol version
+				version = atoi(optarg);
+				if ((version < 0) || (version > 2) ) {
+					version = 0;
+				}
+                cout << "Protocol version: " << version << endl;
                 break;
             case 'h': // Help
                 cout << HELP << endl;
@@ -130,7 +138,7 @@ int main (int argc, const char * argv[])
     Client* clientHandler = NULL;
     if(startClient){
         try {
-            clientHandler = new Client(hosts, clientPort, serverPort);
+            clientHandler = new Client(hosts, clientPort, serverPort, version);
             clientHandler->start();
         } catch (...) {
             cout << "Creating client handler failed." << endl;
@@ -143,7 +151,7 @@ int main (int argc, const char * argv[])
     Server* serverHandler = NULL;
     if(startServer){
         try {
-            serverHandler = new Server(clientHandler, serverPort);
+            serverHandler = new Server(clientHandler, serverPort, version);
             serverHandler->start();
         } catch (...) {
             cout << "Creating server handler failed." << endl;
