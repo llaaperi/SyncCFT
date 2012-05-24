@@ -18,7 +18,7 @@
 enum MsgType {TYPE_ACK, TYPE_HELLO, TYPE_DESCR, TYPE_DIFF, TYPE_GET, TYPE_FILE, TYPE_QUIT, TYPE_NACK};
 
 #define MESSAGE_MTU 1440 //1500 - IP - UDP - HEADER - MAC
-#define DEFAULT_VERSION 0
+#define DEFAULT_VERSION 2
 #define DEFAULT_WINDOW 1
 
 
@@ -44,6 +44,7 @@ class Message {
     
     //char _binaryHeader[HEADER_SIZE];
     char* _payload;
+	unsigned char _mac[32];
     
 public:
     Message();
@@ -60,6 +61,7 @@ public:
     uint32_t getChunk() const {return _chunk;}
     const char* getPayload() const {return _payload;}
     const sockaddr* getAddr() const {return &_addrInfo;}
+	const unsigned char* getMAC(){return _mac;}
     
     bool isHello() const {return _hello;}
     bool isQuit() const {return _quit;}
@@ -73,6 +75,7 @@ public:
     void setWindow(uint16_t w){_window = w;}
     void setSeqnum(uint32_t s){_seqnum = s;}
     void setChunk(uint32_t c){_chunk = c;}
+	
     
     void setPayload(const char* payload, int length);
     
