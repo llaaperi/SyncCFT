@@ -27,6 +27,12 @@ extern list<string> _serverClients; //ip:port
 
 using namespace std;
 
+struct PendingClient{
+    unsigned char cNonce[16];
+    unsigned char sNonce[16];
+    sockaddr addr;
+};
+
 class Server {
     //Transceiver mTransceiver;
     Client* _client;
@@ -37,6 +43,7 @@ class Server {
     int _version;
 	const unsigned char* _secretKey;
     
+    list<PendingClient*> _pendingClients;
     SessionHandler* _sessionHandlers[SERVER_SESSION_HANDLERS];
 
 public:
@@ -70,9 +77,14 @@ private:
     void createNewSession(int clientID, sockaddr cliAddr, uint32_t seqnum, unsigned char* sessionKey);
     
     int getFreeID();
+    PendingClient* getPendingClient(sockaddr cliAddr);
+    PendingClient* addPendingClient(sockaddr cliAddr);
+    void removePendingClient(PendingClient* client);
     void sourceHandler();
     void handshakeHandlerV1(Message* msg, sockaddr cliAddr);
     void handshakeHandlerV2(Message* msg, sockaddr cliAddr);
+    void handshakeHandlerV2Hello(Message* msg, sockaddr cliAddr);
+    void handshakeHandlerV2Ack(Message* msg, sockaddr cliAddr);
     //void terminateHandler(Message* msg, sockaddr cliAddr);
 };
 

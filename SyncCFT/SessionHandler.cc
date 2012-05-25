@@ -29,8 +29,9 @@ SessionHandler::SessionHandler(Server* server, Transceiver* trns, uint8_t id, ui
  * Destructor
  */
 SessionHandler::~SessionHandler(){
-    // Commented to enable unit testing
+    
     cout << "[SESSION] Session " << (unsigned int)_id << " terminated"<< endl;
+    
     if(_trns != NULL){
         delete(_trns);  //Free transceiver
     }
@@ -162,10 +163,10 @@ void SessionHandler::descrHandler(const Message* msg){
     string clientDiff = mFile.getDiff(clientFile);
     string serverDiff = clientFile.getDiff(mFile);
     
-    //cout << "[SESSION] Diff file:" << endl << diff << endl;
+    cout << "[SESSION] Diff file:" << endl << clientDiff << endl;
     reply.setPayload(clientDiff.c_str(), (int)clientDiff.length());
     
-    //msg->printInfo();
+    //reply->printInfo();
     
     //Send diff
     _trns->send(&reply, SERVER_TIMEOUT_SEND);

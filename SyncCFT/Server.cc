@@ -153,12 +153,63 @@ int Server::getFreeID(){
         }else
         if(_sessionHandlers[i]->isExpired()){
             delete(_sessionHandlers[i]);    //Free existing session handler if it has timed out
+            _sessionHandlers[i] = NULL;
             return i;
         }
     }
     return -1;
 }
 
+
+/*
+ *
+ */
+PendingClient* Server::getPendingClient(sockaddr cliAddr){
+    
+    for(PendingClient* client : _pendingClients){
+        if(Networking::cmpAddr(&cliAddr, &client->addr)){
+            return client;
+        }
+    }
+    return NULL;
+}
+
+
+/*
+ *
+ */
+PendingClient* Server::addPendingClient(sockaddr cliAddr){
+    
+    //Check that there is free client ids available
+    if(getFreeID() < 0){
+        return NULL;
+    }
+    
+    PendingClient* newClient = new PendingClient();
+    newClient->addr = cliAddr;
+    _pendingClients.push_back(newClient);
+    return newClient;
+}
+
+/*
+ *
+ */
+void Server::removePendingClient(PendingClient* client){
+    
+    list<PendingClient*>::iterator iter;
+    for(iter = _pendingClients.begin(); iter != _pendingClients.end(); iter++){
+        if(*iter == client){
+            
+            cout << "[SERVER] Pending client ";
+            Networking::printAddress(&client->addr);
+            cout << " erased" << endl;
+            
+            delete(client);
+            _pendingClients.erase(iter);
+            return;
+        }
+    }
+}
 
 
 /*
@@ -252,118 +303,161 @@ void Server::createNewSession(int clientID, sockaddr cliAddr, uint32_t seqnum, u
  */
 void Server::handshakeHandlerV2(Message* msg, sockaddr cliAddr){
     
-    cout << "[SERVER] Handshake handler version 2 started" << endl;
-    static int clientID = 0;
-    static unsigned char cNonce[16];
-    static unsigned char sNonce[16];
-    
+    cout << "[SERVER] Handshake handler version 2 started" << endl;    
     
     //Hanshake is initiated
     if(msg->getType() == TYPE_HELLO){
-        
-        cout << "[SERVER] HELLO received from ";
-        Networking::printAddress(&cliAddr);
-        cout << endl;
-        
-        //Check that there are free client ID's
-        int id = getFreeID();
-        if(id < 0){
-            //Send NACK if ID's are depleted
-            cout << "[SERVER] Connection refused: ClientID's depleted" << endl;
-            replyNACK(msg, cliAddr);
-            return;
-        }
-        
-        //Check nonce
-        if(msg->getPayloadLength() < 16){
-            cout << "[SERVER] Connection refused: Invalid nonce" << endl;
-            replyNACK(msg, cliAddr);
-            return;
-        }
-        
-        //Get client nonce
-        memcpy(cNonce, msg->getPayload(), 16);
-        
-        //Reply with ACK and clientID
-        msg->incrSeqnum();
-        msg->setClientID(id);
-        msg->setType(TYPE_ACK);
-        
-        Utilities::randomBytes(sNonce, 16);
-        msg->setPayload((char*)sNonce, 16);
-        
-        if(Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND)){
-            clientID = id; //Save id if packet was sent succesfully
-        }
-        
-        cout << "[SERVER] Server nonce: ";
-        Utilities::printBytes(sNonce, 16);
-        cout << endl;
-        cout << "[SERVER] Client nonce: ";
-        Utilities::printBytes(cNonce, 16);
-        cout << endl;
-        
+        handshakeHandlerV2Hello(msg, cliAddr);
         return;
     }
     
     //Check client hash
     if(msg->getType() == TYPE_ACK){
-        
-        cout << "[SERVER] HELLOACK received from ";
-        Networking::printAddress(&cliAddr);
-        cout << endl;
-        
-        msg->printInfo();
-        
-        if(msg->getPayloadLength() < HASH_LENGTH){
-            cout << "[SERVER] Connection refused: Invalid hash" << endl;
-            replyNACK(msg, cliAddr);
-            return;
-        }
-        /*
-        cout << "[SERVER] Secret key: " << endl;
-        Utilities::printBytes((unsigned char*)_secretKey, 256);
-        cout << endl;
-        */
-        unsigned char hash[HASH_LENGTH];
-        Utilities::nonceHash(hash, sNonce, _secretKey);
-        
-        cout << "Server hash: " << endl;
-        Utilities::printBytes(hash, HASH_LENGTH);
-        cout << endl;
-        
-        //Utilities::printBytes((unsigned char*)msg->getPayload(), 256);
-        
-        //Check that client hash is correct
-        if(memcmp(hash, msg->getPayload(), HASH_LENGTH)){
-            cout << "[SERVER] Connection refused: Invalid hash value" << endl;
-            replyNACK(msg, cliAddr);
-            return;
-        }
-        
-        //Reply with ACK containing hash
-        Utilities::nonceHash(hash, cNonce, _secretKey);
-        msg->incrSeqnum();
-        msg->setPayload((char*)hash, HASH_LENGTH);
-        msg->setHello(true);
-        if(!Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND)){
-            return;
-        }
-        
-        //Create sesion key
-        unsigned char* sKey = Utilities::sessionKey(sNonce, cNonce, _secretKey);
-        
-        //Allocate resources when client ACKs the handshake
-        if(msg->getClientID() == clientID){
-            createNewSession(clientID, cliAddr, msg->getSeqnum(), sKey);
-        }
-        
-        cout << "[SERVER] Handshake finished: session key=";
-        Utilities::printBytes(sKey, HASH_LENGTH);
-        cout << endl;
-        
+        handshakeHandlerV2Ack(msg, cliAddr);
         return;
     }
+}
+
+
+/*
+ *
+ */
+void Server::handshakeHandlerV2Hello(Message* msg, sockaddr cliAddr){
+    
+    cout << "[SERVER] HELLO received from ";
+    Networking::printAddress(&cliAddr);
+    cout << endl;
+    
+    //Get pending client for overwriting if it exists
+    PendingClient* client = getPendingClient(cliAddr);
+    if(client == NULL){ //Create new pending client if needed
+        client = addPendingClient(cliAddr);
+    }
+    
+    if(client == NULL){
+        //Send NACK if ID's are depleted
+        cout << "[SERVER] Connection refused: ClientID's depleted" << endl;
+        replyNACK(msg, cliAddr);
+        return;
+    }
+    
+    //Check nonce
+    if(msg->getPayloadLength() < 16){
+        cout << "[SERVER] Connection refused: Invalid nonce" << endl;
+        replyNACK(msg, cliAddr);
+        return;
+    }
+    
+    //Create server nonce and save with client nonce to pending client
+    Utilities::randomBytes(client->sNonce, 16);
+    memcpy(client->cNonce, msg->getPayload(), 16);
+    
+    //Reply with ACK and clientID
+    msg->incrSeqnum();
+    msg->setClientID(0);
+    msg->setType(TYPE_ACK);
+    msg->setPayload((char*)(client->sNonce), 16);
+    
+    if(!Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND)){
+        return;
+    }
+    
+    //msg->printInfo();
+    
+    cout << "[SERVER] Server nonce: ";
+    Utilities::printBytes(client->sNonce, 16);
+    cout << endl;
+    cout << "[SERVER] Client nonce: ";
+    Utilities::printBytes(client->cNonce, 16);
+    cout << endl;
+    
+    return;
+}
+
+
+/*
+ *
+ */
+void Server::handshakeHandlerV2Ack(Message* msg, sockaddr cliAddr){
+    
+    cout << "[SERVER] HELLOACK received from ";
+    Networking::printAddress(&cliAddr);
+    cout << endl;
+    
+    //msg->printInfo();
+    PendingClient* client = getPendingClient(cliAddr);
+    
+    //Terminate if unknown source
+    if(client == NULL){
+        cout << "[SERVER] HELLOACK from unknown source" << endl;
+        replyNACK(msg, cliAddr);
+        return;
+    }
+    
+    int clientID = getFreeID();
+    if(clientID < 0){
+        //Send NACK if ID's are depleted
+        cout << "[SERVER] Connection refused: ClientID's depleted" << endl;
+        replyNACK(msg, cliAddr);
+        removePendingClient(client);
+        return;
+    }
+    
+    if(msg->getPayloadLength() < HASH_LENGTH){
+        cout << "[SERVER] Connection refused: Invalid hash" << endl;
+        replyNACK(msg, cliAddr);
+        removePendingClient(client);
+        return;
+    }
+    
+    unsigned char hash[HASH_LENGTH];
+    Utilities::nonceHash(hash, client->sNonce, _secretKey);
+    
+    cout << "Server hash: " << endl;
+    Utilities::printBytes(hash, HASH_LENGTH);
+    cout << endl;
+    
+    //Utilities::printBytes((unsigned char*)msg->getPayload(), 256);
+    
+    cout << "[SERVER] Server nonce: ";
+    Utilities::printBytes(client->sNonce, 16);
+    cout << endl;
+    cout << "[SERVER] Client nonce: ";
+    Utilities::printBytes(client->cNonce, 16);
+    cout << endl;
+    
+    //Check that client hash is correct
+    if(memcmp(hash, msg->getPayload(), HASH_LENGTH)){
+        cout << "[SERVER] Connection refused: Invalid hash value" << endl;
+        replyNACK(msg, cliAddr);
+        removePendingClient(client);
+        return;
+    }
+    
+    //Reply with ACK containing hash
+    Utilities::nonceHash(hash, client->cNonce, _secretKey);
+    msg->incrSeqnum();
+    msg->setPayload((char*)hash, HASH_LENGTH);
+    msg->setHello(true);
+    if(!Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND)){
+        removePendingClient(client);
+        return;
+    }
+    
+    //Create sesion key
+    unsigned char* sKey = Utilities::sessionKey(client->sNonce, client->cNonce, _secretKey);
+    
+    //Allocate resources when client ACKs the handshake
+    if(msg->getClientID() == clientID){
+        createNewSession(clientID, cliAddr, msg->getSeqnum(), sKey);
+    }
+    removePendingClient(client);
+    
+    cout << "[SERVER] Handshake finished: session key=";
+    Utilities::printBytes(sKey, HASH_LENGTH);
+    cout << endl;
+    
+    return;
 }
 
 
