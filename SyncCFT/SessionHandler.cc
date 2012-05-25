@@ -13,13 +13,12 @@
 #include "Transceiver.hh"
 #include "Metafile.hh"
 #include "Server.hh"
-#include "utilities.hh"
 
 
 /*
  * Constructor
  */
-SessionHandler::SessionHandler(Server* server, Transceiver* trns, uint8_t id, uint32_t seqnum) : _server(server), _trns(trns), _id(id), _seqnum(seqnum){
+SessionHandler::SessionHandler(Server* server, Transceiver* trns, uint8_t id, uint32_t seqnum, unsigned char* sessionKey) : _server(server), _trns(trns), _id(id), _seqnum(seqnum), _sessionKey(sessionKey){
     
     cout << "[SESSION] New session with id " << (unsigned int)id << " accepted"<< endl;
     memset(_fFlows, 0, SESSIONHANDLER_MAX_TRANSFERS * sizeof(FileTransfer*));
@@ -32,7 +31,13 @@ SessionHandler::SessionHandler(Server* server, Transceiver* trns, uint8_t id, ui
 SessionHandler::~SessionHandler(){
     // Commented to enable unit testing
     cout << "[SESSION] Session " << (unsigned int)_id << " terminated"<< endl;
-    delete(_trns);  //Free transceiver
+    if(_trns != NULL){
+        delete(_trns);  //Free transceiver
+    }
+    
+    if(_sessionKey != NULL){
+        free(_sessionKey);
+    }
     
     for(int i = 0; i < SESSIONHANDLER_MAX_TRANSFERS; i++){  //Free file transfer objects
         if(_fFlows[i] != NULL){
@@ -67,9 +72,21 @@ bool SessionHandler::isValidMessage(const Message *msg){
     }
     
     //Compare sequence number
-    if((msg->getSeqnum() < _seqnum) && (msg->getSeqnum() > (_seqnum + 7))){
+    if((msg->getSeqnum() < _seqnum) && (msg->getSeqnum() > (_seqnum + (msg->getWindow() * 7)))){
         cout << "Invalid sequence number" << endl;
         return false;
+    }
+    
+    //Check mac
+    if(_sessionKey != NULL){    //Expect v2
+        
+        //Must be v2 if key exists
+        if(msg->getVersion() != 2){
+            return false;
+        }
+        
+        cout << "[SESSION] Invalid MAC" << endl;
+        
     }
     
     return true;

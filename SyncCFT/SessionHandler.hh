@@ -9,6 +9,7 @@
 #ifndef SyncCFT_SessionHandler_hh
 #define SyncCFT_SessionHandler_hh
 
+#include "utilities.hh"
 #include "networking.hh"
 #include "Transceiver.hh"
 #include "FileTransfer.hh"
@@ -30,11 +31,11 @@ class SessionHandler {
     FileTransfer* _fFlows[SESSIONHANDLER_MAX_TRANSFERS];
     Timer _timer;
     
-    unsigned char _sessionKey[32];
+    unsigned char* _sessionKey; //Allocated from server and freed here
     
 public:
     //SessionHandler(){};
-    SessionHandler(Server* server, Transceiver* trns, uint8_t id, uint32_t seqnum);
+    SessionHandler(Server* server, Transceiver* trns, uint8_t id, uint32_t seqnum, unsigned char* sessionKey);
     ~SessionHandler();
     
     

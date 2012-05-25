@@ -53,6 +53,7 @@ class Client {
     Transceiver* _trns;
     FileTransfer* _fFlow;
     const unsigned char* _secretKey;
+    unsigned char* _sessionKey;
 
     
 public:

@@ -220,7 +220,7 @@ void Server::handshakeHandlerV1(Message* msg, sockaddr cliAddr){
         
         //Allocate resources when client ACKs the handshake
         if(msg->getClientID() == clientID){
-            createNewSession(clientID, cliAddr, msg->getSeqnum());
+            createNewSession(clientID, cliAddr, msg->getSeqnum(), NULL);
         }
         return;
     }
@@ -241,9 +241,9 @@ void Server::replyNACK(Message* msg, sockaddr cliAddr){
 /*
  *
  */
-void Server::createNewSession(int clientID, sockaddr cliAddr, uint32_t seqnum){
+void Server::createNewSession(int clientID, sockaddr cliAddr, uint32_t seqnum, unsigned char* sessionKey){
     Transceiver* trns = new Transceiver(_socket, cliAddr);
-    _sessionHandlers[clientID] = new SessionHandler(this, trns, clientID, seqnum);
+    _sessionHandlers[clientID] = new SessionHandler(this, trns, clientID, seqnum, sessionKey);
 }
 
 
@@ -315,7 +315,7 @@ void Server::handshakeHandlerV2(Message* msg, sockaddr cliAddr){
         
         msg->printInfo();
         
-        if(msg->getPayloadLength() < 32){
+        if(msg->getPayloadLength() < HASH_LENGTH){
             cout << "[SERVER] Connection refused: Invalid hash" << endl;
             replyNACK(msg, cliAddr);
             return;
@@ -325,17 +325,17 @@ void Server::handshakeHandlerV2(Message* msg, sockaddr cliAddr){
         Utilities::printBytes((unsigned char*)_secretKey, 256);
         cout << endl;
         */
-        unsigned char hash[32];
+        unsigned char hash[HASH_LENGTH];
         Utilities::nonceHash(hash, sNonce, _secretKey);
         
         cout << "Server hash: " << endl;
-        Utilities::printBytes(hash, 32);
+        Utilities::printBytes(hash, HASH_LENGTH);
         cout << endl;
         
         //Utilities::printBytes((unsigned char*)msg->getPayload(), 256);
         
         //Check that client hash is correct
-        if(memcmp(hash, msg->getPayload(), 32)){
+        if(memcmp(hash, msg->getPayload(), HASH_LENGTH)){
             cout << "[SERVER] Connection refused: Invalid hash value" << endl;
             replyNACK(msg, cliAddr);
             return;
@@ -344,16 +344,24 @@ void Server::handshakeHandlerV2(Message* msg, sockaddr cliAddr){
         //Reply with ACK containing hash
         Utilities::nonceHash(hash, cNonce, _secretKey);
         msg->incrSeqnum();
-        msg->setPayload((char*)hash, 32);
+        msg->setPayload((char*)hash, HASH_LENGTH);
         msg->setHello(true);
         if(!Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND)){
             return;
         }
         
+        //Create sesion key
+        unsigned char* sKey = Utilities::sessionKey(sNonce, cNonce, _secretKey);
+        
         //Allocate resources when client ACKs the handshake
         if(msg->getClientID() == clientID){
-            createNewSession(clientID, cliAddr, msg->getSeqnum());
+            createNewSession(clientID, cliAddr, msg->getSeqnum(), sKey);
         }
+        
+        cout << "[SERVER] Handshake finished: session key=";
+        Utilities::printBytes(sKey, HASH_LENGTH);
+        cout << endl;
+        
         return;
     }
 }

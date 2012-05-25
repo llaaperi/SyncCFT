@@ -14,6 +14,7 @@
 
 #define STATE_LOST 0
 #define STATE_NOT_LOST 1
+#define HASH_LENGTH 32
 
 #define DEFAULT_KEYFILE ".sync.cft.key"
 
@@ -73,6 +74,11 @@ namespace Utilities {
      *
      */
     void nonceHash(unsigned char* result, const unsigned char* nonce, const unsigned char* key);
+    
+    /**
+     *
+     */
+    unsigned char* sessionKey(const unsigned char* sNonce, const unsigned char* cNonce, const unsigned char* key);
     
     /**
      * Get N bit secret key 

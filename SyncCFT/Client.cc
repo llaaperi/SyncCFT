@@ -51,6 +51,10 @@ Client::~Client() {
     if(_fFlow != NULL){
         delete(_fFlow);
     }
+    
+    if(_sessionKey != NULL){
+        free(_sessionKey);
+    }
 }
 
 
@@ -471,34 +475,51 @@ bool Client::handshakeHandlerV2(sockaddr servAddr){
     
     //*********************Send key hash *****************
     
-    unsigned char hash[32];
+    unsigned char hash[HASH_LENGTH];
     
 	Utilities::nonceHash(hash, sNonce, _secretKey);
     
-    cout << "[CLIENT] Sent hash: " << endl;
-    Utilities::printBytes(hash, 32);
+    cout << "[CLIENT] Client hash: " << endl;
+    Utilities::printBytes(hash, HASH_LENGTH);
     cout << endl;
     
     //Reply with ACK containing hash
 	msg.setType(TYPE_ACK);
     msg.incrSeqnum();
-    msg.setPayload((char*)hash, 32);
+    msg.setPayload((char*)hash, HASH_LENGTH);
     msg.setHello(true);
     if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
         return false;
     }
 	//msg.printInfo();
-	return false;
+    
     //************** check server responce ****************
+    if(!_trns->recv(&msg, CLIENT_TIMEOUT_HELLO)){
+        return false;
+    }
+    
+    Utilities::nonceHash(hash, cNonce, _secretKey);
+    
+    cout << "[CLIENT] Server hash: " << endl;
+    Utilities::printBytes(hash, HASH_LENGTH);
+    cout << endl;
+    
+    //Utilities::printBytes((unsigned char*)msg->getPayload(), 256);
+    
+    //Check that server hash is correct
+    if(memcmp(hash, msg.getPayload(), HASH_LENGTH)){
+        cout << "[CLIENT] Handshake failed: Invalid server hash value" << endl;
+        return false;
+    }
+    
+    _sessionKey = Utilities::sessionKey(sNonce, cNonce, _secretKey);
     
     //Save id
     _id = msg.getClientID();
     
-    //Reply with final HELLOACK
-    msg.incrSeqnum();
-    msg.setPayload(NULL, 0);
-    msg.setHello(true);
-    _trns->send(&msg, CLIENT_TIMEOUT_HELLO);
+    cout << "[CLIENT] Handshake finished: session key=";
+    Utilities::printBytes(_sessionKey, HASH_LENGTH);
+    cout << endl;
     
     return true;
 }

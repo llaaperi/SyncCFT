@@ -192,7 +192,7 @@ void Utilities::randomBytes(unsigned char* ptr, int len)
  */
 void Utilities::nonceHash(unsigned char* result, const unsigned char* nonce, const unsigned char* key){
     
-    unsigned char hashInput[80];
+    unsigned char hashInput[80];    //Key (64) + nonce (16)
 	memset(result, 0, 32);
     memcpy(hashInput, nonce, 16);
     memcpy(hashInput + 16, key, 64);
@@ -215,6 +215,23 @@ void Utilities::nonceHash(unsigned char* result, const unsigned char* nonce, con
     */
 }
 
+
+/*
+ * Returned session key must be freed
+ */
+unsigned char* Utilities::sessionKey(const unsigned char* sNonce, const unsigned char* cNonce, const unsigned char* key){
+    
+    unsigned char hashInput[96];    //Key (64) + sNonce (16) + cNonce (16)
+    unsigned char* sessionKey = (unsigned char*)calloc(HASH_LENGTH, sizeof(unsigned char));
+    if(sessionKey != NULL){
+        memcpy(hashInput, cNonce, 16);
+        memcpy(hashInput + 16, sNonce, 16);
+        memcpy(hashInput + 32, key, 64);
+    
+        Utilities::SHA256Hash(sessionKey, hashInput, 96);
+    }
+    return sessionKey;
+}
 
 /*
  * Get N bit secret key 

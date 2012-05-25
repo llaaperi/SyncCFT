@@ -11,7 +11,7 @@
 
 
 Timer::Timer(){
-
+    start();
 }
 
 Timer::~Timer(){
