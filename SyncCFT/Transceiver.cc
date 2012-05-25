@@ -11,6 +11,20 @@
 #include "Transceiver.hh"
 #include "networking.hh"
 
+/*
+ *
+ */
+Transceiver::Transceiver(int socket, struct sockaddr cliAddr, const unsigned char* key, int version) : _socket(socket), _cliAddr(cliAddr), _key(key){
+    
+    if(version <= 0){
+        _version = 2;
+    }else{
+        _version = version;
+    }
+
+}
+
+
 
 /*
  * Function sends the message to the client.
@@ -18,11 +32,6 @@
  *          false if send failed or timeouted
  */
 bool Transceiver::send(Message* msg, int timeout){
-    
-    if(!msg->isHello() && (_key == NULL)){
-        msg->setVersion(1);
-    }
-    
     return sendMsg(_socket, msg, &_cliAddr, timeout);
 }
 

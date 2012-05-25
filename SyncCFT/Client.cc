@@ -13,9 +13,15 @@
 #include "FileTransfer.hh"
 
 
-Client::Client(list<string> hosts, string cport, string sport, int version, const unsigned char* secretKey, int mode) throw(invalid_argument, runtime_error) : _cport(cport), _sport(sport), _version(version), _secretKey(secretKey), _mode(mode), _running(false), _finished(false){
+Client::Client(list<string> hosts, string cport, string sport, int version, const unsigned char* secretKey, int mode) throw(invalid_argument, runtime_error) : _cport(cport), _sport(sport), _secretKey(secretKey), _mode(mode), _running(false), _finished(false){
     
 	//cout << "[CLIENT] Client constructor with mode: " << mode << endl;
+    
+    if(version <= 0){
+        _version = 2;
+    }else{
+        _version = version;
+    }
     
     _socket = Networking::createUnconnectedSocket(_cport);
     if(_socket < 0){
@@ -163,7 +169,7 @@ void Client::sessionHandler(Host h){
     
     sockaddr* sockAddr = h.serverInfo->ai_addr;
     
-    Transceiver trans(_socket, *sockAddr, _sessionKey);
+    Transceiver trans(_socket, *sockAddr, _sessionKey, _version);
     _trns = &trans;
     
     //Try HELLO handshake
@@ -194,7 +200,7 @@ void Client::metafileHandler(sockaddr servAddr, MetaFile** diff){
     
     Message msg;
     //TODO sequence numbers
-    msg.init(TYPE_DESCR);
+    msg.init(_version, TYPE_DESCR);
     msg.setClientID(_id);
     
     MetaFile mFile(METAFILE);
@@ -246,8 +252,7 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
     for(Element e : elements){
         cout << "[CLIENT] Request file: " << e.getName() << endl;
         
-        msg.initHeader(TYPE_GET);   //Create GET message
-		msg.setVersion(_version);
+        msg.initHeader(_version, TYPE_GET);   //Create GET message
 		msg.setWindow(1);   //Init window size to 1
         
         char buf[NETWORKING_MTU];
@@ -406,8 +411,7 @@ bool Client::handshakeHandlerV1(sockaddr servAddr){
     cout << "[CLIENT] Version 1 handshake handler" << endl;
     
     //Send HELLO message
-    msg.initHeader(TYPE_HELLO);
-    msg.setVersion(1);
+    msg.initHeader(_version, TYPE_HELLO);
     
     if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
         return false;
@@ -450,8 +454,7 @@ bool Client::handshakeHandlerV2(sockaddr servAddr){
     cout << "[CLIENT] Version 2 handshake handler" << endl;
     
     //**********************Send HELLO message *************************
-    msg.initHeader(TYPE_HELLO);
-    msg.setVersion(2);
+    msg.initHeader(_version, TYPE_HELLO);
     msg.printInfo();
     Utilities::randomBytes(cNonce, 16);
     msg.setPayload((char*)cNonce, 16);
@@ -538,7 +541,7 @@ bool Client::terminateHandler(sockaddr servAddr){
     Message msg;
     
     //Send QUIT message
-    msg.initHeader(TYPE_QUIT);
+    msg.initHeader(_version, TYPE_QUIT);
     if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
         return false;
     }

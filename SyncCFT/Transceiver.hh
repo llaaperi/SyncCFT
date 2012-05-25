@@ -29,9 +29,10 @@ class Transceiver {
     int _socket;
     struct sockaddr _cliAddr;
     const unsigned char* _key;
+    int _version;
     
 public:
-    Transceiver(int socket, struct sockaddr cliAddr, const unsigned char* key) : _socket(socket), _cliAddr(cliAddr), _key(key){}
+    Transceiver(int socket, struct sockaddr cliAddr, const unsigned char* key, int version);
     ~Transceiver(){}
     
     bool send(Message* msg, int timeout);
@@ -41,6 +42,8 @@ public:
     static bool recvMsg(int socket, Message* msg, struct sockaddr* srcAddr, int timeout);
     
     const sockaddr* getAddr(){return &_cliAddr;}
+    
+    int getVersion(){return _version;}
     
 private:
     Transceiver& operator=(Transceiver const& other);

@@ -266,7 +266,7 @@ void Server::handshakeHandlerV1(Message* msg, sockaddr cliAddr){
         
         //Allocate resources when client ACKs the handshake
         if(msg->getClientID() == clientID){
-            createNewSession(clientID, cliAddr, msg->getSeqnum(), NULL);
+            createNewSession(clientID, cliAddr, msg->getSeqnum(), NULL, msg->getVersion());
         }
         return;
     }
@@ -287,8 +287,8 @@ void Server::replyNACK(Message* msg, sockaddr cliAddr){
 /*
  *
  */
-void Server::createNewSession(int clientID, sockaddr cliAddr, uint32_t seqnum, unsigned char* sessionKey){
-    Transceiver* trns = new Transceiver(_socket, cliAddr, sessionKey);
+void Server::createNewSession(int clientID, sockaddr cliAddr, uint32_t seqnum, unsigned char* sessionKey, int version){
+    Transceiver* trns = new Transceiver(_socket, cliAddr, sessionKey, version);
     _sessionHandlers[clientID] = new SessionHandler(this, trns, clientID, seqnum, sessionKey);
 }
 
@@ -444,7 +444,7 @@ void Server::handshakeHandlerV2Ack(Message* msg, sockaddr cliAddr){
     
     //Allocate resources when client ACKs the handshake
     if(msg->getClientID() == clientID){
-        createNewSession(clientID, cliAddr, msg->getSeqnum(), sKey);
+        createNewSession(clientID, cliAddr, msg->getSeqnum(), sKey, msg->getVersion());
     }
     removePendingClient(client);
     

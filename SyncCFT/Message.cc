@@ -65,23 +65,23 @@ Message::~Message(){
 /*
  * Initializes the whole message. Existing payload is freed.
  */
-void Message::init(uint8_t type){
+void Message::init(uint8_t version, uint8_t type){
     
     //Clear message
     clear();
     //Init header
-    initHeader(type);
+    initHeader(version, type);
 }
 
 
 /*
  * Initialize all header values
  */
-void Message::initHeader(uint8_t type) {
+void Message::initHeader(uint8_t version, uint8_t type) {
     
     srand((unsigned int)time(NULL));
     
-    _version = DEFAULT_VERSION;
+    _version = version;
     _type = type;
     _clientID = 0;
     _checksum = 0;

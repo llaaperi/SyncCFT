@@ -414,7 +414,7 @@ bool FileTransfer::sendWindow(uint16_t size){
 bool FileTransfer::sendChunk(const char* chunk, uint16_t len, uint16_t window, uint32_t chunknum, uint32_t seqnum){
     
     Message msg;
-    msg.init(TYPE_FILE);
+    msg.init(_trns->getVersion(), TYPE_FILE);
     msg.setWindow(window);
     msg.setChunk(chunknum);
     msg.setSeqnum(seqnum);

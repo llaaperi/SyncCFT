@@ -74,7 +74,7 @@ private:
     Server operator=(Server const& other);
     
     void replyNACK(Message* msg, sockaddr cliAddr);
-    void createNewSession(int clientID, sockaddr cliAddr, uint32_t seqnum, unsigned char* sessionKey);
+    void createNewSession(int clientID, sockaddr cliAddr, uint32_t seqnum, unsigned char* sessionKey, int version);
     
     int getFreeID();
     PendingClient* getPendingClient(sockaddr cliAddr);

@@ -89,8 +89,8 @@ public:
     
     void incrSeqnum(){_seqnum++;}
     
-    void init(uint8_t type);
-    void initHeader(uint8_t type);
+    void init(uint8_t version, uint8_t type);
+    void initHeader(uint8_t version, uint8_t type);
     void clear();
     void clearPayload();
     void parseToBytes(char* buffer) const;
