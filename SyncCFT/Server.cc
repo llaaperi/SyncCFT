@@ -127,10 +127,10 @@ void* Server::handle(void* arg){
                 cout << "[SERVER] Packet discarded" << endl;
                 //msg.printInfo();
             }
+        }else{
+            cout << "[SERVER] Received invalid message" << endl;
+            msg.printInfo();
         }
-        
-        cout << "[SERVER] Received invalid message" << endl;
-        
     }
     return 0;
 }
