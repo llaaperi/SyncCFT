@@ -285,7 +285,7 @@ void Message::parseToBytes(char* buffer) const {
     //Add MAC
     if(_version == 2){
         unsigned char hash[HASH_LENGTH];
-        Utilities::SHA256Hash(hash, buffer, HEADER_SIZE + _payloadLen);
+        Utilities::SHA256Hash(hash, (unsigned char*)buffer, HEADER_SIZE + _payloadLen);
         memcpy(&buffer[HEADER_SIZE + _payloadLen], hash, MESSAGE_MAC_SIZE);
     }
 }
@@ -344,7 +344,7 @@ void Message::printInfo() const {
     
     cout << "MAC = ";
     if(getVersion() == 2){
-        Utilities::printBytes(_mac, MESSAGE_MAC_SIZE);
+        Utilities::printBytes((unsigned char*)_mac, MESSAGE_MAC_SIZE);
     }
     cout << endl;
     
