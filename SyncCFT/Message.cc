@@ -19,6 +19,7 @@ Message::Message() : _version(0), _type(0), _clientID(0), _checksum(0),
                     _payloadLen(0), _window(0), _seqnum(0), _chunk(0),
                     _hello(false), _quit(false), _begin(false), _end(false), 
                     _payload(0){
+    memset(_mac, 0, MESSAGE_MAC_SIZE);
 }
 
 
@@ -46,6 +47,10 @@ Message::Message(Message const& other){
     //Payload
     _payload = NULL;
     _payloadLen = 0;
+    
+    //MAC
+    memset(_mac, 0, MESSAGE_MAC_SIZE);
+    
 }
 
 
@@ -131,6 +136,8 @@ void Message::clear(){
     _quit = false;
     _begin = false;
     _end = false;
+    
+    memset(_mac, 0, MESSAGE_MAC_SIZE);
 }
 
 
@@ -200,6 +207,26 @@ bool Message::parseFromBytes(const char* buffer, int len){
     _chunk |= ((buffer[14] & 0xFF) << 8);
     _chunk |= (buffer[15] & 0xFF);
     
+    _payloadLen = len - HEADER_SIZE;
+    if(_version == 2){
+        
+        //Init MAC
+        memset(_mac, 0, MESSAGE_MAC_SIZE);
+        
+        //Chek that received packet contained atleast MAC
+        if(_payloadLen < MESSAGE_MAC_SIZE){
+            return false;
+        }
+        
+        _payloadLen -= MESSAGE_MAC_SIZE;
+        
+        //Check that received packet contained MAC
+        if(_payloadLen > 1500){ //Unsigned math 0 - x >= 0
+            return false;
+        }
+        memcpy(_mac, &buffer[HEADER_SIZE + _payloadLen], MESSAGE_MAC_SIZE);
+    }
+    
     //Allocate memory for the payload and copy content from the buffer
     if(len > HEADER_SIZE){
         _payloadLen = len - HEADER_SIZE;
@@ -255,7 +282,12 @@ void Message::parseToBytes(char* buffer) const {
         memcpy(&buffer[HEADER_SIZE], _payload, _payloadLen);
     }
     
-    //TODO calculate checknum
+    //Add MAC
+    if(_version == 2){
+        unsigned char hash[HASH_LENGTH];
+        Utilities::SHA256Hash(hash, buffer, HEADER_SIZE + _payloadLen);
+        memcpy(&buffer[HEADER_SIZE + _payloadLen], hash, MESSAGE_MAC_SIZE);
+    }
 }
 
 
@@ -309,6 +341,13 @@ void Message::printInfo() const {
     cout << "Source = ";
     Networking::printAddress(&_addrInfo);
     cout << endl;
+    
+    cout << "MAC = ";
+    if(getVersion() == 2){
+        Utilities::printBytes(_mac, MESSAGE_MAC_SIZE);
+    }
+    cout << endl;
+    
     
     if(getPayloadLength() > 0){
         cout << "Payload:" << endl;

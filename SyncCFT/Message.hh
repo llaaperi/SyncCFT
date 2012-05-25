@@ -20,6 +20,7 @@ enum MsgType {TYPE_ACK, TYPE_HELLO, TYPE_DESCR, TYPE_DIFF, TYPE_GET, TYPE_FILE, 
 #define MESSAGE_MTU 1440 //1500 - IP - UDP - HEADER - MAC
 #define DEFAULT_VERSION 2
 #define DEFAULT_WINDOW 1
+#define MESSAGE_MAC_SIZE 32
 
 
 using namespace std;
@@ -44,7 +45,7 @@ class Message {
     
     //char _binaryHeader[HEADER_SIZE];
     char* _payload;
-	unsigned char _mac[32];
+	unsigned char _mac[MESSAGE_MAC_SIZE];
     
 public:
     Message();
