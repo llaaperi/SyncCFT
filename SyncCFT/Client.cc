@@ -26,6 +26,9 @@ Client::Client(list<string> hosts, string cport, string sport, int version, cons
     for(string host : hosts){
         addHost(host, sport, true);
     }
+    
+    //Initialize session key
+    _sessionKey = NULL;
 }
 
 
@@ -160,7 +163,7 @@ void Client::sessionHandler(Host h){
     
     sockaddr* sockAddr = h.serverInfo->ai_addr;
     
-    Transceiver trans(_socket, *sockAddr);
+    Transceiver trans(_socket, *sockAddr, _sessionKey);
     _trns = &trans;
     
     //Try HELLO handshake

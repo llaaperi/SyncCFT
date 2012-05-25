@@ -220,11 +220,6 @@ bool Message::parseFromBytes(const char* buffer, int len){
         }
         
         _payloadLen -= MESSAGE_MAC_SIZE;
-        
-        //Check that received packet contained MAC
-        if(_payloadLen > 1500){ //Unsigned math 0 - x >= 0
-            return false;
-        }
         memcpy(_mac, &buffer[HEADER_SIZE + _payloadLen], MESSAGE_MAC_SIZE);
     }
     

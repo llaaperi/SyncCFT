@@ -129,12 +129,7 @@ void* Server::handle(void* arg){
             }
         }
         
-        /*
-        if(!_serverClients.empty()){
-            //cout << "[SERVER] Handle source clients" << endl;
-            handler->sourceHandler();
-        }
-        */
+        cout << "[SERVER] Received invalid message" << endl;
         
     }
     return 0;
@@ -293,7 +288,7 @@ void Server::replyNACK(Message* msg, sockaddr cliAddr){
  *
  */
 void Server::createNewSession(int clientID, sockaddr cliAddr, uint32_t seqnum, unsigned char* sessionKey){
-    Transceiver* trns = new Transceiver(_socket, cliAddr);
+    Transceiver* trns = new Transceiver(_socket, cliAddr, sessionKey);
     _sessionHandlers[clientID] = new SessionHandler(this, trns, clientID, seqnum, sessionKey);
 }
 

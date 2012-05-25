@@ -18,6 +18,11 @@
  *          false if send failed or timeouted
  */
 bool Transceiver::send(Message* msg, int timeout){
+    
+    if(!msg->isHello() && (_key == NULL)){
+        msg->setVersion(1);
+    }
+    
     return sendMsg(_socket, msg, &_cliAddr, timeout);
 }
 
@@ -61,6 +66,9 @@ bool Transceiver::sendMsg(int socket, Message* msg, struct sockaddr* destAddr, i
     if(msg->getVersion() == 2){
         pktLen += MESSAGE_MAC_SIZE;
     }
+    
+    //msg->printInfo();
+    
     int sentBytes = Networking::sendPacket(socket, sendBuffer, pktLen,  destAddr, timeout);
     
     if(sentBytes < pktLen){

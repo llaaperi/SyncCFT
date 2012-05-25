@@ -288,7 +288,9 @@ bool SessionHandler::parseGet(const Message* msg, Element* file, uint32_t* chunk
  */
 void SessionHandler::getHandler(const Message* msg){
     
-    cout << "[SESSION] Get handler started: " << msg->getPayload() << endl;
+    //cout << "[SESSION] Get handler started: " << msg->getPayload() << endl;
+    cout << "[SESSION] Get handler started" << endl;
+    
     uint32_t chunkBegin = 0;
     uint32_t chunkEnd = 0;
     Element file;

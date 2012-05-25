@@ -28,9 +28,10 @@ using namespace std;
 class Transceiver {
     int _socket;
     struct sockaddr _cliAddr;
+    const unsigned char* _key;
     
 public:
-    Transceiver(int socket, struct sockaddr cliAddr) : _socket(socket), _cliAddr(cliAddr){}
+    Transceiver(int socket, struct sockaddr cliAddr, const unsigned char* key) : _socket(socket), _cliAddr(cliAddr), _key(key){}
     ~Transceiver(){}
     
     bool send(Message* msg, int timeout);
