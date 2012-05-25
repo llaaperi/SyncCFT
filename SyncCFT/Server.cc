@@ -432,6 +432,7 @@ void Server::handshakeHandlerV2Ack(Message* msg, sockaddr cliAddr){
     //Reply with ACK containing hash
     Utilities::nonceHash(hash, client->cNonce, _secretKey);
     msg->incrSeqnum();
+    msg->setClientID(clientID); //Add valid client id
     msg->setPayload((char*)hash, HASH_LENGTH);
     msg->setHello(true);
     if(!Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND)){
