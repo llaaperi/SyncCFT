@@ -288,7 +288,6 @@ void Message::parseToBytes(char* buffer) const {
         unsigned char hash[HASH_LENGTH];
         Utilities::SHA256Hash(hash, (unsigned char*)buffer, HEADER_SIZE + _payloadLen);
         memcpy(&buffer[HEADER_SIZE + _payloadLen], hash, MESSAGE_MAC_SIZE);
-        _payloadLen += MESSAGE_MAC_SIZE;    //Increase payoadLen for Transceiver
     }
 }
 

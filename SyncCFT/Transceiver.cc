@@ -58,6 +58,9 @@ bool Transceiver::sendMsg(int socket, Message* msg, struct sockaddr* destAddr, i
     
     msg->parseToBytes(sendBuffer);
     int pktLen = HEADER_SIZE + msg->getPayloadLength();
+    if(msg->getVersion() == 2){
+        pktLen += MESSAGE_MAC_SIZE;
+    }
     int sentBytes = Networking::sendPacket(socket, sendBuffer, pktLen,  destAddr, timeout);
     
     if(sentBytes < pktLen){
@@ -100,6 +103,7 @@ bool Transceiver::recvMsg(int socket, Message* msg, struct sockaddr* srcAddr, in
     
     // Parse message and discard invalid packets
     if(!msg->parseFromBytes(recvBuffer, recvLen)){
+        cout << "[TRANSCEIVER] ParseFromBytes failed." << endl;
         return false;
     }
     
