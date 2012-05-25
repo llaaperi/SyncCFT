@@ -134,6 +134,8 @@ void* Client::handle(void* arg)
 {
     Client* handler = (Client*)arg;
     
+    sleep(1);   //Wait server to start
+    
     cout << "[CLIENT] Client handler" << endl;
     
     while(handler->_running){
