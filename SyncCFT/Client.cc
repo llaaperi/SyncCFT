@@ -505,9 +505,9 @@ bool Client::handshakeHandlerV2(sockaddr servAddr){
     cout << endl;
     
     //Utilities::printBytes((unsigned char*)msg->getPayload(), 256);
-    
+    //msg.printInfo();
     //Check that server hash is correct
-    if(memcmp(hash, msg.getPayload(), HASH_LENGTH)){
+    if((msg.getPayloadLength() < HASH_LENGTH) || memcmp(hash, msg.getPayload(), HASH_LENGTH)){
         cout << "[CLIENT] Handshake failed: Invalid server hash value" << endl;
         return false;
     }
@@ -537,12 +537,12 @@ bool Client::terminateHandler(sockaddr servAddr){
     if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
         return false;
     }
-    /*
+    
     //Receive reply from the server
     if(!_trns->recv(&msg, CLIENT_TIMEOUT_QUIT)){
         return false;
     }
-    
+    /*
     //Check that received ACK
     if(msg.getType() != TYPE_ACK){
         return false;

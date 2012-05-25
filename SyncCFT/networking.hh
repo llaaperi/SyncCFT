@@ -24,7 +24,7 @@ namespace Networking {
     
     
     /**
-     * Compare two network address
+     * Compare two network address and ports
      * @addr1 First address
      * @addr2 Second address
      * @return true if addresses match, false if not
