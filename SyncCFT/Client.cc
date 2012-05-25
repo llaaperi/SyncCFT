@@ -167,7 +167,7 @@ void Client::sessionHandler(Host h){
     startSession(*sockAddr);
     
     //Metafile handler
-    MetaFile* diff;
+    MetaFile* diff = NULL;
     metafileHandler(*sockAddr, &diff);
     
     //File transfers
@@ -234,7 +234,7 @@ void Client::metafileHandler(sockaddr servAddr, MetaFile** diff){
 void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
     
     cout << "[CLIENT] File transfer started" << endl;
-    
+
     Message msg;
     
     list<Element> elements = diff->getData();
@@ -537,7 +537,7 @@ bool Client::terminateHandler(sockaddr servAddr){
     if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
         return false;
     }
-    
+    /*
     //Receive reply from the server
     if(!_trns->recv(&msg, CLIENT_TIMEOUT_QUIT)){
         return false;
@@ -547,7 +547,7 @@ bool Client::terminateHandler(sockaddr servAddr){
     if(msg.getType() != TYPE_ACK){
         return false;
     }
-    
+    */
     //Remove id
     _id = 0;
     
