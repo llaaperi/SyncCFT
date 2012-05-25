@@ -215,6 +215,7 @@ bool Message::parseFromBytes(const char* buffer, int len){
         
         //Chek that received packet contained atleast MAC
         if(_payloadLen < MESSAGE_MAC_SIZE){
+            cout << "[MESSAGE] Message does not contain MAC" << endl;
             return false;
         }
         
@@ -287,6 +288,7 @@ void Message::parseToBytes(char* buffer) const {
         unsigned char hash[HASH_LENGTH];
         Utilities::SHA256Hash(hash, (unsigned char*)buffer, HEADER_SIZE + _payloadLen);
         memcpy(&buffer[HEADER_SIZE + _payloadLen], hash, MESSAGE_MAC_SIZE);
+        _payloadLen += MESSAGE_MAC_SIZE;    //Increase payoadLen for Transceiver
     }
 }
 
