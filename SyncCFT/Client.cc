@@ -244,12 +244,13 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
         cout << "[CLIENT] Request file: " << e.getName() << endl;
         
         msg.initHeader(TYPE_GET);   //Create GET message
+		msg.setVersion(_version);
 		msg.setWindow(1);   //Init window size to 1
         
         char buf[NETWORKING_MTU];
         sprintf(buf, "%s;%d-%d", e.getName().c_str(), 0, 0);
         msg.setPayload(buf, (int)strlen(buf));
-        
+        msg.printInfo();
         if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
             cout << "[CLIENT] Unable to send GET" << endl;
             return;
@@ -423,6 +424,7 @@ bool Client::handshakeHandlerV1(sockaddr servAddr){
     _id = msg.getClientID();
     
     //Reply with final HELLOACK
+	msg.setVersion(1);
     msg.incrSeqnum();
     msg.setPayload(NULL, 0);
     msg.setHello(true);
@@ -447,7 +449,7 @@ bool Client::handshakeHandlerV2(sockaddr servAddr){
     //**********************Send HELLO message *************************
     msg.initHeader(TYPE_HELLO);
     msg.setVersion(2);
-    
+    msg.printInfo();
     Utilities::randomBytes(cNonce, 16);
     msg.setPayload((char*)cNonce, 16);
     if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
@@ -458,7 +460,7 @@ bool Client::handshakeHandlerV2(sockaddr servAddr){
     if(!_trns->recv(&msg, CLIENT_TIMEOUT_HELLO)){
         return false;
     }
-    
+    msg.printInfo();
     //Check that received HELLOACK with nonce
     if((msg.getType() != TYPE_ACK) || (msg.getPayloadLength() < 16)){
         return false;
