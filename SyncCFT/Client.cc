@@ -391,6 +391,8 @@ void Client::endSession(sockaddr servAddr){
         if(terminated){
             cout << "[CLIENT] Session terminated succesfully" << endl;
         }else{
+            cout << "[CLIENT] Session terminated" << endl;
+            return; //Do not retry termination even if server ack is lost
             cout << "[CLIENT] Session termination failed, retrying in " << CLIENT_BACKOFF << " seconds" << endl;
             sleep(CLIENT_BACKOFF);
         }
