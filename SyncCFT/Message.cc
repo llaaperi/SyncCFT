@@ -23,8 +23,8 @@ Message::Message() : _version(0), _type(0), _clientID(0), _checksum(0),
 }
 
 
-/*
- * Copy constructor
+/**
+ * Copy constructor. Doesn't copy payload.
  */
 Message::Message(Message const& other){
 
@@ -54,16 +54,18 @@ Message::Message(Message const& other){
 }
 
 
-/*
- * Destructor frees the existing payload
+/**
+ * Destructor. Frees the existing payload
  */
 Message::~Message(){
     clearPayload();
 }
 
 
-/*
+/**
  * Initializes the whole message. Existing payload is freed.
+ * @param version Protocol version
+ * @param type Message type
  */
 void Message::init(uint8_t version, uint8_t type){
     
@@ -74,8 +76,10 @@ void Message::init(uint8_t version, uint8_t type){
 }
 
 
-/*
- * Initialize all header values
+/**
+ * Initialize all message header values
+ * @param version Protocol version
+ * @param type Message type
  */
 void Message::initHeader(uint8_t version, uint8_t type) {
     
@@ -105,7 +109,9 @@ void Message::initHeader(uint8_t version, uint8_t type) {
     _end = false;
 }
 
-
+/**
+ * Clear message payload
+ */
 void Message::clearPayload(){
     
     //Free payload if exists
@@ -117,8 +123,8 @@ void Message::clearPayload(){
 }
 
 
-/*
- *
+/**
+ * Zero all header values and free allocated memory
  */
 void Message::clear(){
     
@@ -141,8 +147,10 @@ void Message::clear(){
 }
 
 
-/*
- *
+/**
+ * Set message payload. Overwrites existing payload.
+ * @param payload New message payload
+ * @param length Payload lentgth
  */
 void Message::setPayload(const char *payload, int length){
     
@@ -161,9 +169,11 @@ void Message::setPayload(const char *payload, int length){
 }
 
 
-/*
+/**
  * Parses message from byte array. 
  * Memory is allocated for the possible payload and existing payload is freed.
+ * @param buffer Stored message in a byte array
+ * @param len Length of the message
  */
 bool Message::parseFromBytes(const char* buffer, int len){
     
@@ -213,16 +223,14 @@ bool Message::parseFromBytes(const char* buffer, int len){
         //Init MAC
         memset(_mac, 0, MESSAGE_MAC_SIZE);
         
-        //Chek that received packet contained atleast MAC
+        //Chek that received packet contained at least MAC
         if(_payloadLen < MESSAGE_MAC_SIZE){
             cout << "[MESSAGE] Message does not contain MAC" << endl;
             return false;
         }
-        
         _payloadLen -= MESSAGE_MAC_SIZE;
         memcpy(_mac, &buffer[HEADER_SIZE + _payloadLen], MESSAGE_MAC_SIZE);
     }
-    
     //Allocate memory for the payload and copy content from the buffer
     if(len > HEADER_SIZE){
         _payloadLen = len - HEADER_SIZE;
@@ -233,13 +241,13 @@ bool Message::parseFromBytes(const char* buffer, int len){
         _payload = NULL;
         _payloadLen = 0;
     }
-    
     return true;
 }
 
 
-/*
+/**
  * Convert message header into binary format
+ * @param buffer Memory for storing binary message
  */
 void Message::parseToBytes(char* buffer) const {
     
@@ -287,8 +295,11 @@ void Message::parseToBytes(char* buffer) const {
 }
 
 
-/*
- *
+/**
+ * Compare to message sequence numbers
+ * @param msg1 Message 1
+ * @param msg2 Message 2
+ * @return True if Message 2 sequence number > Message 1 sequence number
  */
 bool Message::compare_seqnum(Message* msg1, Message* msg2){
     
@@ -299,8 +310,8 @@ bool Message::compare_seqnum(Message* msg1, Message* msg2){
 }
 
 
-/*
- * Print contents of the header in hex
+/**
+ * Print contents of the header in hex format
  */
 void Message::printBytes() const {
     
@@ -313,7 +324,7 @@ void Message::printBytes() const {
 }
 
 
-/*
+/**
  * Print text representation of the message header and payload.
  */
 void Message::printInfo() const {
@@ -344,11 +355,9 @@ void Message::printInfo() const {
     }
     cout << endl;
     
-    
     if(getPayloadLength() > 0){
         cout << "Payload:" << endl;
         Utilities::printBytes((unsigned char*)getPayload(), getPayloadLength());
         cout << endl;
     }
-    
 }

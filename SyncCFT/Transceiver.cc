@@ -11,8 +11,12 @@
 #include "Transceiver.hh"
 #include "networking.hh"
 
-/*
- *
+/**
+ * Constructor
+ * @param socket Used UDP socket
+ * @param cliAddr Struct containing required address info
+ * @param key Session key for authentication
+ * @param version Protocol version
  */
 Transceiver::Transceiver(int socket, struct sockaddr cliAddr, const unsigned char* key, int version) : _socket(socket), _cliAddr(cliAddr), _key(key){
     
@@ -25,21 +29,23 @@ Transceiver::Transceiver(int socket, struct sockaddr cliAddr, const unsigned cha
 }
 
 
-
-/*
- * Function sends the message to the client.
- * @return  true if message was sent successfully, 
- *          false if send failed or timeouted
- */
-bool Transceiver::send(Message* msg, int timeout){
+/**
+ * Function for sending messages
+ * @param msg Message to be sent
+ * @param timeout Time in milliseconds
+ * @return True if message was sent successfully, 
+ *  false if send failed or timeouted
+ */bool Transceiver::send(Message* msg, int timeout){
     return sendMsg(_socket, msg, &_cliAddr, timeout);
 }
 
 
-/*
- * Function receives message from the client.
- * @return  true if valid message was received from the client, 
- *          false if invalid message or wrong source.
+/**
+ * Function for receiving messages
+ * @param msg Save received message here
+ * @param timeout Time in milliseconds
+ * @return  True if valid message was received, 
+ *  false if invalid message or wrong source.
  */
 bool Transceiver::recv(Message* msg, int timeout){
     
@@ -49,8 +55,6 @@ bool Transceiver::recv(Message* msg, int timeout){
     if(!recvMsg(_socket, msg, &srcAddr, timeout)){
         return false;
     }
-    // TODO: Doesn't work with multiple parallel communications with multiple
-    //       different hosts
     //Check source
     if(!Networking::cmpAddr(&srcAddr, &_cliAddr)){
         return false;
@@ -59,8 +63,14 @@ bool Transceiver::recv(Message* msg, int timeout){
 }
 
 
-/*
- *
+/**
+ * Static version of send message
+ * @param socket UDP socket to be used
+ * @param msg Message to be sent
+ * @param destAddr Destination address
+ * @param timeout Time in milliseconds
+ * @return True if message was sent successfully, 
+ *  false if send failed or timeouted
  */
 bool Transceiver::sendMsg(int socket, Message* msg, struct sockaddr* destAddr, int timeout){
     
@@ -88,8 +98,14 @@ bool Transceiver::sendMsg(int socket, Message* msg, struct sockaddr* destAddr, i
 }
 
 
-/*
- *
+/**
+ * Static version of receive message
+ * @param socket UDP socket to be used
+ * @param msg Save received message here
+ * @param srcAddr Source address
+ * @param timeout Time in milliseconds
+ * @return  True if valid message was received, 
+ *  false if invalid message or wrong source.
  */
 bool Transceiver::recvMsg(int socket, Message* msg, struct sockaddr* srcAddr, int timeout){
     

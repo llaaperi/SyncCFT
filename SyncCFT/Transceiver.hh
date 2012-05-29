@@ -15,15 +15,6 @@
 
 using namespace std;
 
-/**
- * TODO: - Class has to support multiple parallel sessions
- *       - Class has to perform message authentication
- *
- * IDEAS: - Create an individual receive buffer for each session (client ID,
- *          struct sockaddr) -> if received packet doesn't belong to own
- *          session, save it to the correct receive buffer
- *
- **/
 
 class Transceiver {
     int _socket;
@@ -32,17 +23,57 @@ class Transceiver {
     int _version;
     
 public:
+    /**
+     * Constructor
+     * @param socket Used UDP socket
+     * @param cliAddr Struct containing required address info
+     * @param key Session key for authentication
+     * @param version Protocol version
+     */
     Transceiver(int socket, struct sockaddr cliAddr, const unsigned char* key, int version);
     ~Transceiver(){}
     
+    /**
+     * Function for sending messages
+     * @param msg Message to be sent
+     * @param timeout Time in milliseconds
+     * @return True if message was sent successfully, 
+     *  false if send failed or timeouted
+     */
     bool send(Message* msg, int timeout);
+    
+    /**
+     * Function for receiving messages
+     * @param msg Save received message here
+     * @param timeout Time in milliseconds
+     * @return  True if valid message was received, 
+     *  false if invalid message or wrong source.
+     */
     bool recv(Message* msg, int timeout);
     
+    /**
+     * Static version of send message
+     * @param socket UDP socket to be used
+     * @param msg Message to be sent
+     * @param destAddr Destination address
+     * @param timeout Time in milliseconds
+     * @return True if message was sent successfully, 
+     *  false if send failed or timeouted
+     */
     static bool sendMsg(int socket, Message* msg, struct sockaddr* destAddr, int timeout);
+    
+    /**
+     * Static version of receive message
+     * @param socket UDP socket to be used
+     * @param msg Save received message here
+     * @param srcAddr Source address
+     * @param timeout Time in milliseconds
+     * @return  True if valid message was received, 
+     *  false if invalid message or wrong source.
+     */
     static bool recvMsg(int socket, Message* msg, struct sockaddr* srcAddr, int timeout);
     
     const sockaddr* getAddr(){return &_cliAddr;}
-    
     int getVersion(){return _version;}
     
 private:
