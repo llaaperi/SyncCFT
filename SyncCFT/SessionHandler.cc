@@ -15,8 +15,13 @@
 #include "Server.hh"
 
 
-/*
- * Constructor
+/**
+ * Constuctor
+ * @param server Pointer to Server object
+ * @param trns Pointer to a Transceiver object
+ * @param id Session ID
+ * @param seqnum Sequence number
+ * @param sessionKey Session key
  */
 SessionHandler::SessionHandler(Server* server, Transceiver* trns, uint8_t id, uint32_t seqnum, unsigned char* sessionKey) : _server(server), _trns(trns), _id(id), _seqnum(seqnum), _sessionKey(sessionKey){
     
@@ -25,8 +30,8 @@ SessionHandler::SessionHandler(Server* server, Transceiver* trns, uint8_t id, ui
 }
 
 
-/*
- * Destructor
+/**
+ * Destructor. Frees allocated dynamic memory
  */
 SessionHandler::~SessionHandler(){
     
@@ -39,7 +44,6 @@ SessionHandler::~SessionHandler(){
     if(_sessionKey != NULL){
         free(_sessionKey);
     }
-    
     for(int i = 0; i < SESSIONHANDLER_MAX_TRANSFERS; i++){  //Free file transfer objects
         if(_fFlows[i] != NULL){
             delete(_fFlows[i]);
@@ -48,8 +52,10 @@ SessionHandler::~SessionHandler(){
 }
 
 
-/*
+/**
  * Function for checking if source is valid for this session
+ * @param msg Message to be checked
+ * @return True if message source is valid
  */
 bool SessionHandler::isValidSource(const Message *msg){
     
@@ -61,8 +67,10 @@ bool SessionHandler::isValidSource(const Message *msg){
 }
 
 
-/*
- * 
+/**
+ * Function for checking if Message is valid for this session
+ * @param msg Message to be checked
+ * @return True if message is valid
  */
 bool SessionHandler::isValidMessage(const Message *msg){
     
@@ -85,17 +93,16 @@ bool SessionHandler::isValidMessage(const Message *msg){
         if(msg->getVersion() != 2){
             return false;
         }
-        
         cout << "[SESSION] Invalid MAC" << endl;
-        
     }
-    
     return true;
 }
 
 
-/*
- *
+/**
+ * Handle received message
+ * @param msg Pointer to the received message
+ * @return True if message is valid
  */
 bool SessionHandler::newMessage(const Message* msg){
 
@@ -104,7 +111,6 @@ bool SessionHandler::newMessage(const Message* msg){
         cout << "[SESSION] Invalid message" << endl;
         return true;
     }
-    
     // Reset idle timer
     _timer.start();
     
@@ -144,8 +150,9 @@ bool SessionHandler::newMessage(const Message* msg){
 }
 
 
-/*
- * Handles DESCR messages
+/**
+ * Handle DESCR message
+ * @param msg Pointer to the message
  */
 void SessionHandler::descrHandler(const Message* msg){
     
@@ -189,9 +196,9 @@ void SessionHandler::descrHandler(const Message* msg){
 
 
 
-/*
+/**
  * Function for requesting next free client id
- * Return: -1 if no free ID's are available or free id
+ * @return Free ID or -1 if no free IDs are available
  */
 int SessionHandler::getFreeFlow(){
     
@@ -204,9 +211,10 @@ int SessionHandler::getFreeFlow(){
 }
 
 
-/*
+/**
  * Check if Element file is being transferred already
- * @return true if file is being transferred
+ * @param file Pointer to the element
+ * @return True if file is being transferred
  */
 bool SessionHandler::isTransferring(Element* file){
 
@@ -221,19 +229,9 @@ bool SessionHandler::isTransferring(Element* file){
     return false;
 }
 
-
-/*
- * Send reply NACK to the message
- */
-void SessionHandler::sendNack(const Message* msg){
-    Message reply(*msg);
-    reply.setType(TYPE_NACK);
-    _trns->send(&reply, SERVER_TIMEOUT_SEND);
-}
-
-
-/*
- * Send reply ACK to the message
+/**
+ * Send reply ACK to a message
+ * @param file Pointer to the received message
  */
 void SessionHandler::sendAck(const Message* msg){
     Message reply(*msg);
@@ -242,8 +240,24 @@ void SessionHandler::sendAck(const Message* msg){
 }
 
 
-/*
- *
+/**
+ * Send reply NACK to a message
+ * @param file Pointer to the received message
+ */
+void SessionHandler::sendNack(const Message* msg){
+    Message reply(*msg);
+    reply.setType(TYPE_NACK);
+    _trns->send(&reply, SERVER_TIMEOUT_SEND);
+}
+
+
+/**
+ * Parse a GET message to request chunks
+ * @param msg Received GET message
+ * @param file Pointer to the requested element
+ * @param chunkBegin First chunk
+ * @param chunkEnd Last Chunk
+ * @return True if requested file was found
  */
 bool SessionHandler::parseGet(const Message* msg, Element* file, uint32_t* chunkBegin, uint32_t* chunkEnd){
     
@@ -283,8 +297,9 @@ bool SessionHandler::parseGet(const Message* msg, Element* file, uint32_t* chunk
 }
 
 
-/*
- *
+/**
+ * Handle received GET message
+ * @param msg Received message
  */
 void SessionHandler::getHandler(const Message* msg){
     
@@ -331,15 +346,16 @@ void SessionHandler::getHandler(const Message* msg){
 }
 
 
-/*
- *
+/**
+ * Handle file transfer
+ * @param msg Received message
  */
 void SessionHandler::fileHandler(const Message* msg){
     
     cout << "[SESSION] File handler started" << endl;
     
     int flowID = 0;
-    //Chose file transfer from messages flow index
+    //Chooce file transfer from messages flow index
     //TODO
     FileTransfer* flow = _fFlows[flowID];
     
@@ -347,7 +363,6 @@ void SessionHandler::fileHandler(const Message* msg){
     if(flow == NULL){
         return;
     }
-    
     //Give chunk to the file transfer object
     if(flow->sendFile(msg)){    //File is transferred successfully
         delete(flow);
@@ -356,14 +371,13 @@ void SessionHandler::fileHandler(const Message* msg){
 }
 
 
-/*
- * Creates a 256-bit session key from two nonces and the secret key
+/**
+ * Creates a 32-byte session key from two nonces and the secret key
  * @param nonce1 First 16-byte random nonce
  * @param nonce2 Second 16-byte random nonce
- * @param secretKey Stored  64-byte secret key
+ * @param secretKey Stored 64-byte secret key
  */ 
-void SessionHandler::createSessionKey(unsigned char* nonce1, unsigned char* nonce2, unsigned char* secretKey)
-{
+void SessionHandler::createSessionKey(unsigned char* nonce1, unsigned char* nonce2, unsigned char* secretKey){
     unsigned char data[96]; // 16+16+64
     unsigned char* dataPointer = data;
     memset(data, 0, 96);
@@ -379,8 +393,10 @@ void SessionHandler::createSessionKey(unsigned char* nonce1, unsigned char* nonc
 }
 
 
-/*
+/**
  * Handler for session termination
+ * @param msg Received message
+ * @return True if the session was properly terminated
  */
 bool SessionHandler::quitHandler(const Message* msg){
     
@@ -400,7 +416,7 @@ bool SessionHandler::quitHandler(const Message* msg){
 }
 
 
-/*
+/**
  * Check if connection has been idle too long
  * @return True if expired
  */

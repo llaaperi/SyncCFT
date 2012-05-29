@@ -15,8 +15,14 @@
 #include "FileTransfer.hh"
 #include "Server.hh"
 
-/*
+/**
  * FileTransfer constructor
+ * @param trns Transceiver object used for file transfer
+ * @param file Transmitted file
+ * @param chunkBegin First chunk
+ * @param chunkEnd Last chunk
+ * @param seqnum Sequence number to begin from
+ * @param type Send or receive
  */
 FileTransfer::FileTransfer(Transceiver* trns, Element file, uint32_t chunkBegin,
                            uint32_t chunkEnd , int seqnum, int type)
@@ -60,8 +66,8 @@ FileTransfer::FileTransfer(Transceiver* trns, Element file, uint32_t chunkBegin,
 }
 
 
-/*
- * Destructor for file transfer
+/**
+ * Destructor for file transfer. Frees allocated dynamic memory.
  */
 FileTransfer::~FileTransfer(){
     cout << "[FILE] Transfer destroyed" << endl;
@@ -75,7 +81,7 @@ FileTransfer::~FileTransfer(){
 }
 
 
-/*
+/**
  * Clear reception list content
  */
 void FileTransfer::recvListClear(){
@@ -86,8 +92,9 @@ void FileTransfer::recvListClear(){
 }
 
 
-/*
+/**
  * Write reception list to the file
+ * @param last Final message to be written
  */
 void FileTransfer::writeRecvListToFile(const Message* last){
     
@@ -109,8 +116,9 @@ void FileTransfer::writeRecvListToFile(const Message* last){
 }
 
 
-/*
- *
+/**
+ * Add new message to the reception list
+ * @param msg Received message 
  */
 void FileTransfer::recvListAdd(Message* msg){
     
@@ -135,8 +143,10 @@ void FileTransfer::recvListAdd(Message* msg){
 }
 
 
-/*
- *
+/**
+ * Handle receiving a file from the server
+ * @param msg Received message
+ * @return True when the file transfer is completed
  */
 bool FileTransfer::recvFile(const Message* msg){
     
@@ -173,14 +183,14 @@ bool FileTransfer::recvFile(const Message* msg){
             return true;    //Return true whether or not the file was received successfully
         }
     }
-
     return false;
 }
 
 
 
-/*
- *
+/**
+ * Finish file transfer.Check that the hash matches and rename temp file.
+ * @return True if the file was received correctly
  */
 bool FileTransfer::fileFinish(){
     fclose(_file); // Close output file
@@ -204,9 +214,10 @@ bool FileTransfer::fileFinish(){
 }
 
 
-
-/*
- *
+/**
+ * Sort received messages and check if some are missing from chunks
+ * @param last Pointer to the last message in the last full chunk
+ * @return Number of fully received chunks
  */
 int FileTransfer::getReceivedChunks(Message** last){
 
@@ -235,8 +246,9 @@ int FileTransfer::getReceivedChunks(Message** last){
 }
 
 
-/*
- *
+/**
+ * Check that all chunks have been received correctly and reply to the sender.
+ * @return True if all chunks have been received
  */
 bool FileTransfer::recvFinish(){
     
@@ -274,8 +286,9 @@ bool FileTransfer::recvFinish(){
 }
 
 
-/*
- * Called when packet(s) are lost
+/**
+ * Handle receive timeouts. Called when packet(s) are lost.
+ * @param msg Last received message
  */
 void FileTransfer::recvTimeout(const Message *msg){
     
@@ -308,8 +321,10 @@ void FileTransfer::recvTimeout(const Message *msg){
 }
 
 
-/*
- * Return true when finished
+/**
+ * Handle file sending
+ * @param msg Last received message
+ * @return True if whole file has been transmitted
  */
 bool FileTransfer::sendFile(const Message* msg){
     
@@ -368,8 +383,9 @@ bool FileTransfer::sendFile(const Message* msg){
 }
 
 
-/*
- * Load window size amount of data to send buffer
+/**
+ * Load window size of data to the send buffer
+ * @param size Window size
  */
 void FileTransfer::loadWindow(uint16_t size){
     
@@ -382,9 +398,10 @@ void FileTransfer::loadWindow(uint16_t size){
 }
 
 
-/*
- * Send window.
- * @param size  window size
+/**
+ * Send a window of data
+ * @param size Window size
+ * @return True when window has been sent
  */
 bool FileTransfer::sendWindow(uint16_t size){
     
@@ -408,8 +425,14 @@ bool FileTransfer::sendWindow(uint16_t size){
 }
 
 
-/*
- *
+/**
+ * Send a single chunk
+ * @param chunk Pointer to the data
+ * @param len Length of the data
+ * @param window Size of the transfer window
+ * @param chunknum Chunk number
+ * @param seqnum Sequence number
+ * @return True when whole chunk has been transmitted
  */
 bool FileTransfer::sendChunk(const char* chunk, uint16_t len, uint16_t window, uint32_t chunknum, uint32_t seqnum){
     
