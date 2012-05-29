@@ -68,7 +68,7 @@ struct psd_udp {
 };
 
 /**
- * Calculate IP checksum
+ * Calculate checksum
  * Source: http://www.enderunix.org/docs/en/rawipspoof/ 
  */
 unsigned short in_cksum(unsigned short *addr, int len);
@@ -95,14 +95,14 @@ unsigned short in_cksum(unsigned short *addr, int len){
 }
 
 /**
- * Fills the UDP header and calculates the checksum
+ * Fills the IPv4 pseudo header and calculates the checksum
  * Source: http://www.enderunix.org/docs/en/rawipspoof/ 
  */
 unsigned short in_cksum_udp(int src, int dst, unsigned short *addr, int len);
 unsigned short in_cksum_udp(int src, int dst, unsigned short *addr, int len){
 	struct psd_udp buf;
     
-	memset(&buf, 0, sizeof(buf));
+	memset(&buf, 0, sizeof(struct psd_udp));
 	buf.src.s_addr = src;
 	buf.dst.s_addr = dst;
 	buf.pad = 0;
@@ -218,7 +218,7 @@ int main (int argc, const char * argv[]){
     // Total length
     // IP header + UDP header + payload
     int totLen = sizeof(struct ip) + sizeof(struct udphdr) + pktLen;
-    
+    cout << "Total length: " << totLen << endl;
     // Fill the IP headers
     ip->ip_hl = 0x5;
 	ip->ip_v = 0x4;
@@ -245,9 +245,12 @@ int main (int argc, const char * argv[]){
     //udp.len = htons(8); // UDP header + data, data still missing
     
     // Calculate checksum
-    udp->uh_sum = htons(ntohs(0x3251));
+    udp->uh_sum = 0;
+    //udp->uh_sum = htons(0x3251);
     //udp.check = 0;
-	//udp->uh_sum = in_cksum_udp(ip->ip_src.s_addr, ip->ip_dst.s_addr, (unsigned short *)udp, sizeof(struct udphdr));
+	//udp->uh_sum = in_cksum_udp(ip->ip_src.s_addr, ip->ip_dst.s_addr, (unsigned short *)udp, (sizeof(struct ip) + sizeof(struct udphdr)));
+    cout << "Source: " << ip->ip_src.s_addr << endl;
+    cout << "Destination: " << ip->ip_dst.s_addr << endl;
     printf("CRC: %X", udp->uh_sum);
     
     // Create raw UDP socket
