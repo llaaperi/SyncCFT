@@ -12,7 +12,15 @@
 #include "networking.hh"
 #include "FileTransfer.hh"
 
-
+/**
+ * Constuctor for a client
+ * @param hosts List of clients
+ * @param cport Client port
+ * @param scport Server port 
+ * @param version Supported protocol version. 0 supports both 1 and 2
+ * @param secretKey Secret key used in authentication
+ * @param mode Defines how many times the synchronization operation is repeated, 0 = infinite
+ */
 Client::Client(list<string> hosts, string cport, string sport, int version, const unsigned char* secretKey, int mode) throw(invalid_argument, runtime_error) : _cport(cport), _sport(sport), _secretKey(secretKey), _mode(mode), _running(false), _finished(false){
     
 	//cout << "[CLIENT] Client constructor with mode: " << mode << endl;
@@ -39,10 +47,8 @@ Client::Client(list<string> hosts, string cport, string sport, int version, cons
 
 
 /**
- *
  * Destructor for Client class
- *
- **/
+ */
 Client::~Client() {
     
     cout << "[CLIENT] Destructor" << endl;
@@ -67,8 +73,11 @@ Client::~Client() {
 }
 
 
-/*
- *
+/**
+ * Add new host to the hosts list
+ * @param addr Host address
+ * @param port Host port
+ * @param permanent Is host stored permanently
  */
 void Client::addHost(string addr, string port, bool permanent){
     
@@ -104,8 +113,8 @@ void Client::addHost(string addr, string port, bool permanent){
 }
 
 
-/*
- * Start thread for handling clients
+/**
+ * Start thread for handling client messages
  */
 void Client::start(void)
 {
@@ -116,8 +125,8 @@ void Client::start(void)
 
 
 
-/*
- * Stop thread for handling clients
+/**
+ * Stop thread
  */
 void Client::stop(void) {
     _running = false;
@@ -127,7 +136,7 @@ void Client::stop(void) {
 
 
 
-/*
+/**
  * Main function for client thread
  */
 void* Client::handle(void* arg)
@@ -162,8 +171,9 @@ void* Client::handle(void* arg)
 }
 
 
-/*
- *
+/**
+ * Handles a session with a single host
+ * @param h Target host
  */
 void Client::sessionHandler(Host h){
     
@@ -191,8 +201,10 @@ void Client::sessionHandler(Host h){
 }
 
 
-/*
- *
+/**
+ * Perform metafile comparison between the client and the server
+ * @param servAddr Struct for storing server address info
+ * @param diff Difference between the two Metafiles
  */
 void Client::metafileHandler(sockaddr servAddr, MetaFile** diff){
     
@@ -239,8 +251,11 @@ void Client::metafileHandler(sockaddr servAddr, MetaFile** diff){
 }
 
 
-/*
+/**
+ * Perform file download from the server
  * //TODO: servAddr parameter not used anywhere
+ * @param servAddr Struct for storing server address info
+ * @param diff Metafile containing the files to transfer
  */
 void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
     
@@ -357,7 +372,8 @@ bool Client::completeFileTransfer(Message* msg, bool first) {
 
 /**
  * Function tries to start session with a server.
- **/
+ * @param servAddr Struct for storing server address info
+ */
 void Client::startSession(sockaddr servAddr){
     
     bool started = false;
@@ -379,8 +395,9 @@ void Client::startSession(sockaddr servAddr){
 
 
 
-/*
+/**
  * Function terminates current session
+ * @param servAddr Struct for storing server address info
  */
 void Client::endSession(sockaddr servAddr){
     int retries = CLIENT_QUIT_RETRIES;
@@ -404,9 +421,11 @@ void Client::endSession(sockaddr servAddr){
 
 
 
-/*
- * HandshakeHandler function handles the HELLO handshake between client and server.
- * Returns true if handshake was successfull and false if it failed.
+/**
+ * HandshakeHandler function handles the HELLO handshake between client and
+ * server using protocol version 1.
+ * @param servAddr Struct for storing server address info
+ * @return True if handshake was successfull and false if it failed.
  */
 bool Client::handshakeHandlerV1(sockaddr servAddr){
     
@@ -445,9 +464,11 @@ bool Client::handshakeHandlerV1(sockaddr servAddr){
 }
 
 
-/*
- * HandshakeHandler function handles the HELLO handshake between client and server.
- * Returns true if handshake was successfull and false if it failed.
+/**
+ * HandshakeHandler function handles the HELLO handshake between client and
+ * server using protocol version 2.
+ * @param servAddr Struct for storing server address info
+ * @return True if handshake was successfull and false if it failed.
  */
 bool Client::handshakeHandlerV2(sockaddr servAddr){
     
@@ -537,8 +558,10 @@ bool Client::handshakeHandlerV2(sockaddr servAddr){
 }
 
 
-/*
- * Handleds termination of the session
+/**
+ * Handles termination of the session
+ * @param servAddr Struct for storing server address info
+ * @return True if termination was successfull and false if it failed.
  */
 bool Client::terminateHandler(sockaddr servAddr){
     

@@ -16,8 +16,12 @@
 list<string> _serverClients;
 
 
-/*
- * Constructor
+/**
+ * Constuctor for a server
+ * @param clientHandler Pointer to a client handler object
+ * @param port Server port 
+ * @param version Supported protocol version. 0 supports both 1 and 2.
+ * @param secretKey Secret key used in authentication
  */
 Server::Server(Client* clientHandler, string port, int version, const unsigned char* secretKey) throw(invalid_argument,runtime_error) : _client(clientHandler), _port(port), _version(version), _secretKey(secretKey), _running(false){
     
@@ -31,8 +35,7 @@ Server::Server(Client* clientHandler, string port, int version, const unsigned c
 }
 
 
-
-/*
+/**
  * Destructor
  */
 Server::~Server(){
@@ -40,9 +43,8 @@ Server::~Server(){
 }
 
 
-
-/*
- * Start thread for handling clients
+/**
+ * Start thread for handling server messages
  */
 void Server::start(void){
     _running = true;
@@ -51,9 +53,8 @@ void Server::start(void){
 }
 
 
-
-/*
- * Stop thread for server
+/**
+ * Stop thread
  */
 void Server::stop(void){
     _running = false;
@@ -62,22 +63,9 @@ void Server::stop(void){
 }
 
 
-/*
- * Add new sync source to the client hosts
- */
-void Server::addSource(string addr, string port){
-    
-    //cout << "[SERVER] Add new source, ip: " << addr << ", port: " << port << endl;
-    if(_client != NULL){
-        _client->addHost(addr, port, false); 
-    }else{
-        cout << "[SERVER] Server does not accept new sources" << endl;
-    }
-}
-
-
-/*
- * Main function for server
+/**
+ * Main function for server thread
+ * @param arg Pointer to server object
  */
 void* Server::handle(void* arg){
     Server* handler = (Server*)arg;
@@ -95,7 +83,7 @@ void* Server::handle(void* arg){
         //while(!Transceiver::recvMsg(handler->_socket, &msg, &cliAddr, SERVER_TIMEOUT_RECV));        
         
         if(Transceiver::recvMsg(handler->_socket, &msg, &cliAddr, SERVER_TIMEOUT_RECV)){
-        
+            
             //msg.printBytes();
             //msg.printInfo();
             
@@ -135,10 +123,25 @@ void* Server::handle(void* arg){
     return 0;
 }
 
+/**
+ * Add new sync source to the client hosts
+ * @param addr Source address
+ * @param port Source port
+ */
+void Server::addSource(string addr, string port){
+    
+    //cout << "[SERVER] Add new source, ip: " << addr << ", port: " << port << endl;
+    if(_client != NULL){
+        _client->addHost(addr, port, false); 
+    }else{
+        cout << "[SERVER] Server does not accept new sources" << endl;
+    }
+}
 
-/*
+
+/**
  * Function for requesting next free client id
- * Return: -1 if no free ID's are available or free id
+ * @return Free id or -1 if no free ID's are available
  */
 int Server::getFreeID(){
     
@@ -147,8 +150,8 @@ int Server::getFreeID(){
             return i;
         }else
         if(_sessionHandlers[i]->isExpired()){
-            delete(_sessionHandlers[i]);    //Free existing session handler if it has timed out
-            _sessionHandlers[i] = NULL;
+            delete(_sessionHandlers[i]);    // Free existing session handler if 
+            _sessionHandlers[i] = NULL;     // it has timed out
             return i;
         }
     }
@@ -156,8 +159,11 @@ int Server::getFreeID(){
 }
 
 
-/*
- *
+/**
+ * Get PendingClient if handshake is already in progress
+ * @param cliAddr Struct containing the client address and port
+ * @return Pointer to a pending client or NULL if no handshake is in progress
+ *  with this client
  */
 PendingClient* Server::getPendingClient(sockaddr cliAddr){
     
@@ -170,8 +176,10 @@ PendingClient* Server::getPendingClient(sockaddr cliAddr){
 }
 
 
-/*
- *
+/**
+ * Add new PendingClient
+ * @param cliAddr Struct containing the client address and port
+ * @return Pointer to the pending client
  */
 PendingClient* Server::addPendingClient(sockaddr cliAddr){
     
@@ -186,8 +194,10 @@ PendingClient* Server::addPendingClient(sockaddr cliAddr){
     return newClient;
 }
 
-/*
- *
+
+/**
+ * Remove PendingClient
+ * @param Pointer to the PendingClient being removed
  */
 void Server::removePendingClient(PendingClient* client){
     
@@ -207,9 +217,12 @@ void Server::removePendingClient(PendingClient* client){
 }
 
 
-/*
- * Handshake handler funcion handles new connection requests and allocates ne handler when sucessfull
+/**
+ * Handshake handler (VERSION 1) funcion handles new connection requests and
+ * allocates new handler when sucessfull. 
  * NOT ROBUST YET, ALLOCATES RESOURCES WITHOUT CHECKING
+ * @param msg Message received from client
+ * @param cliAddr Struct storing the client address and port
  */
 void Server::handshakeHandlerV1(Message* msg, sockaddr cliAddr){
     
@@ -266,15 +279,18 @@ void Server::handshakeHandlerV1(Message* msg, sockaddr cliAddr){
         
         //Allocate resources when client ACKs the handshake
         if(msg->getClientID() == clientID){
-            createNewSession(clientID, cliAddr, msg->getSeqnum(), NULL, msg->getVersion());
+            createNewSession(clientID, cliAddr, msg->getSeqnum(), NULL,
+                             msg->getVersion());
         }
         return;
     }
 }
 
 
-/*
- *
+/**
+ * Send a NACK message to the client
+ * @param msg Message containing the required header information
+ * @param clieAddr Address info to send NACK message
  */
 void Server::replyNACK(Message* msg, sockaddr cliAddr){
     msg->incrSeqnum();
@@ -284,17 +300,27 @@ void Server::replyNACK(Message* msg, sockaddr cliAddr){
 }
 
 
-/*
- *
+/**
+ * Create a new session for communicating with a client
+ * @param clientID Allocated client ID
+ * @param cliAddr Client address info
+ * @param seqnum Sequence number from which to continue communication
+ * @param sessionKey Used session key
+ * @param version Protocol version
  */
-void Server::createNewSession(int clientID, sockaddr cliAddr, uint32_t seqnum, unsigned char* sessionKey, int version){
+void Server::createNewSession(int clientID, sockaddr cliAddr, uint32_t seqnum,
+                              unsigned char* sessionKey, int version){
     Transceiver* trns = new Transceiver(_socket, cliAddr, sessionKey, version);
-    _sessionHandlers[clientID] = new SessionHandler(this, trns, clientID, seqnum, sessionKey);
+    _sessionHandlers[clientID] = new SessionHandler(this, trns, clientID,
+                                                    seqnum, sessionKey);
 }
 
 
-/*
- *
+/**
+ * Handshake handler (VERSION 2) funcion handles new connection requests and
+ * allocates new handler when sucessfull. 
+ * @param msg Message received from client
+ * @param cliAddr Struct storing the client address and port
  */
 void Server::handshakeHandlerV2(Message* msg, sockaddr cliAddr){
     
@@ -314,8 +340,10 @@ void Server::handshakeHandlerV2(Message* msg, sockaddr cliAddr){
 }
 
 
-/*
- *
+/**
+ * Handle HELLO messages for protocol version 2
+ * @param msg Message received from client
+ * @param cliAddr Struct storing the client address and port
  */
 void Server::handshakeHandlerV2Hello(Message* msg, sockaddr cliAddr){
     
@@ -370,8 +398,10 @@ void Server::handshakeHandlerV2Hello(Message* msg, sockaddr cliAddr){
 }
 
 
-/*
- *
+/**
+ * Handle ACK messages for protocol version 2
+ * @param msg Message received from client
+ * @param cliAddr Struct storing the client address and port
  */
 void Server::handshakeHandlerV2Ack(Message* msg, sockaddr cliAddr){
     
@@ -457,8 +487,8 @@ void Server::handshakeHandlerV2Ack(Message* msg, sockaddr cliAddr){
 }
 
 
-/*
- * Handler for session termination
+/**
+ * DEPRECATED: Handler for session termination
  */
 /*
 void Server::terminateHandler(Message* msg, sockaddr cliAddr){
