@@ -28,6 +28,11 @@
 		9085F00C1535C03F00583D25 /* Transceiver.cc in Sources */ = {isa = PBXBuildFile; fileRef = 969340BF152003E800BAC8CA /* Transceiver.cc */; };
 		90B291DB1503779C00E57979 /* Client.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90B291DA1503779B00E57979 /* Client.cc */; };
 		90B291DD150377A900E57979 /* Server.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90B291DC150377A900E57979 /* Server.cc */; };
+		90BA95B4157505F200A2B23C /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90BA95B3157505F200A2B23C /* main.cc */; };
+		90BA95B6157505F200A2B23C /* QuitAttack.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 90BA95B5157505F200A2B23C /* QuitAttack.1 */; };
+		90BA95C11575160600A2B23C /* Message.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9023095F14FBEB89004C81D0 /* Message.cc */; };
+		90BA95C21575160B00A2B23C /* utilities.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90487DEE14EF0A7B006505C2 /* utilities.cc */; };
+		90BA95C31575162700A2B23C /* networking.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0D5CAC9B14EFE1CD006CDCD6 /* networking.cc */; };
 		90C011AD1524E9A800AA4294 /* utilities_unittest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90C011AC1524E9A800AA4294 /* utilities_unittest.cc */; };
 		90CB6D611525E32B001B7F0C /* Element.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90CB6D601525E32B001B7F0C /* Element.cc */; };
 		90CB6D641525E5CC001B7F0C /* Element.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90CB6D601525E32B001B7F0C /* Element.cc */; };
@@ -47,6 +52,16 @@
 			dstSubfolderSpec = 0;
 			files = (
 				906B8BC414F94EBB0038163D /* UnitTests.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		90BA95AE157505F200A2B23C /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				90BA95B6157505F200A2B23C /* QuitAttack.1 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
@@ -86,6 +101,9 @@
 		9085F0071535BEDC00583D25 /* SessionHandler_unittest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SessionHandler_unittest.cc; sourceTree = "<group>"; };
 		90B291DA1503779B00E57979 /* Client.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Client.cc; sourceTree = "<group>"; };
 		90B291DC150377A900E57979 /* Server.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Server.cc; sourceTree = "<group>"; };
+		90BA95B0157505F200A2B23C /* QuitAttack */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = QuitAttack; sourceTree = BUILT_PRODUCTS_DIR; };
+		90BA95B3157505F200A2B23C /* main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
+		90BA95B5157505F200A2B23C /* QuitAttack.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = QuitAttack.1; sourceTree = "<group>"; };
 		90C011AC1524E9A800AA4294 /* utilities_unittest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utilities_unittest.cc; sourceTree = "<group>"; };
 		90CB6D601525E32B001B7F0C /* Element.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Element.cc; sourceTree = "<group>"; };
 		90CB6D631525E33C001B7F0C /* Element.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Element.hh; sourceTree = "<group>"; };
@@ -105,6 +123,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				0D84213315208ABB005ACCB7 /* gtest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		90BA95AD157505F200A2B23C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -133,11 +158,21 @@
 			path = UnitTests;
 			sourceTree = "<group>";
 		};
+		90BA95B2157505F200A2B23C /* QuitAttack */ = {
+			isa = PBXGroup;
+			children = (
+				90BA95B3157505F200A2B23C /* main.cc */,
+				90BA95B5157505F200A2B23C /* QuitAttack.1 */,
+			);
+			path = QuitAttack;
+			sourceTree = "<group>";
+		};
 		966F0F8614E5AADB007FB278 = {
 			isa = PBXGroup;
 			children = (
 				966F0F9414E5AADB007FB278 /* SyncCFT */,
 				906B8BC014F94EBB0038163D /* UnitTests */,
+				90BA95B2157505F200A2B23C /* QuitAttack */,
 				966F0F9214E5AADB007FB278 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -147,6 +182,7 @@
 			children = (
 				966F0F9114E5AADB007FB278 /* SyncCFT */,
 				906B8BBE14F94EBB0038163D /* UnitTests */,
+				90BA95B0157505F200A2B23C /* QuitAttack */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -154,30 +190,30 @@
 		966F0F9414E5AADB007FB278 /* SyncCFT */ = {
 			isa = PBXGroup;
 			children = (
-				966F0F9514E5AADB007FB278 /* main.cc */,
-				0D5CAC9C14EFE1CD006CDCD6 /* networking.hh */,
-				0D5CAC9B14EFE1CD006CDCD6 /* networking.cc */,
-				906FAC2914E5C5B900D78FF6 /* Metafile.hh */,
-				906FAC2714E5C5A000D78FF6 /* Metafile.cc */,
-				96C8D8131552C8C8003599D5 /* Timer.hh */,
-				96C8D8151552C8D7003599D5 /* Timer.cc */,
-				90487DEC14EF0A67006505C2 /* utilities.hh */,
-				90487DEE14EF0A7B006505C2 /* utilities.cc */,
-				0D5CAC9714EFE155006CDCD6 /* Server.hh */,
-				90B291DC150377A900E57979 /* Server.cc */,
-				0D5CAC9814EFE160006CDCD6 /* Client.hh */,
 				90B291DA1503779B00E57979 /* Client.cc */,
-				0D5CAC9914EFE16A006CDCD6 /* Message.hh */,
-				9023095F14FBEB89004C81D0 /* Message.cc */,
-				0D5CAC9A14EFE1B3006CDCD6 /* Transceiver.hh */,
-				969340BF152003E800BAC8CA /* Transceiver.cc */,
-				0DDFD183151CC00300B77760 /* SessionHandler.hh */,
-				0DDFD181151CBFED00B77760 /* SessionHandler.cc */,
-				90CB6D631525E33C001B7F0C /* Element.hh */,
+				0D5CAC9814EFE160006CDCD6 /* Client.hh */,
 				90CB6D601525E32B001B7F0C /* Element.cc */,
-				96E8C2511525CCD500688FFE /* FileTransfer.hh */,
+				90CB6D631525E33C001B7F0C /* Element.hh */,
 				96E8C2531525CCE600688FFE /* FileTransfer.cc */,
+				96E8C2511525CCD500688FFE /* FileTransfer.hh */,
+				966F0F9514E5AADB007FB278 /* main.cc */,
+				9023095F14FBEB89004C81D0 /* Message.cc */,
+				0D5CAC9914EFE16A006CDCD6 /* Message.hh */,
+				906FAC2714E5C5A000D78FF6 /* Metafile.cc */,
+				906FAC2914E5C5B900D78FF6 /* Metafile.hh */,
+				0D5CAC9B14EFE1CD006CDCD6 /* networking.cc */,
+				0D5CAC9C14EFE1CD006CDCD6 /* networking.hh */,
+				90B291DC150377A900E57979 /* Server.cc */,
+				0D5CAC9714EFE155006CDCD6 /* Server.hh */,
+				0DDFD181151CBFED00B77760 /* SessionHandler.cc */,
+				0DDFD183151CC00300B77760 /* SessionHandler.hh */,
 				966F0F9714E5AADB007FB278 /* SyncCFT.1 */,
+				96C8D8151552C8D7003599D5 /* Timer.cc */,
+				96C8D8131552C8C8003599D5 /* Timer.hh */,
+				969340BF152003E800BAC8CA /* Transceiver.cc */,
+				0D5CAC9A14EFE1B3006CDCD6 /* Transceiver.hh */,
+				90487DEE14EF0A7B006505C2 /* utilities.cc */,
+				90487DEC14EF0A67006505C2 /* utilities.hh */,
 			);
 			path = SyncCFT;
 			sourceTree = "<group>";
@@ -200,6 +236,23 @@
 			name = UnitTests;
 			productName = UnitTests;
 			productReference = 906B8BBE14F94EBB0038163D /* UnitTests */;
+			productType = "com.apple.product-type.tool";
+		};
+		90BA95AF157505F200A2B23C /* QuitAttack */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 90BA95B9157505F200A2B23C /* Build configuration list for PBXNativeTarget "QuitAttack" */;
+			buildPhases = (
+				90BA95AC157505F200A2B23C /* Sources */,
+				90BA95AD157505F200A2B23C /* Frameworks */,
+				90BA95AE157505F200A2B23C /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = QuitAttack;
+			productName = QuitAttack;
+			productReference = 90BA95B0157505F200A2B23C /* QuitAttack */;
 			productType = "com.apple.product-type.tool";
 		};
 		966F0F9014E5AADB007FB278 /* SyncCFT */ = {
@@ -242,6 +295,7 @@
 			targets = (
 				966F0F9014E5AADB007FB278 /* SyncCFT */,
 				906B8BBD14F94EBB0038163D /* UnitTests */,
+				90BA95AF157505F200A2B23C /* QuitAttack */,
 			);
 		};
 /* End PBXProject section */
@@ -266,6 +320,17 @@
 				90C011AD1524E9A800AA4294 /* utilities_unittest.cc in Sources */,
 				9085F0081535BEDC00583D25 /* SessionHandler_unittest.cc in Sources */,
 				96C8D8171552C8D7003599D5 /* Timer.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		90BA95AC157505F200A2B23C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				90BA95B4157505F200A2B23C /* main.cc in Sources */,
+				90BA95C11575160600A2B23C /* Message.cc in Sources */,
+				90BA95C21575160B00A2B23C /* utilities.cc in Sources */,
+				90BA95C31575162700A2B23C /* networking.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -322,6 +387,28 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_LDFLAGS = "-lcrypto";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		90BA95B7157505F200A2B23C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx10.6;
+			};
+			name = Debug;
+		};
+		90BA95B8157505F200A2B23C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx10.6;
 			};
 			name = Release;
 		};
@@ -421,6 +508,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		90BA95B9157505F200A2B23C /* Build configuration list for PBXNativeTarget "QuitAttack" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				90BA95B7157505F200A2B23C /* Debug */,
+				90BA95B8157505F200A2B23C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		966F0F8B14E5AADB007FB278 /* Build configuration list for PBXProject "SyncCFT" */ = {
 			isa = XCConfigurationList;
