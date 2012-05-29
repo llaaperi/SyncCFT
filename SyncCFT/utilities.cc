@@ -23,7 +23,13 @@
 
 double _markov_p = 0, _markov_q = 0;
 
-
+/**
+ * Splits given string using separator. Results are saved in a given vector.
+ * @param str Source string for the method
+ * @param separator String to be used as separator
+ * @param results Vector where to save the results
+ * @return Size of vector results
+ */
 int Utilities::split(string str, string separator, vector<string>& results) {
     results.clear();
     unsigned long found = str.find_first_of(separator);
@@ -44,8 +50,10 @@ int Utilities::split(string str, string separator, vector<string>& results) {
 }
 
 
-/*
- *
+/**
+ * Initialize the Markov process
+ * @param p Probability paramater P
+ * @param q Probability paramater Q
  */
 void Utilities::initMarkov(const string& p, const string& q){
     
@@ -83,8 +91,10 @@ void Utilities::initMarkov(const string& p, const string& q){
 }
 
 
-/*
+/**
  * Markov process
+ * Extern variables (_markov_p and _markov_q) must be initialized before use
+ * @return True if packet is lost
  */
 bool Utilities::isPacketLost() {
     
@@ -112,7 +122,8 @@ bool Utilities::isPacketLost() {
 }
 
 
-/* Calculates 16-byte MD5 hash from the given file
+/** 
+ * Calculates 16-byte MD5 hash from the given file
  * @param filename Name of the file
  * @param hash Store the hash here
  * @return 16-byte has hash as string
@@ -150,11 +161,11 @@ bool Utilities::MD5Hash(string const& filename, string& hash) {
 }
 
 
-/* Calculates a 32-byte SHA256 hash from the given data
- * @ptr A buffer where to store the hash
- * @msg Pointer to message data
- * @len Length of message data
- * @return A pointer to the 32-byte hash
+/**
+ * Calculates a 32-byte SHA256 hash from the given data
+ * @param ptr A buffer where to store the hash
+ * @param msg Pointer to message data
+ * @param len Length of message data
  */
 void Utilities::SHA256Hash(unsigned char* ptr, unsigned char const* msg, long len)
 {
@@ -166,10 +177,10 @@ void Utilities::SHA256Hash(unsigned char* ptr, unsigned char const* msg, long le
 }
 
 
-/*
+/**
  * Create N bytes of random data
- * @ptr Buffer for storing the random data
- * @len Length of the buffer
+ * @param ptr Buffer for storing the random data
+ * @param len Length of the buffer
  */
 void Utilities::randomBytes(unsigned char* ptr, int len)
 {
@@ -187,8 +198,11 @@ void Utilities::randomBytes(unsigned char* ptr, int len)
 }
 
 
-/*
- * Calculate hash from nonce and key
+/**
+ * Calculate hash from nonce and secret key
+ * @param result 32-byte buffer for storing the hash
+ * @param nonce 16-byte nonce
+ * @param key 64-byte secret key
  */
 void Utilities::nonceHash(unsigned char* result, const unsigned char* nonce, const unsigned char* key){
     
@@ -216,8 +230,12 @@ void Utilities::nonceHash(unsigned char* result, const unsigned char* nonce, con
 }
 
 
-/*
- * Returned session key must be freed
+/**
+ * Create session key from two nonces and the secret key
+ * @param sNonce 16-byte server nonce
+ * @param cNonce 16-byte client nonce
+ * @param key 64-byte secret key
+ * @return  32-byte session key
  */
 unsigned char* Utilities::sessionKey(const unsigned char* sNonce, const unsigned char* cNonce, const unsigned char* key){
     
@@ -233,12 +251,14 @@ unsigned char* Utilities::sessionKey(const unsigned char* sNonce, const unsigned
     return sessionKey;
 }
 
-/*
- * Get N bit secret key 
- * @ptr An address where to store the the secret 
- * @len Length of the secret
- * @fName Name of file storing the secret, if NULL create a new secret
+
+/**
+ * Get N bit secret key from storage or create a new secret
+ * @param ptr An address where to store the the secret 
+ * @param len Length of the secret
+ * @param fName Name of file storing the secret, if NULL create a new secret
  *  to a default file
+ * @return true if key file was loaded, false if new key was created
  */
 bool Utilities::getSecretKey(unsigned char* ptr, int len, const char* fName) {
     
@@ -275,8 +295,10 @@ bool Utilities::getSecretKey(unsigned char* ptr, int len, const char* fName) {
 }
 
 
-/*
- *
+/**
+ * Print N bytes of binary data to stdout as hex values
+ * @param ptr Pointer to the data
+ * @param len Length of the data
  */
 void Utilities::printBytes(unsigned char* ptr, int len){
     for(int i = 0; i < len; i++){

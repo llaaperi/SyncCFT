@@ -21,11 +21,28 @@ class Timer{
 public:
     
     Timer();
-    ~Timer();
+    ~Timer(){};
     
+    /**
+     * Start or reset the timer
+     */
     void start();
+    
+    /**
+     * Stop the timer
+     */
     void stop();
+    
+    /**
+     * Get the time since start in seconds
+     * @return Elapsed time in seconds
+     */
     long elapsed_ms();
+    
+    /**
+     * Get the time since start in seconds
+     * @return Elapsed time in seconds
+     */
     long elapsed_s();
     
 private:

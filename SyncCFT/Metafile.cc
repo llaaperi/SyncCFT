@@ -24,8 +24,15 @@
 #include "metafile.hh"
 #include "utilities.hh"
 
-string _syncDir = "./Sync/";
+#define DEFAULT_SYNC_DIR "./Sync/"
 
+string _syncDir = DEFAULT_SYNC_DIR;
+
+
+/**
+ * Construct new MetaFile object from stored MetaFile
+ * @param fName Name of the saved MetaFile
+ */
 MetaFile::MetaFile(string fName) : _fileName(fName) {
     
     // Read metadata file
@@ -38,8 +45,12 @@ MetaFile::MetaFile(string fName) : _fileName(fName) {
     write();
 }
 
-/*
- * Construct metafile from received data
+
+/**
+ * Constructor used to create new metafile from packet
+ * payload
+ * @param buffer Packet payload
+ * @param len Length of the payload
  */
 MetaFile:: MetaFile(const char* buffer, int len) {
     string line;
@@ -52,8 +63,9 @@ MetaFile:: MetaFile(const char* buffer, int len) {
     }    
 }
 
-/*
- * Find element
+
+/**
+ * Find element from metafile
  * @param name Name of the element
  * @param found Success status of search
  * @return Reference to the found element
@@ -70,8 +82,11 @@ Element& MetaFile::find(string const& name, bool& found) {
 }
 
 
-/*
+/**
  * Convert string to Element
+ * @param line Element info stored in a string
+ * @param file Reference to a Element where to save the info
+ * @return Success status of the operation
  */
 bool MetaFile::strToElement(string const& line, Element& file) {
     vector<string> splitted;
@@ -84,8 +99,11 @@ bool MetaFile::strToElement(string const& line, Element& file) {
     return true;
 }
 
-/*
+
+/**
  * Convert Element to string
+ * @param file Reference to the Element from which to read the info
+ * @return String containing the element info
  */
 string MetaFile::elementToStr(Element const& file) const{
     ostringstream line;
@@ -94,7 +112,7 @@ string MetaFile::elementToStr(Element const& file) const{
 }
 
 
-/*
+/**
  * Read the contents of the metatile
  */
 void MetaFile::read(void) {
@@ -115,8 +133,10 @@ void MetaFile::read(void) {
     }   
 }
 
-/*
+
+/**
  * Overwrite to the metatile
+ * @return Success status of the operation
  */
 bool MetaFile::write(void) {
     _metafile.open((_syncDir + _fileName).c_str(), fstream::out | fstream::trunc);
@@ -131,8 +151,10 @@ bool MetaFile::write(void) {
     }
 }
 
-/*
+
+/**
  * Updates the contents of metafile and metadata
+ * @return Success status of the operation
  */
 bool MetaFile::updateAll(void) {
     DIR *directory;
@@ -200,7 +222,8 @@ bool MetaFile::updateAll(void) {
     return true;     
 }
 
-/*
+
+/**
  * Print metadata
  */
 void MetaFile::print(void) const{
@@ -209,22 +232,8 @@ void MetaFile::print(void) const{
     }
 }
 
-/*
- * Print metadata to stream
- */
-std::ostream& operator<<(std::ostream& os, const MetaFile& m) {
-    ostringstream strs;
-    string collect;
-    list<Element> data = m.getMetadata();
-    for (list<Element>::const_iterator iter = data.begin(); iter != data.end(); iter++) {
-        collect += m.elementToStr(*iter) + "\n";
-    }
-    collect = collect.substr(0,collect.length()-1);
-    return os << collect;
-}
 
-
-/*
+/**
  * Compares two MetaFiles and returns all the elements, which cannot be be found
  * on the other-Metafile. In case an element has been modified the newer element
  * is chosen. If the timestamps match, the other-element is chosen.
@@ -254,11 +263,30 @@ string MetaFile::getDiff(MetaFile& other) {
 }
 
 
-/*
- *
+/**
+ * Get contents of Metafile
+ * @return Contents of the Metafile as a string
  */
 string MetaFile::getDescr(){
     stringstream sStream;
     sStream << *this; 
     return sStream.str();
+}
+
+
+/**
+ * Print metadata to stream
+ * @param os The output stream to print into
+ * @param m Metafile to print
+ * @return Metadata contents
+ */
+std::ostream& operator<<(std::ostream& os, const MetaFile& m) {
+    ostringstream strs;
+    string collect;
+    list<Element> data = m.getMetadata();
+    for (list<Element>::const_iterator iter = data.begin(); iter != data.end(); iter++) {
+        collect += m.elementToStr(*iter) + "\n";
+    }
+    collect = collect.substr(0,collect.length()-1);
+    return os << collect;
 }

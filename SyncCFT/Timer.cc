@@ -14,29 +14,26 @@ Timer::Timer(){
     start();
 }
 
-Timer::~Timer(){
 
-}
-
-
-/*
- *
+/**
+ * Start or reset the timer
  */
 void Timer::start(){
     gettimeofday(&_startTime, NULL);
 }
 
 
-/*
- *
+/**
+ * Stop the timer
  */
 void Timer::stop(){
     gettimeofday(&_endTime, NULL);
 }
 
 
-/*
- *
+/**
+ * Get the time since start in seconds
+ * @return Elapsed time in seconds
  */
 long Timer::elapsed_ms(){
     
@@ -49,8 +46,9 @@ long Timer::elapsed_ms(){
 }
 
 
-/*
- *
+/**
+ * Get the time since start in seconds
+ * @return Elapsed time in seconds
  */
 long Timer::elapsed_s(){
     return elapsed_ms() / 1000;
