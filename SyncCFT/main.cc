@@ -9,6 +9,7 @@
 #include <iostream>
 #include <getopt.h>
 #include <sys/stat.h>
+#include <signal.h>
 
 #include "Metafile.hh"
 #include "Message.hh"
@@ -17,6 +18,20 @@
 #include "utilities.hh"
 
 #define HELP "Usage: synccft [-c <client port>] [-s <server port>] [-p <p>] [-q <q>] [-k] [-d <dir>] [-v <version>] <hosts>"
+
+
+/**
+ * Interrupt signal handler
+ */
+void signalHandler(int signo);
+void signalHandler(int signo){
+	(void)signo;
+    
+    // TODO: Free used resources
+    
+    cout << "SyncCFT closing" << endl;
+    exit(0);
+}
 
 int main (int argc, const char * argv[])
 {
@@ -103,6 +118,9 @@ int main (int argc, const char * argv[])
         cout << "No remote hosts defined." << endl;
         cout << "Starting in server mode." << endl;
     }
+    
+    // Add signal handler
+    signal (SIGINT, signalHandler);
     
     // Load a secret key
     unsigned char secretKey[64];
