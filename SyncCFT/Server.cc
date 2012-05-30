@@ -85,7 +85,7 @@ void* Server::handle(void* arg){
         if(Transceiver::recvMsg(handler->_socket, &msg, &cliAddr, SERVER_TIMEOUT_RECV)){
             
             //msg.printBytes();
-            //msg.printInfo();
+            msg.printInfo();
             
             //Server handles HELLO and QUIT messages
             if(msg.isHello()){  //Handle new handshake requests

