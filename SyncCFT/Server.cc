@@ -326,6 +326,16 @@ void Server::handshakeHandlerV2(Message* msg, sockaddr cliAddr){
     
     cout << "[SERVER] Handshake handler version 2 started" << endl;    
     
+    if(_version < 2){
+        //Send NACK if version 1 is not supported by the server
+        cout << "[SERVER] Connection refused: Version 2 not supported" << endl;
+        msg->incrSeqnum();
+        msg->setType(TYPE_NACK);
+        msg->clearPayload();
+        Transceiver::sendMsg(_socket, msg, &cliAddr, SERVER_TIMEOUT_SEND);
+        return;
+    }
+    
     //Hanshake is initiated
     if(msg->getType() == TYPE_HELLO){
         handshakeHandlerV2Hello(msg, cliAddr);
