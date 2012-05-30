@@ -156,8 +156,10 @@ void* Client::handle(void* arg)
             
             if((*iter).first || (*iter).timer.elapsed_s() >= CLIENT_REFRESH){
                 cout << "[CLIENT] Syncing with host " << (*iter).ip << endl;
+                
                 (*iter).first = false;  //Mark host as first time synced
                 bool success = handler->sessionHandler(*iter);
+                (*iter).timer.start();  //Reset timer
                 
                 //Remove temporary hosts
                 if(success && !(*iter).perm){
