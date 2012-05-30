@@ -419,7 +419,7 @@ bool Client::startSession(sockaddr servAddr){
 bool Client::endSession(sockaddr servAddr){
     
     int retries = CLIENT_QUIT_RETRIES;
-    while((retries--) > 0){
+    while((retries--) >= 0){
         cout << "[CLIENT] Trying to terminate session ..." << endl;
         
         if(terminateHandler(servAddr)){
