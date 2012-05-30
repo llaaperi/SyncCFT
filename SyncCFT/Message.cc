@@ -234,7 +234,7 @@ bool Message::parseFromBytes(const char* buffer, int len){
     }
     //Allocate memory for the payload and copy content from the buffer
     if(len > HEADER_SIZE){
-        _payloadLen = len - HEADER_SIZE;
+        //_payloadLen = len - HEADER_SIZE;
         _payload = (char*)malloc(_payloadLen + 1);
         memcpy(_payload, &buffer[HEADER_SIZE], _payloadLen);
         _payload[_payloadLen] = 0;  //Add terminating null
