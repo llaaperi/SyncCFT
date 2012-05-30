@@ -15,7 +15,7 @@
 #include "FileTransfer.hh"
 #include "Message.hh"
 #include "Timer.hh"
-#define SESSION_TIMEOUT 60 // Seconds
+#define SESSION_TIMEOUT 10 // Seconds
 #define SESSIONHANDLER_MAX_TRANSFERS 1
 
 using namespace std;

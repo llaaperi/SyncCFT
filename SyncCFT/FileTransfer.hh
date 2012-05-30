@@ -23,7 +23,7 @@
 #define FILE_TRANSFER_TYPE_CLIENT 0
 #define FILE_TRANSFER_TYPE_SERVER 1
 
-
+#define VERBOSE 0
 
 using namespace std;
 

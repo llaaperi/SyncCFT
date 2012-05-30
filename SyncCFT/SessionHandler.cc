@@ -76,13 +76,19 @@ bool SessionHandler::isValidMessage(const Message *msg){
     
     //Compare source address
     if(!isValidSource(msg)){
-        cout << "Invalid source address" << endl;
+        cout << "[SESSION] Invalid source address" << endl;
+        return false;
+    }
+    
+    //Compare id
+    if(msg->getClientID() != _id){
+        cout << "[SESSION] Invalid client ID" << endl;
         return false;
     }
     
     //Compare sequence number
     if((msg->getSeqnum() < _seqnum) && (msg->getSeqnum() > (_seqnum + (msg->getWindow() * 7)))){
-        cout << "Invalid sequence number" << endl;
+        cout << "[SESSION] Invalid sequence number" << endl;
         return false;
     }
     

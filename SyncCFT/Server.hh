@@ -21,7 +21,7 @@
 #define SERVER_TIMEOUT_SEND 5000
 #define SERVER_TIMEOUT_HELLOACK 5000
 
-#define SERVER_SESSION_HANDLERS 3 //Number of handlers can be defined. Maximum value is 256.
+#define SERVER_SESSION_HANDLERS 10 //Number of handlers can be defined. Maximum value is 256.
 
 extern list<string> _serverClients; //ip:port
 

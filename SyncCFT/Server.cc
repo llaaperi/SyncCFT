@@ -117,7 +117,7 @@ void* Server::handle(void* arg){
             }
         }else{
             cout << "[SERVER] Received invalid message" << endl;
-            msg.printInfo();
+            //msg.printInfo();
         }
     }
     return 0;
