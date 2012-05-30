@@ -43,7 +43,7 @@ int main (int argc, const char * argv[])
     string p = "-1.0";  //Init as not set
     string q = "-1.0";  //Init as not set
     string dir = "./Sync/";
-	int version = 0; // Support both protocol versions by default
+	int version = 2; // Support protocol 2 by default
     list<string> hosts;
     bool newSecret = false;
     
@@ -92,8 +92,8 @@ int main (int argc, const char * argv[])
                 break;
 			case 'v': // Protocol version
 				version = atoi(optarg);
-				if ((version < 0) || (version > 2) ) {
-					version = 0;
+				if ((version < 1) || (version > 2) ) {
+					version = 2;
 				}
                 cout << "Protocol version: " << version << endl;
                 break;
