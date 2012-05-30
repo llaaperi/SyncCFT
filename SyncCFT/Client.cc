@@ -384,24 +384,28 @@ bool Client::completeFileTransfer(Message* msg, bool first) {
  */
 bool Client::startSession(sockaddr servAddr){
     
-    bool started = false;
-    do{
+    int retries = CLIENT_HELLO_RETRIES;
+    while((retries--) > 0){
         cout << "[CLIENT] Trying to start session ..." << endl;
+        
+        bool started = false;
         if(_version == 1){
             started = handshakeHandlerV1(servAddr);
         }else{
             started = handshakeHandlerV2(servAddr);
         }
+        
         if(started){
             cout << "[CLIENT] Session started succesfully" << endl;
-        }else{
-            cout << "[CLIENT] Session start failed" << endl;
-            return false;
-            //cout << "[CLIENT] Session start failed, retrying in " << CLIENT_BACKOFF << " seconds" << endl;
-            //sleep(CLIENT_BACKOFF);
+            return true;
         }
-    }while(!started);
-    return true;
+        
+        if(retries > 0){
+            cout << "[CLIENT] Session start failed, retrying in " << CLIENT_BACKOFF << " seconds" << endl;
+            sleep(CLIENT_BACKOFF);
+        }
+    }
+    return false;
 }
 
 
@@ -411,24 +415,22 @@ bool Client::startSession(sockaddr servAddr){
  * @param servAddr Struct for storing server address info
  */
 bool Client::endSession(sockaddr servAddr){
+    
     int retries = CLIENT_QUIT_RETRIES;
-    bool terminated = false;
-    do{
+    while((retries--) > 0){
         cout << "[CLIENT] Trying to terminate session ..." << endl;
-        terminated = terminateHandler(servAddr);
-        if(terminated){
+        
+        if(terminateHandler(servAddr)){
             cout << "[CLIENT] Session terminated succesfully" << endl;
-        }else{
-            cout << "[CLIENT] Session terminated" << endl;
-            return false; //Do not retry termination even if server ack is lost
+            return true;
+        }
+        
+        if(retries > 0){
             cout << "[CLIENT] Session termination failed, retrying in " << CLIENT_BACKOFF << " seconds" << endl;
             sleep(CLIENT_BACKOFF);
         }
-        if ((retries--) <= 0) { // Retry quit CLIENT_QUIT_RETRIES times
-            return false;
-        }
-    }while(!terminated);
-    return true;
+    }
+    return false;
 }
 
 

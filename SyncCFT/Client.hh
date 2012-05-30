@@ -25,7 +25,8 @@
 #define CLIENT_TIMEOUT_FILE 5000
 
 #define CLIENT_CHUNK_RETRIES 5 // Max chunk retries
-#define CLIENT_QUIT_RETRIES 1 // Max quit retries
+#define CLIENT_HELLO_RETRIES 3 // Max hello retries
+#define CLIENT_QUIT_RETRIES 0 // Max quit retries
 // In seconds
 #define CLIENT_BACKOFF 5    //seconds, wait if hello fails
 #define CLIENT_REFRESH 10   //seconds, resync
