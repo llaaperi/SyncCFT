@@ -452,11 +452,13 @@ bool Client::handshakeHandlerV1(sockaddr servAddr){
     
     //Receive reply from the server
     if(!_trns->recv(&msg, CLIENT_TIMEOUT_HELLO)){
+        cout << "[CLIENT] Host unreachable" << endl;
         return false;
     }
     
     //Check that received HELLOACK
     if(msg.getType() != TYPE_ACK){
+        cout << "[CLIENT] Host refused connection" << endl;
         return false;
     }
     
@@ -499,11 +501,13 @@ bool Client::handshakeHandlerV2(sockaddr servAddr){
     
     //******************Receive reply from the server *************************
     if(!_trns->recv(&msg, CLIENT_TIMEOUT_HELLO)){
+        cout << "[CLIENT] Host unreachable" << endl;
         return false;
     }
     msg.printInfo();
     //Check that received HELLOACK with nonce
     if((msg.getType() != TYPE_ACK) || (msg.getPayloadLength() < 16)){
+        cout << "[CLIENT] Host refused connection" << endl;
         return false;
     }
     
@@ -538,6 +542,7 @@ bool Client::handshakeHandlerV2(sockaddr servAddr){
     
     //************** check server responce ****************
     if(!_trns->recv(&msg, CLIENT_TIMEOUT_HELLO)){
+        cout << "[CLIENT] Host unreachable" << endl;
         return false;
     }
     
