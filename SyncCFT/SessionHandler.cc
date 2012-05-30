@@ -99,7 +99,7 @@ bool SessionHandler::isValidMessage(const Message *msg){
         if(msg->getVersion() != 2){
             return false;
         }
-        cout << "[SESSION] Invalid MAC" << endl;
+        //cout << "[SESSION] Invalid MAC" << endl;
     }
     return true;
 }
