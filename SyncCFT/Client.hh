@@ -125,14 +125,16 @@ private:
     /**
      * Function tries to start session with a server.
      * @param servAddr Struct for storing server address info
+     * @return True if start was successfull and false if it failed.
      */
-    void startSession(sockaddr servAddr);
+    bool startSession(sockaddr servAddr);
     
     /**
      * Function terminates current session
      * @param servAddr Struct for storing server address info
+     * @return True if end was successfull and false if it failed.
      */
-    void endSession(sockaddr servAddr);
+    bool endSession(sockaddr servAddr);
     
     /**
      * HandshakeHandler function handles the HELLO handshake between client and

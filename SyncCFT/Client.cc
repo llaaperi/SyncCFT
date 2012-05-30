@@ -187,7 +187,9 @@ void Client::sessionHandler(Host h){
     _trns = &trans;
     
     //Try HELLO handshake
-    startSession(*sockAddr);
+    if(!startSession(*sockAddr)){
+        return;
+    }
     
     //Metafile handler
     MetaFile* diff = NULL;
@@ -376,7 +378,7 @@ bool Client::completeFileTransfer(Message* msg, bool first) {
  * Function tries to start session with a server.
  * @param servAddr Struct for storing server address info
  */
-void Client::startSession(sockaddr servAddr){
+bool Client::startSession(sockaddr servAddr){
     
     bool started = false;
     do{
@@ -390,11 +392,12 @@ void Client::startSession(sockaddr servAddr){
             cout << "[CLIENT] Session started succesfully" << endl;
         }else{
             cout << "[CLIENT] Session start failed" << endl;
-            return;
+            return false;
             //cout << "[CLIENT] Session start failed, retrying in " << CLIENT_BACKOFF << " seconds" << endl;
             //sleep(CLIENT_BACKOFF);
         }
     }while(!started);
+    return true;
 }
 
 
@@ -403,7 +406,7 @@ void Client::startSession(sockaddr servAddr){
  * Function terminates current session
  * @param servAddr Struct for storing server address info
  */
-void Client::endSession(sockaddr servAddr){
+bool Client::endSession(sockaddr servAddr){
     int retries = CLIENT_QUIT_RETRIES;
     bool terminated = false;
     do{
@@ -413,14 +416,15 @@ void Client::endSession(sockaddr servAddr){
             cout << "[CLIENT] Session terminated succesfully" << endl;
         }else{
             cout << "[CLIENT] Session terminated" << endl;
-            return; //Do not retry termination even if server ack is lost
+            return false; //Do not retry termination even if server ack is lost
             cout << "[CLIENT] Session termination failed, retrying in " << CLIENT_BACKOFF << " seconds" << endl;
             sleep(CLIENT_BACKOFF);
         }
         if ((retries--) <= 0) { // Retry quit CLIENT_QUIT_RETRIES times
-            return;
+            return false;
         }
     }while(!terminated);
+    return true;
 }
 
 
