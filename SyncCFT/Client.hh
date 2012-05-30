@@ -41,6 +41,7 @@ struct Host {
     string port;
     struct addrinfo* serverInfo;
     bool perm;  //Permanent host (from command line)
+    Timer timer;    //Timer from the last resfresh
 };
 
 class Client {

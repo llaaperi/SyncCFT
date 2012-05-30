@@ -95,6 +95,7 @@ void Client::addHost(string addr, string port, bool permanent){
     newHost.perm = permanent;   //Set host type
     newHost.ip = addr;
     newHost.port = port;
+    newHost.timer.start();  //Start timer
     
     // Find out server address
     // TODO: Currently supports only one server
@@ -151,7 +152,11 @@ void* Client::handle(void* arg)
         
         list<Host>::iterator iter;
         for(iter = handler->_hosts.begin(); iter != handler->_hosts.end(); iter++){
-            handler->sessionHandler(*iter);
+            
+            if((*iter).timer.elapsed_s() >= CLIENT_REFRESH){
+                cout << "[CLIENT] Syncing with host " << (*iter).ip << endl;
+                handler->sessionHandler(*iter);
+            }
             
             //Remove temporary hosts
             if(!(*iter).perm){
@@ -159,10 +164,7 @@ void* Client::handle(void* arg)
                 handler->_hosts.erase(iter);
             }
         }
-		
-        
-        
-        sleep(CLIENT_REFRESH);
+        //sleep(CLIENT_REFRESH);
     }
     handler->_running = false;
     handler->_finished = true;
@@ -387,8 +389,10 @@ void Client::startSession(sockaddr servAddr){
         if(started){
             cout << "[CLIENT] Session started succesfully" << endl;
         }else{
-            cout << "[CLIENT] Session start failed, retrying in " << CLIENT_BACKOFF << " seconds" << endl;
-            sleep(CLIENT_BACKOFF);
+            cout << "[CLIENT] Session start failed" << endl;
+            return;
+            //cout << "[CLIENT] Session start failed, retrying in " << CLIENT_BACKOFF << " seconds" << endl;
+            //sleep(CLIENT_BACKOFF);
         }
     }while(!started);
 }
