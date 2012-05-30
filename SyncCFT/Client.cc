@@ -285,7 +285,7 @@ void Client::fileTransfer(sockaddr servAddr, MetaFile* diff){
         char buf[NETWORKING_MTU];
         sprintf(buf, "%s;%d-%d", e.getName().c_str(), 0, 0);
         msg.setPayload(buf, (int)strlen(buf));
-        msg.printInfo();
+        //msg.printInfo();
         if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
             cout << "[CLIENT] Unable to send GET" << endl;
             return;
@@ -368,11 +368,13 @@ bool Client::completeFileTransfer(Message* msg, bool first) {
         if (timeout < 100) { // Set minimum timeout value
             timeout = 100;
         }
-        cout << "[CLIENT] Inter-arrival time (ms): " << ms << endl;
+        //cout << "[CLIENT] Inter-arrival time (ms): " << ms << endl;
         
         tmr.start();
         
-        cout << "[CLIENT] Received file message from Chunk: " << msg->getChunk() << ", Seqnum: " << msg->getSeqnum() << ", Size: " << msg->getPayloadLength() << ", Window size: " << msg->getWindow() << endl;
+        if(1){
+            cout << "[CLIENT] Received file message from Chunk: " << msg->getChunk() << ", Seqnum: " << msg->getSeqnum() << ", Size: " << msg->getPayloadLength() << ", Window size: " << msg->getWindow() << endl;
+        }
         ready = _fFlow->recvFile(msg);
         first = false;
     }
