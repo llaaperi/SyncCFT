@@ -27,8 +27,8 @@
 #define CLIENT_CHUNK_RETRIES 5 // Max chunk retries
 #define CLIENT_QUIT_RETRIES 1 // Max quit retries
 // In seconds
-#define CLIENT_BACKOFF 2 
-#define CLIENT_REFRESH 10
+#define CLIENT_BACKOFF 5    //seconds, wait if hello fails
+#define CLIENT_REFRESH 10   //seconds, resync
 
 
 using namespace std;
