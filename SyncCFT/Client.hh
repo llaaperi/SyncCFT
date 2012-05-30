@@ -42,6 +42,7 @@ struct Host {
     struct addrinfo* serverInfo;
     bool perm;  //Permanent host (from command line)
     Timer timer;    //Timer from the last resfresh
+    bool first;    //Is this first sync time
 };
 
 class Client {
@@ -120,7 +121,7 @@ private:
      * Handles a session with a single host
      * @param h Target host
      */
-    void sessionHandler(Host h);
+    bool sessionHandler(Host h);
     
     /**
      * Function tries to start session with a server.

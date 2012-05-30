@@ -96,6 +96,7 @@ void Client::addHost(string addr, string port, bool permanent){
     newHost.ip = addr;
     newHost.port = port;
     newHost.timer.start();  //Start timer
+    newHost.first = true;
     
     // Find out server address
     // TODO: Currently supports only one server
@@ -153,18 +154,19 @@ void* Client::handle(void* arg)
         list<Host>::iterator iter;
         for(iter = handler->_hosts.begin(); iter != handler->_hosts.end(); iter++){
             
-            if((*iter).timer.elapsed_s() >= CLIENT_REFRESH){
+            if((*iter).first || (*iter).timer.elapsed_s() >= CLIENT_REFRESH){
                 cout << "[CLIENT] Syncing with host " << (*iter).ip << endl;
-                handler->sessionHandler(*iter);
-            }
-            
-            //Remove temporary hosts
-            if(!(*iter).perm){
-                cout << "[CLIENT] Removing temporary host " << (*iter).ip << endl;
-                handler->_hosts.erase(iter);
+                (*iter).first = false;  //Mark host as first time synced
+                bool success = handler->sessionHandler(*iter);
+                
+                //Remove temporary hosts
+                if(success && !(*iter).perm){
+                    cout << "[CLIENT] Removing temporary host " << (*iter).ip << endl;
+                    handler->_hosts.erase(iter);
+                }
             }
         }
-        //sleep(CLIENT_REFRESH);
+        sleep(1);
     }
     handler->_running = false;
     handler->_finished = true;
@@ -177,7 +179,7 @@ void* Client::handle(void* arg)
  * Handles a session with a single host
  * @param h Target host
  */
-void Client::sessionHandler(Host h){
+bool Client::sessionHandler(Host h){
     
     cout << "[CLIENT] New session with host " << h.ip << endl;
     
@@ -188,7 +190,7 @@ void Client::sessionHandler(Host h){
     
     //Try HELLO handshake
     if(!startSession(*sockAddr)){
-        return;
+        return false;
     }
     
     //Metafile handler
@@ -201,7 +203,7 @@ void Client::sessionHandler(Host h){
     }
     
     //Terminate session
-    endSession(*sockAddr);
+    return endSession(*sockAddr);
 }
 
 
