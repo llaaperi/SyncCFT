@@ -50,7 +50,7 @@ FileTransfer::FileTransfer(Transceiver* trns, Element file, uint32_t chunkBegin,
     
     if (type == FILE_TRANSFER_TYPE_CLIENT) {
         //Open temp file for writing
-        string fName = _element.getName() + ".tmp";
+        string fName = "." + _element.getName();
         _file = fopen((_syncDir + fName).c_str(), "w");  //w or a
     } else {
         // Open file for reading
@@ -195,7 +195,7 @@ bool FileTransfer::recvFile(const Message* msg){
 bool FileTransfer::fileFinish(){
     fclose(_file); // Close output file
     string fileHash;
-    string tmpName = _element.getName() + ".tmp"; 
+    string tmpName = "." + _element.getName(); 
     if(!Utilities::MD5Hash(_syncDir + tmpName, fileHash)){
         cout << "[TRANSFER] File " << tmpName << " not found" << endl;
         return false;

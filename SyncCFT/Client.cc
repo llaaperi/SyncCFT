@@ -205,7 +205,9 @@ bool Client::sessionHandler(Host h){
     }
     
     //Terminate session
-    return endSession(*sockAddr);
+    endSession(*sockAddr);
+    
+    return true;
 }
 
 
