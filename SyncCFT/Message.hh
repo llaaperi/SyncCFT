@@ -85,6 +85,7 @@ public:
     void setQuit(bool b){_quit = b;}
     void setFirst(bool b){_begin = b;}
     void setLast(bool b){_end = b;}
+    void setMac(const unsigned char* mac);
     
     /**
      * Set message payload. Overwrites existing payload.

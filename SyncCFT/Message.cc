@@ -149,6 +149,18 @@ void Message::clear(){
 
 
 /**
+ * Copy MAC to the message attribute.
+ * @param valid mac for this message
+ */
+void Message::setMac(const unsigned char* mac){
+    
+    if(mac != NULL){
+        memcpy(_mac, mac, MESSAGE_MAC_SIZE);
+    }
+}
+
+
+/**
  * Set message payload. Overwrites existing payload.
  * @param payload New message payload
  * @param length Payload lentgth
@@ -287,11 +299,9 @@ void Message::parseToBytes(char* buffer) const {
         memcpy(&buffer[HEADER_SIZE], _payload, _payloadLen);
     }
     
-    //Add MAC
+    //Copu MAC to the end
     if(_version == 2){
-        unsigned char hash[HASH_LENGTH];
-        Utilities::SHA256Hash(hash, (unsigned char*)buffer, HEADER_SIZE + _payloadLen);
-        memcpy(&buffer[HEADER_SIZE + _payloadLen], hash, MESSAGE_MAC_SIZE);
+        memcpy(&buffer[HEADER_SIZE + _payloadLen], _mac, MESSAGE_MAC_SIZE);
     }
 }
 

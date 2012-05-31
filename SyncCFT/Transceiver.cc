@@ -35,7 +35,24 @@ Transceiver::Transceiver(int socket, struct sockaddr cliAddr, const unsigned cha
  * @param timeout Time in milliseconds
  * @return True if message was sent successfully, 
  *  false if send failed or timeouted
- */bool Transceiver::send(Message* msg, int timeout){
+ */
+bool Transceiver::send(Message* msg, int timeout){
+    
+    //Add valid MAC for the message is version 2 is used
+    if(_version == 2){
+        
+        char buffer[NETWORKING_MTU];
+        memset(buffer, 0, NETWORKING_MTU);
+        
+        msg->parseToBytes(buffer);
+        int pktLen = HEADER_SIZE + msg->getPayloadLength();
+        memcpy(&buffer[pktLen], _key, MESSAGE_MAC_SIZE);    //Copy key to the mac
+        
+        unsigned char hash[HASH_LENGTH];
+        Utilities::SHA256Hash(hash, (unsigned char*)buffer, pktLen + MESSAGE_MAC_SIZE);
+        msg->setMac(hash);
+    }
+     
     return sendMsg(_socket, msg, &_cliAddr, timeout);
 }
 
