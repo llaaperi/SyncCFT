@@ -1,1 +1,20 @@
-This is readme file.
+*** SyncCFT ***
+
+SyncCFT is used to synchronize the contents of a selected folder between other connected application users. The synchronization is limited to this single folder and the subfolders are not synchronized. The application can sync with multiple different parties.
+
+
+** Usage **
+
+synccft [-c <client port>] [-s <server port>] [-p <p>] [-q <q>] [-k] [-d <dir>] [-v <version>] <hosts>
+	-c: Client port
+	-s: Server port
+	-p: Markov P loss probability
+	-q: Markov Q loss probability
+	-k: Generate new secret key
+	-d: Sync directory
+	-v: Protocol version
+	
+
+-Example:
+./synccft -d /Users/JohnDoe/Desktop/Sync --version 2 86.50.134.32
+- Where 86.50.134.32 is another SyncCFT node and the synced directory is /Users/JohnDoe/Desktop/Sync
