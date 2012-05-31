@@ -98,6 +98,23 @@ bool SessionHandler::isValidMessage(const Message *msg){
         //Must be v2 if key exists
         if(msg->getVersion() != 2){
             cout << "[SESSION] Invalid message version" << endl;
+            //msg->printInfo();
+            return false;
+        }
+        
+        //Check MAC
+        char buffer[NETWORKING_MTU];
+        memset(buffer, 0, NETWORKING_MTU);
+        
+        msg->parseToBytes(buffer);
+        int pktLen = HEADER_SIZE + msg->getPayloadLength();
+        memcpy(&buffer[pktLen], _sessionKey, MESSAGE_MAC_SIZE);    //Copy key to the mac
+        
+        unsigned char hash[HASH_LENGTH];
+        Utilities::SHA256Hash(hash, (unsigned char*)buffer, pktLen + MESSAGE_MAC_SIZE);
+        
+        if(memcmp(hash, msg->getMAC(), MESSAGE_MAC_SIZE)){
+            cout << "[SESSION] Invalid MAC" << endl;
             return false;
         }
     }

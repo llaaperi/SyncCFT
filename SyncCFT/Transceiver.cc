@@ -51,6 +51,8 @@ bool Transceiver::send(Message* msg, int timeout){
         unsigned char hash[HASH_LENGTH];
         Utilities::SHA256Hash(hash, (unsigned char*)buffer, pktLen + MESSAGE_MAC_SIZE);
         msg->setMac(hash);
+        
+        //msg->printInfo();
     }
      
     return sendMsg(_socket, msg, &_cliAddr, timeout);
@@ -96,7 +98,6 @@ bool Transceiver::recv(Message* msg, int timeout){
             cout << "[TRANS] Invalid MAC" << endl;
         }
     }
-    
     return true;
 }
 
