@@ -70,7 +70,7 @@ public:
     uint32_t getChunk() const {return _chunk;}
     const char* getPayload() const {return _payload;}
     const sockaddr* getAddr() const {return &_addrInfo;}
-	const unsigned char* getMAC(){return _mac;}
+	const unsigned char* getMAC() const {return _mac;}
     
     // Setters
     void setVersion(uint8_t v){_version = v;}
