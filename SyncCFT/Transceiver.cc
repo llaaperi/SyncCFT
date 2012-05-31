@@ -39,7 +39,7 @@ Transceiver::Transceiver(int socket, struct sockaddr cliAddr, const unsigned cha
 bool Transceiver::send(Message* msg, int timeout){
     
     //Add valid MAC for the message is version 2 is used
-    if(_version == 2){
+    if(_version == 2 && !msg->isHello()){
         
         char buffer[NETWORKING_MTU];
         memset(buffer, 0, NETWORKING_MTU);
@@ -51,6 +51,7 @@ bool Transceiver::send(Message* msg, int timeout){
         unsigned char hash[HASH_LENGTH];
         Utilities::SHA256Hash(hash, (unsigned char*)buffer, pktLen + MESSAGE_MAC_SIZE);
         msg->setMac(hash);
+		//msg->printInfo();
     }
      
     return sendMsg(_socket, msg, &_cliAddr, timeout);
@@ -80,7 +81,7 @@ bool Transceiver::recv(Message* msg, int timeout){
     }
     
     //Check MAC
-    if(_version == 2){
+    if(_version == 2 && !msg->isHello()){
         
         char buffer[NETWORKING_MTU];
         memset(buffer, 0, NETWORKING_MTU);
@@ -94,6 +95,7 @@ bool Transceiver::recv(Message* msg, int timeout){
         
         if(memcmp(hash, msg->getMAC(), MESSAGE_MAC_SIZE)){
             cout << "[TRANS] Invalid MAC" << endl;
+			return false;
         }
     }
     

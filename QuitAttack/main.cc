@@ -126,15 +126,18 @@ int main (int argc, const char * argv[]){
 	host.push_back(target);
 	
 	// Start client first
-    Client* clientHandler = NULL;
-	try {
-		clientHandler = new Client(host, clientPort, serverPort, version, NULL);
-		clientHandler->start();
-		clientHandler->stop();
-	} catch (...) {
-		cout << "Creating client handler failed." << endl;
-		return 0;
+	Client* clientHandler = NULL;
+
+	for (int i = 0; i < 20; i++) {
+		try {
+			clientHandler = new Client(host, clientPort, serverPort, version, NULL);
+			clientHandler->start();
+		} catch (...) {
+			cout << "Creating client handler failed." << endl;
+			return 0;
+		}
 	}
+	
 	
 	while(true){
         sleep(1);

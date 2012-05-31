@@ -187,8 +187,8 @@ bool Client::sessionHandler(Host h){
     
     sockaddr* sockAddr = h.serverInfo->ai_addr;
     
-    Transceiver trans(_socket, *sockAddr, _sessionKey, _version);
-    _trns = &trans;
+    //Transceiver trans(_socket, *sockAddr, _sessionKey, _version);
+    //_trns = &trans;
     
     //Try HELLO handshake
     if(!startSession(*sockAddr)){
@@ -454,12 +454,12 @@ bool Client::handshakeHandlerV1(sockaddr servAddr){
     //Send HELLO message
     msg.initHeader(_version, TYPE_HELLO);
     
-    if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
+    if(!_trns->sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_SEND)){
         return false;
     }
     
     //Receive reply from the server
-    if(!_trns->recv(&msg, CLIENT_TIMEOUT_HELLO)){
+    if(!_trns->recvMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_HELLO)){
         cout << "[CLIENT] Host unreachable" << endl;
         return false;
     }
@@ -478,8 +478,10 @@ bool Client::handshakeHandlerV1(sockaddr servAddr){
     msg.incrSeqnum();
     msg.setPayload(NULL, 0);
     msg.setHello(true);
+	
+	_trns = new Transceiver(_socket, servAddr, NULL, _version);
     _trns->send(&msg, CLIENT_TIMEOUT_HELLO);
-    
+	
     return true;
 }
 
@@ -503,12 +505,12 @@ bool Client::handshakeHandlerV2(sockaddr servAddr){
     msg.printInfo();
     Utilities::randomBytes(cNonce, 16);
     msg.setPayload((char*)cNonce, 16);
-    if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
+    if(!_trns->sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_SEND)){
         return false;
     }
     
     //******************Receive reply from the server *************************
-    if(!_trns->recv(&msg, CLIENT_TIMEOUT_HELLO)){
+    if(!_trns->recvMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_HELLO)){
         cout << "[CLIENT] Host unreachable" << endl;
         return false;
     }
@@ -543,13 +545,13 @@ bool Client::handshakeHandlerV2(sockaddr servAddr){
     msg.incrSeqnum();
     msg.setPayload((char*)hash, HASH_LENGTH);
     msg.setHello(true);
-    if(!_trns->send(&msg, CLIENT_TIMEOUT_SEND)){
+    if(!_trns->sendMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_SEND)){
         return false;
     }
 	//msg.printInfo();
     
     //************** check server responce ****************
-    if(!_trns->recv(&msg, CLIENT_TIMEOUT_HELLO)){
+    if(!_trns->recvMsg(_socket, &msg, &servAddr, CLIENT_TIMEOUT_HELLO)){
         cout << "[CLIENT] Host unreachable" << endl;
         return false;
     }
@@ -576,7 +578,9 @@ bool Client::handshakeHandlerV2(sockaddr servAddr){
     cout << "[CLIENT] Handshake finished: session key=";
     Utilities::printBytes(_sessionKey, HASH_LENGTH);
     cout << endl;
-    
+	
+	_trns = new Transceiver(_socket, servAddr, _sessionKey, _version);
+
     return true;
 }
 

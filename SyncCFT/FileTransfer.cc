@@ -283,6 +283,7 @@ bool FileTransfer::recvFinish(){
     Message reply(*last);
     reply.setType(TYPE_ACK);
     reply.setLast(false);
+	reply.setVersion(_trns->getVersion());
     reply.setWindow(_window + 1);    //Increment window size after successfull window reception
     reply.setSeqnum(last->getSeqnum());
     reply.setChunk(last->getChunk());
@@ -319,6 +320,7 @@ void FileTransfer::recvTimeout(const Message *msg){
     reply.setType(TYPE_ACK);
     reply.setFirst(false);
     reply.setLast(false);
+	reply.setVersion(_trns->getVersion());
     reply.setSeqnum(_seqCurrent);
     reply.setChunk(_chunkCurrent);
     
