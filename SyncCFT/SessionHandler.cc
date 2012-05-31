@@ -97,9 +97,9 @@ bool SessionHandler::isValidMessage(const Message *msg){
         
         //Must be v2 if key exists
         if(msg->getVersion() != 2){
+            cout << "[SESSION] Invalid message version" << endl;
             return false;
         }
-        //cout << "[SESSION] Invalid MAC" << endl;
     }
     return true;
 }

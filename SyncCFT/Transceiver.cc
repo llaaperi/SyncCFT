@@ -70,12 +70,33 @@ bool Transceiver::recv(Message* msg, int timeout){
     
     //Receive valid message
     if(!recvMsg(_socket, msg, &srcAddr, timeout)){
+        cout << "[TRANS] Invalid message" << endl;
         return false;
     }
     //Check source
     if(!Networking::cmpAddr(&srcAddr, &_cliAddr)){
+        cout << "[TRANS] Invalid source" << endl;
         return false;
     }
+    
+    //Check MAC
+    if(_version == 2){
+        
+        char buffer[NETWORKING_MTU];
+        memset(buffer, 0, NETWORKING_MTU);
+        
+        msg->parseToBytes(buffer);
+        int pktLen = HEADER_SIZE + msg->getPayloadLength();
+        memcpy(&buffer[pktLen], _key, MESSAGE_MAC_SIZE);    //Copy key to the mac
+        
+        unsigned char hash[HASH_LENGTH];
+        Utilities::SHA256Hash(hash, (unsigned char*)buffer, pktLen + MESSAGE_MAC_SIZE);
+        
+        if(memcmp(hash, msg->getMAC(), MESSAGE_MAC_SIZE)){
+            cout << "[TRANS] Invalid MAC" << endl;
+        }
+    }
+    
     return true;
 }
 
